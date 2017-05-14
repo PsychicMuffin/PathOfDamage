@@ -1,0 +1,63 @@
+body {
+    padding: 10px 15px;
+    display: flex;
+}
+
+div.input {
+    width: calc(100% - 17em);
+}
+
+div.damageTable {
+    position: fixed;
+    right: 0;
+    width: 17em;
+}
+
+.form-control, .input-group-addon {
+    padding: 5px;
+}
+
+input.form-control {
+    width: auto;
+    display: inline-block;
+}
+
+input#armor {
+    width: 5em;
+}
+
+input#charges, input#resistance {
+    width: 2.5em;
+}
+
+.table {
+    width: auto;
+    margin-bottom: auto;
+}
+
+.table > tbody > tr > td {
+    vertical-align: middle;
+    border-top: inherit;
+}
+
+.table td.name > input {
+    width: 10em;
+}
+
+.table td.percent > * {
+    width: 4em;
+    text-align: right;
+}
+
+.table td > input#flatTaken {
+    width: 2.75em;
+}
+
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+input[type='number'] {
+    -moz-appearance: textfield;
+}
