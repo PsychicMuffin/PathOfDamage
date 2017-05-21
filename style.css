@@ -24,6 +24,7 @@ input.form-control {
 
 input#armor {
     width: 5em;
+    margin-right: 2em;
 }
 
 input#charges, input#resistance {
