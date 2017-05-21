@@ -10,184 +10,56 @@
 </head>
 <body ng-controller="Damage">
 <div class="input">
-  <h4>Monster Modifications<br>
-    <small>
-      <i>These are things that directly change a monster's damage before they attack, such as map mods or curses</i>
-    </small>
-  </h4>
-  <table class="table table-condensed">
-    <tr ng-repeat="modifier in buffs.values">
-      <td class="enabled">
-        <input type="checkbox" ng-model="modifier.enabled" ng-change="updateTotal(buffs)" title="">
-      </td>
-      <td class="name">
-        <input class="form-control input-sm" type="text" placeholder="Buff Name" ng-model="modifier.name"
-               ng-change="add(buffs)" ng-model-options="{debounce: 500}">
-      </td>
-      <td class="percent">
-        <div class="input-group">
-          <input class="form-control input-sm" type="number" placeholder="+/-" ng-model="modifier.value"
-                 ng-change="add(buffs)" ng-model-options="{debounce: 500}">
-          <div class="input-group-addon">%</div>
-        </div>
-      </td>
-      <td>
-        <button class="btn btn-danger btn-sm" ng-click="delete(buffs, $index)">Delete</button>
-      </td>
-    </tr>
-  </table>
-  <h5><b>Total Monster Buffs: {{buffs.total}}%</b></h5>
-  <hr>
+  <div class="section" ng-repeat="(sectionName, section) in sections">
+    <h4>{{section.name}}<br>
+      <small><i>{{section.description}}</i></small>
+    </h4>
 
-  <h4>Damage Shifts<br>
-    <small>
-      <i>Modifiers that shift one damage type to another, typically reading like "#% of X Damage taken as Y", such as
-        Taste of Hate or Lightning Coil</i>
-    </small>
-  </h4>
-  <table class="table table-condensed">
-    <tr ng-repeat="modifier in shifts.values">
-      <td class="enabled">
-        <input type="checkbox" ng-model="modifier.enabled" title="">
-      </td>
-      <td class="name">
-        <input class="form-control input-sm" type="text" placeholder="Shift Name" ng-model="modifier.name"
-               ng-change="add(shifts)" ng-model-options="{debounce: 500}">
-      </td>
-      <td class="percent">
-        <div class="input-group">
-          <input class="form-control input-sm" type="number" placeholder="+/-" ng-model="modifier.value"
-                 ng-change="add(shifts)" ng-model-options="{debounce: 500}">
-          <div class="input-group-addon">%</div>
-        </div>
-      </td>
-      <td>
-        <button class="btn btn-danger btn-sm" ng-click="delete(shifts, $index)">Delete</button>
-      </td>
-    </tr>
-  </table>
-  <h5><b>Total Damage Shifts: {{shifts.total}}%</b></h5>
-  <hr>
+    <label ng-if="section.armor !== undefined" class="control-label">Armor:
+      <input class="form-control input-sm" type="number" ng-model="section.armor" ng-model-options="{debounce: 500}"
+             id="armor">
+    </label>
 
-  <h4>Damage Mitigation<br>
-    <small>
-      <i>Elemental and chaos damage is mitigated by its respective resistance. Physical damage is mitigated by the sum
-        of
-        all "#% additional Physical Damage Reduction" modifiers, up to its 90% cap. This includes armor, endurance
-        charges, and things like Basalt Flasks and Chaos Golem.</i>
-    </small>
-  </h4>
-  <label class="control-label">
-    Armor: <input class="form-control input-sm" type="number" ng-model="armor" ng-model-options="{debounce: 500}"
-                  id="armor">
-  </label>
-  &nbsp&nbsp&nbsp&nbsp
-  <label class="control-label">
-    Endurance Charges: <input class="form-control input-sm" type="number" ng-model="charges"
-                              ng-model-options="{debounce: 500}" id="charges">
-  </label>
-  <table class="table table-condensed">
-    <tr ng-repeat="modifier in damageReductions.values">
-      <td class="enabled">
-        <input type="checkbox" ng-model="modifier.enabled" title="">
-      </td>
-      <td class="name">
-        <input class="form-control input-sm" type="text" placeholder="Reduction Name" ng-model="modifier.name"
-               ng-change="add(damageReductions)" ng-model-options="{debounce: 500}">
-      </td>
-      <td class="percent">
-        <div class="input-group">
-          <input class="form-control input-sm" type="number" placeholder="+/-" ng-model="modifier.value"
-                 ng-change="add(damageReductions)" ng-model-options="{debounce: 500}">
-          <div class="input-group-addon">%</div>
-        </div>
-      </td>
-      <td>
-        <button class="btn btn-danger btn-sm" ng-click="delete(damageReductions, $index)">Delete</button>
-      </td>
-    </tr>
-  </table>
-  <h5><b>Total Additional Physical Damage Reduction: {{damageReductions.total}}%</b></h5>
-  <hr>
+    <label ng-if="section.charges !== undefined" class="control-label">Endurance Charges:
+      <input class="form-control input-sm" type="number" ng-model="section.charges" ng-model-options="{debounce: 500}"
+             id="charges">
+    </label>
 
-  <h4>Damage Taken<br>
-    <small>
-      <i>After damage mitigation, modifiers to damage taken are applied. Flat amounts (±# X Damage taken from Y, like
-        in Astramentis) are applied first, then the sum of all increases/reductions (#% increased/reduced X Damage
-        taken, like Fortify, Shock, and Abyssus) and lastly more/less multipliers (#% more/less X Damage taken,
-        like Arctic Armour).</i>
-    </small>
-  </h4>
-  <table class="table table-condensed">
-    <tr ng-repeat="modifier in flatTaken.values">
-      <td class="enabled">
-        <input type="checkbox" ng-model="modifier.enabled" title="">
-      </td>
-      <td class="name">
-        <input class="form-control input-sm" type="text" placeholder="Flat Reduction" ng-model="modifier.name"
-               ng-change="add(flatTaken)" ng-model-options="{debounce: 500}">
-      </td>
-      <td class="percent">
-        <input class="form-control input-sm" type="number" placeholder="+/-" ng-model="modifier.value"
-               ng-change="add(flatTaken)" ng-model-options="{debounce: 500}" id="flatTaken">
-      </td>
-      <td>
-        <button class="btn btn-danger btn-sm" ng-click="delete(flatTaken, $index)">Delete</button>
-      </td>
-    </tr>
-  </table>
-  <h5><b>Total Flat Reductions: {{flatTaken.total}}</b></h5>
-  <hr>
-  <table class="table table-condensed">
-    <tr ng-repeat="modifier in reducedTaken.values">
-      <td class="enabled">
-        <input type="checkbox" ng-model="modifier.enabled" title="">
-      </td>
-      <td class="name">
-        <input class="form-control input-sm" type="text" placeholder="Reduced Taken" ng-model="modifier.name"
-               ng-change="add(reducedTaken)" ng-model-options="{debounce: 500}">
-      </td>
-      <td class="percent">
-        <div class="input-group">
-          <input class="form-control input-sm" type="number" placeholder="+/-" ng-model="modifier.value"
-                 ng-change="add(reducedTaken)" ng-model-options="{debounce: 500}">
-          <div class="input-group-addon">%</div>
-        </div>
-      </td>
-      <td>
-        <button class="btn btn-danger btn-sm" ng-click="delete(reducedTaken, $index)">Delete</button>
-      </td>
-    </tr>
-  </table>
-  <h5><b>Total Reduced Damage Taken: {{reducedTaken.total}}%</b></h5>
-  <hr>
-  <table class="table table-condensed">
-    <tr ng-repeat="modifier in lessTaken.values">
-      <td class="enabled">
-        <input type="checkbox" ng-model="modifier.enabled" title="">
-      </td>
-      <td class="name">
-        <input class="form-control input-sm" type="text" placeholder="Less Taken" ng-model="modifier.name"
-               ng-change="add(lessTaken)" ng-model-options="{debounce: 500}">
-      </td>
-      <td class="percent">
-        <div class="input-group">
-          <input class="form-control input-sm" type="number" placeholder="+/-" ng-model="modifier.value"
-                 ng-change="add(lessTaken)" ng-model-options="{debounce: 500}">
-          <div class="input-group-addon">%</div>
-        </div>
-      </td>
-      <td>
-        <button class="btn btn-danger btn-sm" ng-click="delete(lessTaken, $index)">Delete</button>
-      </td>
-    </tr>
-  </table>
+    <table class="table table-condensed" ng-repeat-start="(tableName, table) in section.tables">
+      <tr ng-repeat="value in table.values">
+        <td>
+          <input type="checkbox" ng-model="value.enabled" ng-change="updateTotal(table)">
+        </td>
+        <td class="name">
+          <input class="form-control input-sm" type="text" placeholder={{table.placeholder}} ng-model="value.name"
+                 ng-change="add(table)" ng-model-options="{debounce: 500}">
+        </td>
+        <td class="percent">
+          <div class="input-group">
+            <input class="form-control input-sm" type="number" placeholder="+/-" ng-model="value.value"
+                   ng-change="add(table)" ng-model-options="{debounce: 500}" ng-attr-id="{{tableName}}">
+            <div ng-if="tableName !== 'flat'" class="input-group-addon">%</div>
+          </div>
+        </td>
+        <td ng-if="!$last">
+          <button class="btn btn-danger btn-sm" ng-click="delete(table, $index)">Delete</button>
+        </td>
+      </tr>
+    </table>
+
+    <h5 ng-if="table.total !== undefined">
+      <b>Total {{table.totalName}}: {{table.total}}{{tableName !== 'flat' ? '%' : ''}}</b>
+    </h5>
+    <hr ng-repeat-end>
+  </div>
 </div>
+
 <div class="damageTable">
-  <label class="control-label">
-    Elemental Resistance: <input class="form-control input-sm" type="number" ng-model="resistance"
-                          ng-model-options="{debounce: 500}" id="resistance">
+  <label class="control-label">Elemental Resistance:
+    <input class="form-control input-sm" type="number" ng-model="resistance" ng-model-options="{debounce: 500}"
+           id="resistance">
   </label>
+
   <table class="table table-bordered table-striped">
     <tr>
       <th>Physical Hit</th>
