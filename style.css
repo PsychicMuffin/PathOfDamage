@@ -6,6 +6,7 @@
     background: #07889B;
     color: #FFF;
 }
+
 .title {
     font-size: 30px;
 }
@@ -18,7 +19,7 @@ div.input {
 div.damageTable {
     position: fixed;
     right: 10px;
-    top: 130px;
+    top: 90px;
     width: 17em;
 }
 
@@ -87,6 +88,6 @@ input[type='number'] {
     border-top: 1px solid #B2DCDF ;
 }
 
-.damageTable .table-striped>tbody>tr:nth-of-type(odd) {
+.damageTable .table-striped > tbody > tr:nth-of-type(odd) {
     background-color: #F3FAFA;
 }

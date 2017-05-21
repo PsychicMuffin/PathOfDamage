@@ -10,56 +10,56 @@
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico"/>
 </head>
 <body ng-controller="Damage">
-  <div class="background">
-    <div class="header">
-      <div class="title">Path of Damage</div>
-      <div>The Path of Exile physical hit damage calculator</div>
-    </div>
-    <div class="input">
-      <div class="section" ng-repeat="(sectionName, section) in sections">
-        <h4>{{section.name}}<br>
-          <small><i>{{section.description}}</i></small>
-        </h4>
+<div class="background">
+  <div class="header">
+    <div class="title">Path of Damage</div>
+    <div>The Path of Exile physical hit damage calculator</div>
+  </div>
+  <div class="input">
+    <div class="section" ng-repeat="(sectionName, section) in sections">
+      <h4>{{section.name}}<br>
+        <small><i>{{section.description}}</i></small>
+      </h4>
 
-        <label ng-if="section.armor !== undefined" class="control-label">Armor:
-          <input class="form-control input-sm" type="number" ng-model="section.armor" ng-model-options="{debounce: 500}"
-                 id="armor">
-        </label>
+      <label ng-if="section.armor !== undefined" class="control-label">Armor:
+        <input class="form-control input-sm" type="number" ng-model="section.armor" ng-model-options="{debounce: 500}"
+               id="armor">
+      </label>
 
-        <label ng-if="section.charges !== undefined" class="control-label">Endurance Charges:
-          <input class="form-control input-sm" type="number" ng-model="section.charges" ng-model-options="{debounce: 500}"
-                 id="charges">
-        </label>
+      <label ng-if="section.charges !== undefined" class="control-label">Endurance Charges:
+        <input class="form-control input-sm" type="number" ng-model="section.charges" ng-model-options="{debounce: 500}"
+               id="charges">
+      </label>
 
-        <table class="table table-condensed" ng-repeat-start="(tableName, table) in section.tables">
-          <tr ng-repeat="value in table.values">
-            <td>
-              <input type="checkbox" ng-model="value.enabled" ng-change="updateTotal(table)">
-            </td>
-            <td class="name">
-              <input class="form-control input-sm" type="text" placeholder={{table.placeholder}} ng-model="value.name"
-                     ng-change="add(table)" ng-model-options="{debounce: 500}">
-            </td>
-            <td class="percent">
-              <div class="input-group">
-                <input class="form-control input-sm" type="number" placeholder="+/-" ng-model="value.value"
-                       ng-change="add(table)" ng-model-options="{debounce: 500}" ng-attr-id="{{tableName}}">
-                <div ng-if="tableName !== 'flat'" class="input-group-addon">%</div>
-              </div>
-            </td>
-            <td ng-if="!$last">
-              <button class="btn btn-danger btn-sm" ng-click="delete(table, $index)">Delete</button>
-            </td>
-          </tr>
-        </table>
+      <table class="table table-condensed" ng-repeat-start="(tableName, table) in section.tables">
+        <tr ng-repeat="value in table.values">
+          <td>
+            <input type="checkbox" ng-model="value.enabled" ng-change="updateTotal(table)">
+          </td>
+          <td class="name">
+            <input class="form-control input-sm" type="text" placeholder={{table.placeholder}} ng-model="value.name"
+                   ng-change="add(table)" ng-model-options="{debounce: 500}">
+          </td>
+          <td class="percent">
+            <div class="input-group">
+              <input class="form-control input-sm" type="number" placeholder="+/-" ng-model="value.value"
+                     ng-change="add(table)" ng-model-options="{debounce: 500}" ng-attr-id="{{tableName}}">
+              <div ng-if="tableName !== 'flat'" class="input-group-addon">%</div>
+            </div>
+          </td>
+          <td ng-if="!$last">
+            <button class="btn btn-danger btn-sm" ng-click="delete(table, $index)">Delete</button>
+          </td>
+        </tr>
+      </table>
 
-        <h5 ng-if="table.total !== undefined">
-          <b>Total {{table.totalName}}: {{table.total}}{{tableName !== 'flat' ? '%' : ''}}</b>
-        </h5>
-        <hr ng-repeat-end>
-      </div>
+      <h5 ng-if="table.total !== undefined">
+        <b>Total {{table.totalName}}: {{table.total}}{{tableName !== 'flat' ? '%' : ''}}</b>
+      </h5>
+      <hr ng-repeat-end>
     </div>
   </div>
+</div>
 
 <div class="damageTable">
   <table class="table table-bordered table-striped">
