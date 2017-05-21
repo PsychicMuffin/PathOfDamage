@@ -37,8 +37,8 @@
         <td class="percent">
           <div class="input-group">
             <input class="form-control input-sm" type="number" placeholder="+/-" ng-model="value.value"
-                   ng-change="add(table)" ng-model-options="{debounce: 500}">
-            <div class="input-group-addon">%</div>
+                   ng-change="add(table)" ng-model-options="{debounce: 500}" ng-attr-id="{{tableName}}">
+            <div ng-if="tableName !== 'flat'" class="input-group-addon">%</div>
           </div>
         </td>
         <td ng-if="!$last">
@@ -47,7 +47,9 @@
       </tr>
     </table>
 
-    <h5 ng-if="table.total !== undefined"><b>Total {{table.totalName}}: {{table.total}}%</b></h5>
+    <h5 ng-if="table.total !== undefined">
+      <b>Total {{table.totalName}}: {{table.total}}{{tableName !== 'flat' ? '%' : ''}}</b>
+    </h5>
     <hr ng-repeat-end>
   </div>
 </div>

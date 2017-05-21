@@ -31,6 +31,10 @@ input#charges, input#resistance {
     width: 2.5em;
 }
 
+input#flat {
+    width: 2.75em;
+}
+
 .table {
     width: auto;
     margin-bottom: auto;
@@ -48,10 +52,6 @@ input#charges, input#resistance {
 .table td.percent > * {
     width: 4em;
     text-align: right;
-}
-
-.table td > input#flatTaken {
-    width: 2.75em;
 }
 
 input[type='number']::-webkit-outer-spin-button,

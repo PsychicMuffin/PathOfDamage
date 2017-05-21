@@ -11,7 +11,7 @@ app.controller('Damage', function ($scope) {
           total: 0
         },
         more: {
-          placeholder: "More Damage",
+          placeholder: "More Damage"
         }
       }
     },
@@ -54,7 +54,7 @@ app.controller('Damage', function ($scope) {
           total: 0
         },
         less: {
-          placeholder: "Less Taken",
+          placeholder: "Less Taken"
         }
       }
     }
