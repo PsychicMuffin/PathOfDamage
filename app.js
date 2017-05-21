@@ -17,7 +17,7 @@ app.controller('Damage', function ($scope) {
     },
     shift: {
       name: "Damage Shifts",
-      description: "Modifiers that shift one damage type to another, typically reading like '#% of X Damage taken as Y', such as Taste of Hate or Lightning Coil",
+      description: "Modifiers that shift physical damage to elemental, typically reading like '% of Physical Damage taken as Y', such as Taste of Hate or Lightning Coil",
       tables: {
         shifts: {
           placeholder: "Shift Source",
@@ -28,7 +28,7 @@ app.controller('Damage', function ($scope) {
     },
     mitigation: {
       name: "Damage Mitigation",
-      description: "Elemental and chaos damage is mitigated by its respective resistance. Physical damage is mitigated by the sum of all '#% additional Physical Damage Reduction' modifiers, up to its 90% cap. This includes armor, endurance charges, and things like Basalt Flasks and Chaos Golem.",
+      description: "Elemental and chaos damage is mitigated by its respective resistance. Physical damage is mitigated by the sum of all '% additional Physical Damage Reduction' modifiers, up to its 90% cap. This includes armor, endurance charges, and things like Basalt Flasks and Chaos Golem.",
       armor: null,
       charges: null,
       tables: {
@@ -41,7 +41,7 @@ app.controller('Damage', function ($scope) {
     },
     taken: {
       name: "Damage Taken",
-      description: "After damage mitigation, modifiers to damage taken are applied. Flat amounts (±# X Damage taken from Y, like Astramentis) are applied first, then the sum of all increases/reductions (#% increased/reduced X Damage taken, like Fortify, Shock, and Abyssus) and lastly more/less multipliers (#% more/less X Damage taken, like Arctic Armour).",
+      description: "After damage mitigation, modifiers to damage taken are applied. Flat amounts (±X Damage taken from Y, like Astramentis) are applied first, then the sum of all increases/reductions (% increased/reduced X Damage taken, like Fortify, Shock, and Abyssus) and lastly more/less multipliers (% more/less X Damage taken, like Arctic Armour).",
       tables: {
         flat: {
           placeholder: "Flat Reduction",

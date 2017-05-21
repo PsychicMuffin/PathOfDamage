@@ -1,16 +1,32 @@
-body {
-    padding: 10px 15px;
-    display: flex;
+.header {
+    font-weight: bold;
+    padding-left: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background: #07889B;
+    color: #FFF;
+}
+
+.title {
+    font-size: 30px;
 }
 
 div.input {
-    width: calc(100% - 17em);
+    padding: 10px;
+    width: calc(100% - 17em - 10px);
 }
 
 div.damageTable {
     position: fixed;
-    right: 0;
+    right: 10px;
+    top: 90px;
     width: 17em;
+}
+
+.damageTable .control-label {
+    padding-top: 5px;
+    width: 100%;
+    text-align: center;
 }
 
 .form-control, .input-group-addon {
@@ -61,4 +77,17 @@ input[type='number']::-webkit-inner-spin-button {
 
 input[type='number'] {
     -moz-appearance: textfield;
+}
+
+.input-group .input-group-addon {
+    background-color: #D8E5EF;
+}
+
+.section hr {
+    border-bottom: 1px solid #66B9BF;
+    border-top: 1px solid #B2DCDF ;
+}
+
+.damageTable .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #F3FAFA;
 }
