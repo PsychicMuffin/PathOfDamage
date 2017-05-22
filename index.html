@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Path of Damage</title>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>  
+  <script src="lz-string.min.js"></script>
   <script src="app.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <link rel="stylesheet" href="style.css">
@@ -68,8 +69,11 @@
       <th>Phys (Ele) Taken</th>
     </tr>
     <tr ng-repeat="hit in hits">
-      <td>{{hit}}</td>
-      <td>{{calcDamage(hit)}}</td>
+      <td class="damageInput">
+        <input class="form-control input-sm" type="number" ng-model="hit.damage" ng-model-options="{debounce: 500}"
+             ng-change="stringifyUrlData()" id="hit.id">
+      </td>
+      <td class="damageOutput">{{calcDamage(hit.damage)}}</td>
     </tr>
   </table>
   <label class="control-label">Elemental Resistance:

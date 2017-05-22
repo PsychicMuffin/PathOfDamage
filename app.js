@@ -1,5 +1,13 @@
 var app = angular.module('PathOfDamage', []);
 app.controller('Damage', function ($scope) {
+var data = getQueryVariable("data");
+
+  if (data) {
+    data = decodeURIComponent(data);
+    data = JSON.parse(data);
+    console.log(data);
+    $scope.damageDefaults = data.hits;
+  }
   $scope.sections = {
     monster: {
       name: "Monster Modifications",
@@ -60,7 +68,17 @@ app.controller('Damage', function ($scope) {
     }
   };
 
-  $scope.hits = [100, 500, 1000, 2000, 3000, 4000, 5000, 7500, 10000];
+  if ($scope.damageDefaults == null) {
+    $scope.damageDefaults = [100, 500, 1000, 2000, 3000, 4000, 5000, 7500, 10000, null, null];
+  }
+  $scope.hits = [];
+  for(var i = 0; i < $scope.damageDefaults.length; i++) {
+    $scope.hits.push({
+      damage: $scope.damageDefaults[i],
+      id: "hit" + i
+    });
+  }
+
   $scope.resistance = 75;
 
   // Initialize all the tables
@@ -101,9 +119,14 @@ app.controller('Damage', function ($scope) {
         }
       }
     }
+    $scope.stringifyUrlData();
   };
 
   $scope.calcDamage = function (hit) {
+    if (hit == null || hit == 0) {
+      return "0 (0)";
+    }
+
     var monsterIncrease = $scope.sections.monster.tables.increase.total / 100;
     hit *= (1 + monsterIncrease);
 
@@ -135,4 +158,27 @@ app.controller('Damage', function ($scope) {
 
     return Math.round(hit) + " (" + Math.round(shifted) + ")";
   };
+
+  $scope.stringifyUrlData = function(){
+    var hits = [];
+    for(var i = 0; i < $scope.hits.length; i++) {
+      hits.push($scope.hits[i].damage);
+    }
+    var data = {
+      hits: hits
+    };
+    var stringified = JSON.stringify(data);
+    window.history.replaceState({},"", "?data=" + stringified)
+  }
+
+  function getQueryVariable(variable)
+  {
+     var query = window.location.search.substring(1);
+     var vars = query.split("&");
+     for (var i=0;i<vars.length;i++) {
+       var pair = vars[i].split("=");
+       if(pair[0] == variable){return pair[1];}
+     }
+     return(false);
+  }
 });
