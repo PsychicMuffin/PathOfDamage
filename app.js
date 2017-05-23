@@ -1,6 +1,6 @@
 var app = angular.module('PathOfDamage', []);
 app.controller('Damage', function ($scope) {
-  var data = getQueryVariable("data");
+  var data = new URLSearchParams(window.location.search).get("data");
 
   if (data) {
     data = decodeURIComponent(data);
@@ -8,6 +8,7 @@ app.controller('Damage', function ($scope) {
     console.log(data);
     $scope.damageDefaults = data.hits;
   }
+
   $scope.sections = {
     monster: {
       name: "Monster Modifications",
@@ -71,6 +72,7 @@ app.controller('Damage', function ($scope) {
   if ($scope.damageDefaults === null) {
     $scope.damageDefaults = [100, 500, 1000, 2000, 3000, 4000, 5000, 7500, 10000, null, null];
   }
+
   $scope.hits = [];
   for (var i = 0; i < $scope.damageDefaults.length; i++) {
     $scope.hits.push({
@@ -170,16 +172,4 @@ app.controller('Damage', function ($scope) {
     var stringified = JSON.stringify(data);
     window.history.replaceState({}, "", "?data=" + stringified)
   };
-
-  function getQueryVariable(variable) {
-    var query = window.location.search.substring(1);
-    var vars = query.split("&");
-    for (var i = 0; i < vars.length; i++) {
-      var pair = vars[i].split("=");
-      if (pair[0] === variable) {
-        return pair[1];
-      }
-    }
-    return (false);
-  }
 });
