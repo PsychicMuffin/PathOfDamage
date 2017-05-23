@@ -29,6 +29,21 @@ div.damageTable {
     text-align: center;
 }
 
+.damageTable .damageInput input {
+    width: 8em;
+    background-color: transparent;
+    font-size: 14px;
+}
+
+.damageTable table tbody td.damageInput,
+.damageTable table tbody td.damageOutput {
+    padding: 0;
+}
+
+.damageTable table tbody td.damageOutput {
+    padding-left: 5px;
+}
+
 .form-control, .input-group-addon {
     padding: 5px;
 }
@@ -85,7 +100,7 @@ input[type='number'] {
 
 .section hr {
     border-bottom: 1px solid #66B9BF;
-    border-top: 1px solid #B2DCDF ;
+    border-top: 1px solid #B2DCDF;
 }
 
 .damageTable .table-striped > tbody > tr:nth-of-type(odd) {
