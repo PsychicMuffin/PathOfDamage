@@ -1,14 +1,5 @@
 var app = angular.module('PathOfDamage', []);
 app.controller('Damage', function ($scope) {
-  var data = new URLSearchParams(window.location.search).get("data");
-
-  if (data) {
-    data = decodeURIComponent(data);
-    data = JSON.parse(data);
-    console.log(data);
-    $scope.damageDefaults = data.hits;
-  }
-
   $scope.sections = {
     monster: {
       name: "Monster Modifications",
@@ -69,50 +60,37 @@ app.controller('Damage', function ($scope) {
     }
   };
 
-  if ($scope.damageDefaults === null) {
-    $scope.damageDefaults = [100, 500, 1000, 2000, 3000, 4000, 5000, 7500, 10000, null, null];
-  }
-
-  $scope.hits = [];
-  for (var i = 0; i < $scope.damageDefaults.length; i++) {
-    $scope.hits.push({
-      damage: $scope.damageDefaults[i],
-      id: "hit" + i
-    });
-  }
-
+  $scope.hits = [100, 500, 1000, 2000, 3000, 4000, 5000, 7500, 10000];
   $scope.resistance = 75;
 
-  // Initialize all the tables
-  Object.keys($scope.sections).forEach(function (sectionKey) {
-    var section = $scope.sections[sectionKey];
-    Object.keys(section.tables).forEach(function (tableKey) {
-      section.tables[tableKey].values = [{
-        enabled: true,
-        name: "",
-        value: null
-      }];
-    });
-  });
+  $scope.updateHit = function (index) {
+    if ($scope.hits[index] === null) {
+      $scope.hits.splice(index, 1);
+    }
+    if ($scope.hits[$scope.hits.length - 1] !== null) {
+      $scope.hits.push(null);
+    }
+    $scope.stringifyUrlData();
+  };
 
-  $scope.add = function (table) {
+  $scope.add = function (table, skipStringify) {
     var lastEntry = table.values[table.values.length - 1];
-    if (lastEntry.name !== "" || lastEntry.value !== null) {
+    if (!lastEntry || lastEntry.name !== "" || lastEntry.value !== null) {
       table.values.push({
         enabled: true,
         name: "",
         value: null
       });
     }
-    $scope.updateTotal(table);
+    $scope.updateTotal(table, skipStringify);
   };
 
-  $scope.delete = function (table, index) {
+  $scope.delete = function (table, index, skipStringify) {
     table.values.splice(index, 1);
-    $scope.updateTotal(table);
+    $scope.updateTotal(table, skipStringify);
   };
 
-  $scope.updateTotal = function (table) {
+  $scope.updateTotal = function (table, skipStringify) {
     if (table.total !== undefined) {
       table.total = 0;
       for (var i = 0; i < table.values.length - 1; i++) {
@@ -121,7 +99,9 @@ app.controller('Damage', function ($scope) {
         }
       }
     }
-    $scope.stringifyUrlData();
+    if (!skipStringify) {
+      $scope.stringifyUrlData();
+    }
   };
 
   $scope.calcDamage = function (hit) {
@@ -162,14 +142,53 @@ app.controller('Damage', function ($scope) {
   };
 
   $scope.stringifyUrlData = function () {
-    var hits = [];
-    for (var i = 0; i < $scope.hits.length; i++) {
-      hits.push($scope.hits[i].damage);
-    }
     var data = {
-      hits: hits
+      increase: $scope.sections.monster.tables.increase.values.slice(0, -1),
+      more: $scope.sections.monster.tables.more.values.slice(0, -1),
+      shift: $scope.sections.shift.tables.shifts.values.slice(0, -1),
+      armor: $scope.sections.mitigation.armor,
+      charges: $scope.sections.mitigation.charges,
+      reduction: $scope.sections.mitigation.tables.reduction.values.slice(0, -1),
+      flat: $scope.sections.taken.tables.flat.values.slice(0, -1),
+      reduced: $scope.sections.taken.tables.reduced.values.slice(0, -1),
+      less: $scope.sections.taken.tables.less.values.slice(0, -1),
+      hits: $scope.hits.slice(0, -1),
+      resistance: $scope.resistance
     };
-    var stringified = JSON.stringify(data);
+    var stringified = angular.toJson(data);
     window.history.replaceState({}, "", "?data=" + stringified)
   };
+
+  function loadUrlData(data) {
+    $scope.sections.monster.tables.increase.values = data.increase;
+    $scope.sections.monster.tables.more.values = data.more;
+    $scope.sections.shift.tables.shifts.values = data.shift;
+    $scope.sections.mitigation.armor = data.armor;
+    $scope.sections.mitigation.charges = data.charges;
+    $scope.sections.mitigation.tables.reduction.values = data.reduction;
+    $scope.sections.taken.tables.flat.values = data.flat;
+    $scope.sections.taken.tables.reduced.values = data.reduced;
+    $scope.sections.taken.tables.less.values = data.less;
+    $scope.hits = data.hits;
+    $scope.resistance = data.resistance;
+  }
+
+  // Load data from URL
+  var data = new URLSearchParams(window.location.search).get("data");
+  if (data) {
+    data = decodeURIComponent(data);
+    data = JSON.parse(data);
+    loadUrlData(data)
+  }
+
+  // Add empty last row to tables
+  Object.keys($scope.sections).forEach(function (sectionKey) {
+    var section = $scope.sections[sectionKey];
+    Object.keys(section.tables).forEach(function (tableKey) {
+      var table = section.tables[tableKey];
+      table.values = table.values || [];
+      $scope.add(table, true);
+    });
+  });
+  $scope.hits.push(null);
 });

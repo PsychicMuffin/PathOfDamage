@@ -68,17 +68,17 @@
       <th>Physical Hit</th>
       <th>Phys (Ele) Taken</th>
     </tr>
-    <tr ng-repeat="hit in hits">
+    <tr ng-repeat="hit in hits track by $index">
       <td class="damageInput">
-        <input class="form-control input-sm" type="number" ng-model="hit.damage" ng-model-options="{debounce: 500}"
-               ng-change="stringifyUrlData()" id="hit.id">
+        <input class="form-control input-sm" type="number" ng-model="hits[$index]" ng-model-options="{debounce: 500}"
+               ng-change="updateHit($index)">
       </td>
-      <td class="damageOutput">{{calcDamage(hit.damage)}}</td>
+      <td class="damageOutput">{{calcDamage(hit)}}</td>
     </tr>
   </table>
   <label class="control-label">Elemental Resistance:
     <input class="form-control input-sm" type="number" ng-model="resistance" ng-model-options="{debounce: 500}"
-           id="resistance">
+           id="resistance" ng-change="stringifyUrlData()">
   </label>
 </div>
 </body>
