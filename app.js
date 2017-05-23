@@ -1,6 +1,6 @@
 var app = angular.module('PathOfDamage', []);
 app.controller('Damage', function ($scope) {
-var data = getQueryVariable("data");
+  var data = getQueryVariable("data");
 
   if (data) {
     data = decodeURIComponent(data);
@@ -68,11 +68,11 @@ var data = getQueryVariable("data");
     }
   };
 
-  if ($scope.damageDefaults == null) {
+  if ($scope.damageDefaults === null) {
     $scope.damageDefaults = [100, 500, 1000, 2000, 3000, 4000, 5000, 7500, 10000, null, null];
   }
   $scope.hits = [];
-  for(var i = 0; i < $scope.damageDefaults.length; i++) {
+  for (var i = 0; i < $scope.damageDefaults.length; i++) {
     $scope.hits.push({
       damage: $scope.damageDefaults[i],
       id: "hit" + i
@@ -123,7 +123,7 @@ var data = getQueryVariable("data");
   };
 
   $scope.calcDamage = function (hit) {
-    if (hit == null || hit == 0) {
+    if (hit === null || hit === 0) {
       return "0 (0)";
     }
 
@@ -159,26 +159,27 @@ var data = getQueryVariable("data");
     return Math.round(hit) + " (" + Math.round(shifted) + ")";
   };
 
-  $scope.stringifyUrlData = function(){
+  $scope.stringifyUrlData = function () {
     var hits = [];
-    for(var i = 0; i < $scope.hits.length; i++) {
+    for (var i = 0; i < $scope.hits.length; i++) {
       hits.push($scope.hits[i].damage);
     }
     var data = {
       hits: hits
     };
     var stringified = JSON.stringify(data);
-    window.history.replaceState({},"", "?data=" + stringified)
-  }
+    window.history.replaceState({}, "", "?data=" + stringified)
+  };
 
-  function getQueryVariable(variable)
-  {
-     var query = window.location.search.substring(1);
-     var vars = query.split("&");
-     for (var i=0;i<vars.length;i++) {
-       var pair = vars[i].split("=");
-       if(pair[0] == variable){return pair[1];}
-     }
-     return(false);
+  function getQueryVariable(variable) {
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i = 0; i < vars.length; i++) {
+      var pair = vars[i].split("=");
+      if (pair[0] === variable) {
+        return pair[1];
+      }
+    }
+    return (false);
   }
 });
