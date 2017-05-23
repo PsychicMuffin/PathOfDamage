@@ -150,10 +150,10 @@ app.controller('Damage', function ($scope, LZString) {
       c: $scope.sections.mitigation.charges,
       r: $scope.sections.mitigation.tables.reduction.values.slice(0, -1),
       f: $scope.sections.taken.tables.flat.values.slice(0, -1),
-      reduced: $scope.sections.taken.tables.reduced.values.slice(0, -1),
+      d: $scope.sections.taken.tables.reduced.values.slice(0, -1),
       l: $scope.sections.taken.tables.less.values.slice(0, -1),
       h: $scope.hits.slice(0, -1),
-      res: $scope.resistance
+      t: $scope.resistance
     };
     var stringified = angular.toJson(data);
     stringified = LZString.compressToEncodedURIComponent(stringified);
@@ -169,10 +169,10 @@ app.controller('Damage', function ($scope, LZString) {
     $scope.sections.mitigation.charges = data.c;
     $scope.sections.mitigation.tables.reduction.values = data.r;
     $scope.sections.taken.tables.flat.values = data.f;
-    $scope.sections.taken.tables.reduced.values = data.reduced;
+    $scope.sections.taken.tables.reduced.values = data.d;
     $scope.sections.taken.tables.less.values = data.l;
     $scope.hits = data.h;
-    $scope.resistance = data.res;
+    $scope.resistance = data.t;
   }
 
   // Load data from URL
