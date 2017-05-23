@@ -1,5 +1,5 @@
-var app = angular.module('PathOfDamage', []);
-app.controller('Damage', function ($scope) {
+var app = angular.module('PathOfDamage', ['lz-string']);
+app.controller('Damage', function ($scope, LZString) {
   $scope.sections = {
     monster: {
       name: "Monster Modifications",
@@ -143,40 +143,42 @@ app.controller('Damage', function ($scope) {
 
   $scope.stringifyUrlData = function () {
     var data = {
-      increase: $scope.sections.monster.tables.increase.values.slice(0, -1),
-      more: $scope.sections.monster.tables.more.values.slice(0, -1),
-      shift: $scope.sections.shift.tables.shifts.values.slice(0, -1),
-      armor: $scope.sections.mitigation.armor,
-      charges: $scope.sections.mitigation.charges,
-      reduction: $scope.sections.mitigation.tables.reduction.values.slice(0, -1),
-      flat: $scope.sections.taken.tables.flat.values.slice(0, -1),
-      reduced: $scope.sections.taken.tables.reduced.values.slice(0, -1),
-      less: $scope.sections.taken.tables.less.values.slice(0, -1),
-      hits: $scope.hits.slice(0, -1),
-      resistance: $scope.resistance
+      i: $scope.sections.monster.tables.increase.values.slice(0, -1),
+      m: $scope.sections.monster.tables.more.values.slice(0, -1),
+      s: $scope.sections.shift.tables.shifts.values.slice(0, -1),
+      a: $scope.sections.mitigation.armor,
+      c: $scope.sections.mitigation.charges,
+      r: $scope.sections.mitigation.tables.reduction.values.slice(0, -1),
+      f: $scope.sections.taken.tables.flat.values.slice(0, -1),
+      d: $scope.sections.taken.tables.reduced.values.slice(0, -1),
+      l: $scope.sections.taken.tables.less.values.slice(0, -1),
+      h: $scope.hits.slice(0, -1),
+      t: $scope.resistance
     };
     var stringified = angular.toJson(data);
-    window.history.replaceState({}, "", "?data=" + stringified)
+    stringified = LZString.compressToEncodedURIComponent(stringified);
+    console.log(LZString.decompressFromEncodedURIComponent(stringified));
+    window.history.replaceState({}, "", "?d=" + stringified)
   };
 
   function loadUrlData(data) {
-    $scope.sections.monster.tables.increase.values = data.increase;
-    $scope.sections.monster.tables.more.values = data.more;
-    $scope.sections.shift.tables.shifts.values = data.shift;
-    $scope.sections.mitigation.armor = data.armor;
-    $scope.sections.mitigation.charges = data.charges;
-    $scope.sections.mitigation.tables.reduction.values = data.reduction;
-    $scope.sections.taken.tables.flat.values = data.flat;
-    $scope.sections.taken.tables.reduced.values = data.reduced;
-    $scope.sections.taken.tables.less.values = data.less;
-    $scope.hits = data.hits;
-    $scope.resistance = data.resistance;
+    $scope.sections.monster.tables.increase.values = data.i;
+    $scope.sections.monster.tables.more.values = data.m;
+    $scope.sections.shift.tables.shifts.values = data.s;
+    $scope.sections.mitigation.armor = data.a;
+    $scope.sections.mitigation.charges = data.c;
+    $scope.sections.mitigation.tables.reduction.values = data.r;
+    $scope.sections.taken.tables.flat.values = data.f;
+    $scope.sections.taken.tables.reduced.values = data.d;
+    $scope.sections.taken.tables.less.values = data.l;
+    $scope.hits = data.h;
+    $scope.resistance = data.t;
   }
 
   // Load data from URL
-  var data = new URLSearchParams(window.location.search).get("data");
+  var data = new URLSearchParams(window.location.search).get("d");
   if (data) {
-    data = decodeURIComponent(data);
+    data = LZString.decompressFromEncodedURIComponent(data.replace(" ", "+"));
     data = JSON.parse(data);
     loadUrlData(data)
   }
