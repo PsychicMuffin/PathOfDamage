@@ -99,7 +99,7 @@ angular.module('PathOfDamage', [])
     };
     var stringified = rison.encode(data);
     stringified = LZString.compressToEncodedURIComponent(stringified);
-    window.history.replaceState({}, '', '?d=' + stringified);
+    window.history.pushState({}, '', stringified);
   };
 
   function loadUrlData(data) {
@@ -117,9 +117,9 @@ angular.module('PathOfDamage', [])
   }
 
   // Load data from URL
-  var data = new URLSearchParams(window.location.search).get('d');
-  if (data) {
-    data = LZString.decompressFromEncodedURIComponent(data.replace(' ', '+'));
+  var data = window.location.search;
+  if (data && !data.startsWith('?')) {
+    data = LZString.decompressFromEncodedURIComponent(data);
     data = rison.decode(data);
     loadUrlData(data)
   }
@@ -134,4 +134,8 @@ angular.module('PathOfDamage', [])
     });
   });
   $scope.hits.push(null);
+
+  window.onpopstate = function () {
+    window.location.reload();
+  }
 });
