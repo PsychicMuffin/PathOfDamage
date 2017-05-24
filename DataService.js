@@ -1,7 +1,7 @@
 angular.module('PathOfDamage')
-.service('DataService', function() {
+.service('DataService', function () {
   return {
-    getSections: function(){
+    getSections: function () {
       return {
         monster: {
           name: "Monster Modifications",
@@ -72,7 +72,7 @@ angular.module('PathOfDamage')
       }
       return data;
     },
-    generateDataTable: function(list) {
+    generateDataTable: function (list) {
       var table = [];
       if (!list.length) {
         return table;
