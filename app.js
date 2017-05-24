@@ -1,64 +1,6 @@
-var app = angular.module('PathOfDamage', []);
-app.controller('Damage', function ($scope) {
-  $scope.sections = {
-    monster: {
-      name: "Monster Modifications",
-      description: "These are things that directly change a monster's damage before they attack, such as map mods or curses",
-      tables: {
-        increase: {
-          placeholder: "Increased Damage",
-          totalName: "Increased Monster Damage",
-          total: 0
-        },
-        more: {
-          placeholder: "More Damage"
-        }
-      }
-    },
-    shift: {
-      name: "Damage Shifts",
-      description: "Modifiers that shift physical damage to elemental, typically reading like '% of Physical Damage taken as Y', such as Taste of Hate or Lightning Coil",
-      tables: {
-        shifts: {
-          placeholder: "Shift Source",
-          totalName: "Damage Shifted",
-          total: 0
-        }
-      }
-    },
-    mitigation: {
-      name: "Damage Mitigation",
-      description: "Elemental and chaos damage is mitigated by its respective resistance. Physical damage is mitigated by the sum of all '% additional Physical Damage Reduction' modifiers, up to its 90% cap. This includes armor, endurance charges, and things like Basalt Flasks and Chaos Golem.",
-      armor: null,
-      charges: null,
-      tables: {
-        reduction: {
-          placeholder: "Reduction Name",
-          totalName: "Additional Physical Damage Reduction",
-          total: 0
-        }
-      }
-    },
-    taken: {
-      name: "Damage Taken",
-      description: "After damage mitigation, modifiers to damage taken are applied. Flat amounts (±X Damage taken from Y, like Astramentis) are applied first, then the sum of all increases/reductions (% increased/reduced X Damage taken, like Fortify, Shock, and Abyssus) and lastly more/less multipliers (% more/less X Damage taken, like Arctic Armour).",
-      tables: {
-        flat: {
-          placeholder: "Flat Reduction",
-          totalName: "Flat Reduction",
-          total: 0
-        },
-        reduced: {
-          placeholder: "Reduced Taken",
-          totalName: "Reduced Damage Taken",
-          total: 0
-        },
-        less: {
-          placeholder: "Less Taken"
-        }
-      }
-    }
-  };
+angular.module('PathOfDamage', [])
+.controller('Damage', function ($scope, DataService) {
+  $scope.sections = DataService.getSections();
 
   $scope.hits = [100, 500, 1000, 2000, 3000, 4000, 5000, 7500, 10000];
   $scope.resistance = 75;
@@ -75,10 +17,10 @@ app.controller('Damage', function ($scope) {
 
   $scope.add = function (table, skipStringify) {
     var lastEntry = table.values[table.values.length - 1];
-    if (!lastEntry || lastEntry.name !== "" || lastEntry.value !== null) {
+    if (!lastEntry || lastEntry.name !== '' || lastEntry.value !== null) {
       table.values.push({
         enabled: true,
-        name: "",
+        name: '',
         value: null
       });
     }
@@ -106,7 +48,7 @@ app.controller('Damage', function ($scope) {
 
   $scope.calcDamage = function (hit) {
     if (hit === null) {
-      return "";
+      return '';
     }
 
     var monsterIncrease = $scope.sections.monster.tables.increase.total / 100;
@@ -138,46 +80,46 @@ app.controller('Damage', function ($scope) {
       hit *= (1 - lessTaken.value / 100)
     });
 
-    return Math.round(hit || 0) + " (" + Math.round(shifted) + ")";
+    return Math.round(hit || 0) + ' (' + Math.round(shifted) + ')';
   };
 
   $scope.stringifyUrlData = function () {
     var data = {
-      i: $scope.sections.monster.tables.increase.values.slice(0, -1),
-      m: $scope.sections.monster.tables.more.values.slice(0, -1),
-      s: $scope.sections.shift.tables.shifts.values.slice(0, -1),
+      i: DataService.generateDataList($scope.sections.monster.tables.increase.values),
+      m: DataService.generateDataList($scope.sections.monster.tables.more.values),
+      s: DataService.generateDataList($scope.sections.shift.tables.shifts.values),
       a: $scope.sections.mitigation.armor,
       c: $scope.sections.mitigation.charges,
-      r: $scope.sections.mitigation.tables.reduction.values.slice(0, -1),
-      f: $scope.sections.taken.tables.flat.values.slice(0, -1),
-      d: $scope.sections.taken.tables.reduced.values.slice(0, -1),
-      l: $scope.sections.taken.tables.less.values.slice(0, -1),
+      r: DataService.generateDataList($scope.sections.mitigation.tables.reduction.values),
+      f: DataService.generateDataList($scope.sections.taken.tables.flat.values),
+      d: DataService.generateDataList($scope.sections.taken.tables.reduced.values),
+      l: DataService.generateDataList($scope.sections.taken.tables.less.values),
       h: $scope.hits.slice(0, -1),
       t: $scope.resistance
     };
     var stringified = rison.encode(data);
     stringified = LZString.compressToEncodedURIComponent(stringified);
-    window.history.replaceState({}, "", "?d=" + stringified);
+    window.history.replaceState({}, '', '?d=' + stringified);
   };
 
   function loadUrlData(data) {
-    $scope.sections.monster.tables.increase.values = data.i;
-    $scope.sections.monster.tables.more.values = data.m;
-    $scope.sections.shift.tables.shifts.values = data.s;
+    $scope.sections.monster.tables.increase.values = DataService.generateDataTable(data.i);
+    $scope.sections.monster.tables.more.values = DataService.generateDataTable(data.m);
+    $scope.sections.shift.tables.shifts.values = DataService.generateDataTable(data.s);
     $scope.sections.mitigation.armor = data.a;
     $scope.sections.mitigation.charges = data.c;
-    $scope.sections.mitigation.tables.reduction.values = data.r;
-    $scope.sections.taken.tables.flat.values = data.f;
-    $scope.sections.taken.tables.reduced.values = data.d;
-    $scope.sections.taken.tables.less.values = data.l;
+    $scope.sections.mitigation.tables.reduction.values = DataService.generateDataTable(data.r);
+    $scope.sections.taken.tables.flat.values = DataService.generateDataTable(data.f);
+    $scope.sections.taken.tables.reduced.values = DataService.generateDataTable(data.d);
+    $scope.sections.taken.tables.less.values = DataService.generateDataTable(data.l);
     $scope.hits = data.h;
     $scope.resistance = data.t;
   }
 
   // Load data from URL
-  var data = new URLSearchParams(window.location.search).get("d");
+  var data = new URLSearchParams(window.location.search).get('d');
   if (data) {
-    data = LZString.decompressFromEncodedURIComponent(data.replace(" ", "+"));
+    data = LZString.decompressFromEncodedURIComponent(data.replace(' ', '+'));
     data = rison.decode(data);
     loadUrlData(data)
   }
