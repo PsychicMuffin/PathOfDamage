@@ -1,5 +1,5 @@
-var app = angular.module('PathOfDamage', ['lz-string']);
-app.controller('Damage', function ($scope, LZString) {
+var app = angular.module('PathOfDamage', []);
+app.controller('Damage', function ($scope) {
   $scope.sections = {
     monster: {
       name: "Monster Modifications",
@@ -105,8 +105,8 @@ app.controller('Damage', function ($scope, LZString) {
   };
 
   $scope.calcDamage = function (hit) {
-    if (hit === null || hit === 0) {
-      return "0 (0)";
+    if (hit === null) {
+      return "";
     }
 
     var monsterIncrease = $scope.sections.monster.tables.increase.total / 100;
@@ -138,7 +138,7 @@ app.controller('Damage', function ($scope, LZString) {
       hit *= (1 - lessTaken.value / 100)
     });
 
-    return Math.round(hit) + " (" + Math.round(shifted) + ")";
+    return Math.round(hit || 0) + " (" + Math.round(shifted) + ")";
   };
 
   $scope.stringifyUrlData = function () {
@@ -155,10 +155,9 @@ app.controller('Damage', function ($scope, LZString) {
       h: $scope.hits.slice(0, -1),
       t: $scope.resistance
     };
-    var stringified = angular.toJson(data);
+    var stringified = rison.encode(data);
     stringified = LZString.compressToEncodedURIComponent(stringified);
-    console.log(LZString.decompressFromEncodedURIComponent(stringified));
-    window.history.replaceState({}, "", "?d=" + stringified)
+    window.history.replaceState({}, "", "?d=" + stringified);
   };
 
   function loadUrlData(data) {
@@ -179,7 +178,7 @@ app.controller('Damage', function ($scope, LZString) {
   var data = new URLSearchParams(window.location.search).get("d");
   if (data) {
     data = LZString.decompressFromEncodedURIComponent(data.replace(" ", "+"));
-    data = JSON.parse(data);
+    data = rison.decode(data);
     loadUrlData(data)
   }
 
