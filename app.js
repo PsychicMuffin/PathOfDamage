@@ -117,9 +117,9 @@ angular.module('PathOfDamage', [])
   }
 
   // Load data from URL
-  var data = new URLSearchParams(window.location.search).get("d");
+  var data = new URLSearchParams(window.location.search).get('d');
   if (data) {
-    data = LZString.decompressFromEncodedURIComponent(data.replace(" ", "+"));
+    data = LZString.decompressFromEncodedURIComponent(data.replace(' ', '+'));
     data = rison.decode(data);
     loadUrlData(data)
   }
