@@ -89,9 +89,6 @@ angular.module('PathOfDamage')
       return table;
     },
     generateHitList: function (hits) {
-      if (!hits) {
-        return null;
-      }
       var list = [];
       for (var i = 0; i < hits.length; i++) {
         list.push(hits[i].hit);
@@ -99,16 +96,15 @@ angular.module('PathOfDamage')
       return list;
     },
     generateHitObject: function (hitList) {
-      if (!hitList) {
-        return null;
+      if (hitList) {
+        var hits = [];
+        for (var i = 0; i < hitList.length; i++) {
+            hits.push({
+                hit: hitList[i]
+            });
+        }
+        return hits;
       }
-      var hits = [];
-      for (var i = 0; i < hitList.length; i++) {
-        hits.push({
-          hit: hitList[i]
-        });
-      }
-      return hits;
     }
   };
 });

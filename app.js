@@ -48,7 +48,7 @@ angular.module('PathOfDamage', [])
         }
       }
     }
-    $scope.updateHits(skipStringify);
+    $scope.updateHits(true);
     if (!skipStringify) {
       $scope.stringifyUrlData();
     }
@@ -125,7 +125,7 @@ angular.module('PathOfDamage', [])
       f: DataService.generateDataList($scope.sections.taken.tables.flat.values),
       d: DataService.generateDataList($scope.sections.taken.tables.reduced.values),
       l: DataService.generateDataList($scope.sections.taken.tables.less.values),
-      h: DataService.generateHitList($scope.hits),
+      h: DataService.generateHitList($scope.hits.slice(0,-1)),
       t: $scope.resistance
     };
     var stringified = rison.encode(data);
