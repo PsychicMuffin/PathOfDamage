@@ -99,7 +99,7 @@ angular.module('PathOfDamage', [])
     };
     var stringified = rison.encode(data);
     stringified = LZString.compressToEncodedURIComponent(stringified);
-    window.history.pushState({}, '', stringified);
+    window.history.pushState({}, '', '?' + stringified);
   };
 
   function loadUrlData(data) {
@@ -118,8 +118,8 @@ angular.module('PathOfDamage', [])
 
   // Load data from URL
   var data = window.location.search;
-  if (data && !data.startsWith('?')) {
-    data = LZString.decompressFromEncodedURIComponent(data);
+  if (data) {
+    data = LZString.decompressFromEncodedURIComponent(data.substring(1));
     data = rison.decode(data);
     loadUrlData(data)
   }
