@@ -13,7 +13,8 @@ angular.module('PathOfDamage')
               total: 0
             },
             more: {
-              placeholder: "More Damage"
+              placeholder: "More Damage",
+              values: []
             }
           }
         },
@@ -56,7 +57,8 @@ angular.module('PathOfDamage')
               total: 0
             },
             less: {
-              placeholder: "Less Taken"
+              placeholder: "Less Taken",
+              values: []
             }
           }
         }
@@ -85,6 +87,24 @@ angular.module('PathOfDamage')
         });
       }
       return table;
+    },
+    generateHitList: function (hits) {
+      var list = [];
+      for (var i = 0; i < hits.length; i++) {
+        list.push(hits[i].hit);
+      }
+      return list;
+    },
+    generateHitObject: function (hitList) {
+      if (hitList) {
+        var hits = [];
+        for (var i = 0; i < hitList.length; i++) {
+            hits.push({
+                hit: hitList[i]
+            });
+        }
+        return hits;
+      }
     }
   };
 });
