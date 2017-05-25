@@ -2,17 +2,24 @@ angular.module('PathOfDamage', [])
 .controller('Damage', function ($scope, DataService) {
   $scope.sections = DataService.getSections();
 
-  $scope.hits = [100, 500, 1000, 2000, 3000, 4000, 5000, 7500, 10000];
+  $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000},
+    {hit: 4000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
   $scope.resistance = 75;
+  $scope.health = 7000;
 
-  $scope.updateHit = function (index) {
-    if ($scope.hits[index] === null) {
+  $scope.updateHit = function (index, skipStringify) {
+    if ($scope.hits[index].hit === null) {
       $scope.hits.splice(index, 1);
     }
-    if ($scope.hits[$scope.hits.length - 1] !== null) {
-      $scope.hits.push(null);
+    if (index > 0 && $scope.hits[$scope.hits.length - 1].hit !== null) {
+      $scope.hits.push({hit: null});
     }
-    $scope.stringifyUrlData();
+    if ($scope.hits[index]) {
+      $scope.hits[index] = calcDamage($scope.hits[index].hit);
+    }
+    if (!skipStringify) {
+      $scope.stringifyUrlData();
+    }
   };
 
   $scope.add = function (table, skipStringify) {
@@ -41,15 +48,17 @@ angular.module('PathOfDamage', [])
         }
       }
     }
+    $scope.updateHits(skipStringify);
     if (!skipStringify) {
       $scope.stringifyUrlData();
     }
   };
 
-  $scope.calcDamage = function (hit) {
+  function calcDamage(hit) {
     if (hit === null) {
-      return '';
+      return {};
     }
+    var initialHit = hit;
 
     var monsterIncrease = $scope.sections.monster.tables.increase.total / 100;
     hit *= (1 + monsterIncrease);
@@ -80,7 +89,29 @@ angular.module('PathOfDamage', [])
       hit *= (1 - lessTaken.value / 100)
     });
 
-    return Math.round(hit || 0) + ' (' + Math.round(shifted) + ')';
+    return {
+      hit: initialHit,
+      taken: Math.round(hit || 0),
+      shifted: Math.round(shifted),
+      remaining: Math.round($scope.health - hit || 0)
+    }
+  }
+
+  $scope.updateHits = function(skipStringify) {
+    for (var i = 0; i < $scope.hits.length - 1; i++) {
+      $scope.updateHit(i, true);
+    }
+    if (!skipStringify) {
+      $scope.stringifyUrlData();
+    }
+  };
+
+  $scope.getWidth = function(damage) {
+    var percent = (damage / $scope.health) * 100;
+    if (percent > 100) {
+      percent = 100;
+    }
+    return {width: (percent || 0) + "%"};
   };
 
   $scope.stringifyUrlData = function () {
@@ -94,7 +125,7 @@ angular.module('PathOfDamage', [])
       f: DataService.generateDataList($scope.sections.taken.tables.flat.values),
       d: DataService.generateDataList($scope.sections.taken.tables.reduced.values),
       l: DataService.generateDataList($scope.sections.taken.tables.less.values),
-      h: $scope.hits.slice(0, -1),
+      h: DataService.generateHitList($scope.hits),
       t: $scope.resistance
     };
     var stringified = rison.encode(data);
@@ -112,7 +143,7 @@ angular.module('PathOfDamage', [])
     $scope.sections.taken.tables.flat.values = DataService.generateDataTable(data.f);
     $scope.sections.taken.tables.reduced.values = DataService.generateDataTable(data.d);
     $scope.sections.taken.tables.less.values = DataService.generateDataTable(data.l);
-    $scope.hits = data.h;
+    $scope.hits = DataService.generateHitObject(data.h) || $scope.hits;
     $scope.resistance = data.t;
   }
 
@@ -133,7 +164,8 @@ angular.module('PathOfDamage', [])
       $scope.add(table, true);
     });
   });
-  $scope.hits.push(null);
+
+  $scope.updateHits(true);
 
   window.onpopstate = function () {
     window.location.reload();
