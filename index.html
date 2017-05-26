@@ -91,11 +91,11 @@
   </table>
   <label class="control-label">Elemental Resistance:
     <input class="form-control input-sm" type="number" ng-model="resistance" ng-model-options="{debounce: 500}"
-           id="resistance" ng-change="stringifyUrlData()">
+           id="resistance" ng-change="updateHits()">
   </label>
   <label class="control-label">Health and ES Pool:
-    <input class="form-control input-sm" type="number" ng-model="health" ng-model-options="{debounce: 500}"
-           id="health" ng-change="stringifyUrlData()">
+    <input class="form-control input-sm" type="number" ng-model="healthPool" ng-model-options="{debounce: 500}"
+           id="health" ng-change="updateHits()">
   </label>
 </div>
 </body>
