@@ -26,12 +26,12 @@
 
       <label ng-if="section.armor !== undefined" class="control-label">Armor:
         <input class="form-control input-sm" type="number" ng-model="section.armor" ng-model-options="{debounce: 500}"
-               id="armor" ng-change="updateHits()">
+               id="armor" ng-change="updateDamageValues()">
       </label>
 
       <label ng-if="section.charges !== undefined" class="control-label">Endurance Charges:
         <input class="form-control input-sm" type="number" ng-model="section.charges" ng-model-options="{debounce: 500}"
-               id="charges" ng-change="updateHits()">
+               id="charges" ng-change="updateDamageValues()">
       </label>
 
       <table class="table table-condensed" ng-repeat-start="(tableName, table) in section.tables">
@@ -72,13 +72,13 @@
     </tr>
     <tr ng-repeat="hit in hits track by $index">
       <td class="damageInput">
-        <input class="form-control input-sm" type="number" ng-model="hits[$index].hit" ng-model-options="{debounce: 500}"
-               ng-change="updateHit($index)">
+        <input class="form-control input-sm" type="number" ng-model="hits[$index].hit"
+               ng-model-options="{debounce: 500}" ng-change="updateHitRow($index)">
       </td>
-        <td class="damageOutput">  <span class="taken">{{hit.taken}}</span>
+      <td class="damageOutput"><span class="taken">{{hit.taken}}</span>
         <div class="healthBarContainer">
-          <div class="health bar" ng-style="getWidth(hit.remaining)"></div>
-          <div class="physical bar" ng-style="getWidth(hit.taken)"></div>
+          <div class="health bar" ng-style="getBarWidth(hit.remaining)"></div>
+          <div class="physical bar" ng-style="getBarWidth(hit.taken)"></div>
         </div>
         <div class="tooltip">
           Phys Damage Taken: {{hit.taken-hit.shifted}} <br/>
@@ -91,11 +91,11 @@
   </table>
   <label class="control-label">Elemental Resistance:
     <input class="form-control input-sm" type="number" ng-model="resistance" ng-model-options="{debounce: 500}"
-           id="resistance" ng-change="updateHits()">
+           id="resistance" ng-change="updateDamageValues()">
   </label>
   <label class="control-label">Health and ES Pool:
     <input class="form-control input-sm" type="number" ng-model="healthPool" ng-model-options="{debounce: 500}"
-           id="health" ng-change="updateHits()">
+           id="health" ng-change="updateDamageValues()">
   </label>
 </div>
 </body>
