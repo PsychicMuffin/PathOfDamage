@@ -52,9 +52,9 @@ angular.module('PathOfDamage', [])
   };
 
   $scope.updateHitRow = function (index) {
-    if ($scope.hits[index].hit) {
+    if (index === $scope.hits.length - 1 || $scope.hits[index].hit !== null) {
       $scope.hits[index] = calcDamage($scope.hits[index].hit);
-      if ($scope.hits[$scope.hits.length - 1].hit) {
+      if ($scope.hits[$scope.hits.length - 1].hit !== null) {
         $scope.hits.push({hit: null});
       }
     } else {
