@@ -3,9 +3,9 @@ angular.module('PathOfDamage', [])
   $scope.sections = DataService.getSections();
 
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000},
-    {hit: 4000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
+    {hit: 5000}, {hit: 7500}, {hit: 10000}];
   $scope.resistance = 75;
-  $scope.healthPool = 7000;
+  $scope.healthPool = 5000;
 
   $scope.updateHit = function (index, skipStringify) {
     if ($scope.hits[index].hit === null) {
@@ -97,7 +97,7 @@ angular.module('PathOfDamage', [])
     }
   }
 
-  $scope.updateHits = function(skipStringify) {
+  $scope.updateHits = function (skipStringify) {
     for (var i = 0; i < $scope.hits.length - 1; i++) {
       $scope.updateHit(i, true);
     }
@@ -106,7 +106,7 @@ angular.module('PathOfDamage', [])
     }
   };
 
-  $scope.getWidth = function(damage) {
+  $scope.getWidth = function (damage) {
     var percent = (damage / $scope.healthPool) * 100;
     if (percent > 100) {
       percent = 100;
@@ -116,16 +116,16 @@ angular.module('PathOfDamage', [])
 
   $scope.stringifyUrlData = function () {
     var data = {
-      i: DataService.generateDataList($scope.sections.monster.tables.increase.values),
-      m: DataService.generateDataList($scope.sections.monster.tables.more.values),
-      s: DataService.generateDataList($scope.sections.shift.tables.shifts.values),
+      i: DataService.serializeDataTable($scope.sections.monster.tables.increase.values),
+      m: DataService.serializeDataTable($scope.sections.monster.tables.more.values),
+      s: DataService.serializeDataTable($scope.sections.shift.tables.shifts.values),
       a: $scope.sections.mitigation.armor,
       c: $scope.sections.mitigation.charges,
-      r: DataService.generateDataList($scope.sections.mitigation.tables.reduction.values),
-      f: DataService.generateDataList($scope.sections.taken.tables.flat.values),
-      d: DataService.generateDataList($scope.sections.taken.tables.reduced.values),
-      l: DataService.generateDataList($scope.sections.taken.tables.less.values),
-      h: DataService.generateHitList($scope.hits.slice(0,-1)),
+      r: DataService.serializeDataTable($scope.sections.mitigation.tables.reduction.values),
+      f: DataService.serializeDataTable($scope.sections.taken.tables.flat.values),
+      d: DataService.serializeDataTable($scope.sections.taken.tables.reduced.values),
+      l: DataService.serializeDataTable($scope.sections.taken.tables.less.values),
+      h: DataService.serializeHits($scope.hits),
       t: $scope.resistance,
       p: $scope.healthPool
     };
@@ -135,16 +135,16 @@ angular.module('PathOfDamage', [])
   };
 
   function loadUrlData(data) {
-    $scope.sections.monster.tables.increase.values = DataService.generateDataTable(data.i);
-    $scope.sections.monster.tables.more.values = DataService.generateDataTable(data.m);
-    $scope.sections.shift.tables.shifts.values = DataService.generateDataTable(data.s);
+    $scope.sections.monster.tables.increase.values = DataService.deserializeDataTable(data.i);
+    $scope.sections.monster.tables.more.values = DataService.deserializeDataTable(data.m);
+    $scope.sections.shift.tables.shifts.values = DataService.deserializeDataTable(data.s);
     $scope.sections.mitigation.armor = data.a;
     $scope.sections.mitigation.charges = data.c;
-    $scope.sections.mitigation.tables.reduction.values = DataService.generateDataTable(data.r);
-    $scope.sections.taken.tables.flat.values = DataService.generateDataTable(data.f);
-    $scope.sections.taken.tables.reduced.values = DataService.generateDataTable(data.d);
-    $scope.sections.taken.tables.less.values = DataService.generateDataTable(data.l);
-    $scope.hits = DataService.generateHitObject(data.h) || $scope.hits;
+    $scope.sections.mitigation.tables.reduction.values = DataService.deserializeDataTable(data.r);
+    $scope.sections.taken.tables.flat.values = DataService.deserializeDataTable(data.f);
+    $scope.sections.taken.tables.reduced.values = DataService.deserializeDataTable(data.d);
+    $scope.sections.taken.tables.less.values = DataService.deserializeDataTable(data.l);
+    $scope.hits = DataService.deserializeHits(data.h);
     $scope.resistance = data.t;
     $scope.healthPool = data.p;
   }

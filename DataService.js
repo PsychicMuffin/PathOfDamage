@@ -64,21 +64,17 @@ angular.module('PathOfDamage')
         }
       };
     },
-    generateDataList: function (table) {
-      table = table.slice(0, -1);
+    serializeDataTable: function (table) {
       var data = [];
-      for (var i = 0; i < table.length; i++) {
+      for (var i = 0; i < table.slice(0, -1).length; i++) {
         data.push(+table[i].enabled);
         data.push(table[i].name);
         data.push(table[i].value);
       }
       return data;
     },
-    generateDataTable: function (list) {
+    deserializeDataTable: function (list) {
       var table = [];
-      if (!list.length) {
-        return table;
-      }
       for (var i = 0; i < list.length / 3; i++) {
         table.push({
           enabled: !!list[3 * i],
@@ -88,23 +84,15 @@ angular.module('PathOfDamage')
       }
       return table;
     },
-    generateHitList: function (hits) {
-      var list = [];
-      for (var i = 0; i < hits.length; i++) {
-        list.push(hits[i].hit);
-      }
-      return list;
+    serializeHits: function (hits) {
+      return hits.map(function (hit) {
+        return hit.hit;
+      });
     },
-    generateHitObject: function (hitList) {
-      if (hitList) {
-        var hits = [];
-        for (var i = 0; i < hitList.length; i++) {
-            hits.push({
-                hit: hitList[i]
-            });
-        }
-        return hits;
-      }
+    deserializeHits: function (hits) {
+      return hits.map(function (hit) {
+        return {hit: hit};
+      });
     }
   };
 });
