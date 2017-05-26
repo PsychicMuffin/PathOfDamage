@@ -115,46 +115,16 @@ angular.module('PathOfDamage', [])
   }
 
   function serializeData() {
-    var data = {
-      i: DataService.serializeDataTable($scope.sections.monster.tables.increase.values),
-      m: DataService.serializeDataTable($scope.sections.monster.tables.more.values),
-      s: DataService.serializeDataTable($scope.sections.shift.tables.shifts.values),
-      a: $scope.sections.mitigation.armor,
-      c: $scope.sections.mitigation.charges,
-      r: DataService.serializeDataTable($scope.sections.mitigation.tables.reduction.values),
-      f: DataService.serializeDataTable($scope.sections.taken.tables.flat.values),
-      d: DataService.serializeDataTable($scope.sections.taken.tables.reduced.values),
-      l: DataService.serializeDataTable($scope.sections.taken.tables.less.values),
-      h: DataService.serializeHits($scope.hits),
-      t: $scope.resistance,
-      p: $scope.healthPool
-    };
-    var stringified = rison.encode(data);
+    var stringified = DataService.encodeData($scope);
     stringified = LZString.compressToEncodedURIComponent(stringified);
     window.history.pushState({}, '', '?' + stringified);
   }
 
-  function deserializeData(data) {
-    $scope.sections.monster.tables.increase.values = DataService.deserializeDataTable(data.i);
-    $scope.sections.monster.tables.more.values = DataService.deserializeDataTable(data.m);
-    $scope.sections.shift.tables.shifts.values = DataService.deserializeDataTable(data.s);
-    $scope.sections.mitigation.armor = data.a;
-    $scope.sections.mitigation.charges = data.c;
-    $scope.sections.mitigation.tables.reduction.values = DataService.deserializeDataTable(data.r);
-    $scope.sections.taken.tables.flat.values = DataService.deserializeDataTable(data.f);
-    $scope.sections.taken.tables.reduced.values = DataService.deserializeDataTable(data.d);
-    $scope.sections.taken.tables.less.values = DataService.deserializeDataTable(data.l);
-    $scope.hits = DataService.deserializeHits(data.h);
-    $scope.resistance = data.t;
-    $scope.healthPool = data.p;
-  }
-
   // Load data from URL
-  var data = window.location.search;
-  if (data) {
-    data = LZString.decompressFromEncodedURIComponent(data.substring(1));
-    data = rison.decode(data);
-    deserializeData(data)
+  var dataString = window.location.search;
+  if (dataString) {
+    dataString = LZString.decompressFromEncodedURIComponent(dataString.substring(1));
+    DataService.decodeData($scope, dataString);
   }
 
   // Add empty last row to tables
