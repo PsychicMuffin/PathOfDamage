@@ -13,8 +13,7 @@ angular.module('PathOfDamage')
               total: 0
             },
             more: {
-              placeholder: "More Damage",
-              values: []
+              placeholder: "More Damage"
             }
           }
         },
@@ -57,8 +56,7 @@ angular.module('PathOfDamage')
               total: 0
             },
             less: {
-              placeholder: "Less Taken",
-              values: []
+              placeholder: "Less Taken"
             }
           }
         }
@@ -85,7 +83,7 @@ angular.module('PathOfDamage')
       return table;
     },
     serializeHits: function (hits) {
-      return hits.map(function (hit) {
+      return hits.slice(0, -1).map(function (hit) {
         return hit.hit;
       });
     },

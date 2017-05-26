@@ -73,12 +73,12 @@
     <tr ng-repeat="hit in hits track by $index">
       <td class="damageInput">
         <input class="form-control input-sm" type="number" ng-model="hits[$index].hit"
-               ng-model-options="{debounce: 500}" ng-change="updateHit($index)">
+               ng-model-options="{debounce: 500}" ng-change="updateHitTable($index)">
       </td>
       <td class="damageOutput"><span class="taken">{{hit.taken}}</span>
         <div class="healthBarContainer">
-          <div class="health bar" ng-style="getWidth(hit.remaining)"></div>
-          <div class="physical bar" ng-style="getWidth(hit.taken)"></div>
+          <div class="health bar" ng-style="getHitWidth(hit.remaining)"></div>
+          <div class="physical bar" ng-style="getHitWidth(hit.taken)"></div>
         </div>
         <div class="tooltip">
           Phys Damage Taken: {{hit.taken-hit.shifted}} <br/>
