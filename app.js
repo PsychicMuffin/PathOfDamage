@@ -38,11 +38,11 @@ angular.module('PathOfDamage', [])
       }
     }
     if (!skipUpdates) {
-      $scope.updateHits();
+      $scope.updateDamageValues();
     }
   };
 
-  $scope.updateHits = function (skipSerialization) {
+  $scope.updateDamageValues = function (skipSerialization) {
     for (var i = 0; i < $scope.hits.length - 1; i++) {
       $scope.hits[i] = calcDamage($scope.hits[i].hit);
     }
@@ -51,19 +51,19 @@ angular.module('PathOfDamage', [])
     }
   };
 
-  $scope.updateHitTable = function (index) {
-    if ($scope.hits[index].hit === null) {
+  $scope.updateHitRow = function (index) {
+    if ($scope.hits[index].hit) {
+      $scope.hits[index] = calcDamage($scope.hits[index].hit);
+      if ($scope.hits[$scope.hits.length - 1].hit) {
+        $scope.hits.push({hit: null});
+      }
+    } else {
       $scope.hits.splice(index, 1);
-      return;
     }
-    if ($scope.hits[$scope.hits.length - 1].hit !== null) {
-      $scope.hits.push({hit: null});
-    }
-    $scope.hits[index] = calcDamage($scope.hits[index].hit);
     serializeData();
   };
 
-  $scope.getHitWidth = function (damage) {
+  $scope.getBarWidth = function (damage) {
     var percent = (damage / $scope.healthPool) * 100;
     if (percent > 100) {
       percent = 100;
@@ -173,7 +173,7 @@ angular.module('PathOfDamage', [])
   });
 
   $scope.hits.push({hit: null});
-  $scope.updateHits(true);
+  $scope.updateDamageValues(true);
 
   window.onpopstate = function () {
     window.location.reload();

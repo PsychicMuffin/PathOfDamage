@@ -64,7 +64,7 @@ angular.module('PathOfDamage')
     },
     serializeDataTable: function (table) {
       var data = [];
-      for (var i = 0; i < table.slice(0, -1).length; i++) {
+      for (var i = 0; i < table.length - 1; i++) {
         data.push(+table[i].enabled);
         data.push(table[i].name);
         data.push(table[i].value);
