@@ -140,6 +140,12 @@ input#charges, input#resistance {
 input#flat {
     width: 2.75em;
 }
+.tableContainer {
+    display: inline-block;
+    padding-right: 0.5em;
+    position: relative;
+    vertical-align: top;
+}
 
 .table {
     width: auto;
@@ -149,6 +155,8 @@ input#flat {
 .table > tbody > tr > td {
     vertical-align: middle;
     border-top: inherit;
+    padding-left: 3px;
+    padding-right: 0;
 }
 
 .table td.name > input {
@@ -173,7 +181,46 @@ input[type='number'] {
     background-color: #D8E5EF;
 }
 
-.section hr {
+.input-group .input-group-addon.flat:hover {
+    background-color: #C2CED7;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select:none;
+    user-select:none;
+    -o-user-select:none;
+}
+
+.section .borderLine {
     border-bottom: 1px solid #66B9BF;
     border-top: 1px solid #B2DCDF;
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
+
+.section label {
+    position: relative;
+    margin-top: 1.7em;
+}
+
+.section .tableTitle {
+    padding-left: 20px;
+    font-weight: bold;
+}
+
+.section .total {
+    padding-left: 10em;
+}
+
+.section .buttonContainer {
+    width: 30px;
+}
+
+.section .btn {
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity .35s ease;
+}
+
+.section .tableContainer tr:hover .btn {
+    opacity: 1;
 }

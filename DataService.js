@@ -13,7 +13,9 @@ angular.module('PathOfDamage')
               total: 0
             },
             more: {
-              placeholder: "More Damage"
+              placeholder: "More Damage",
+              totalName: "More Monster Damage",
+              total: 0
             }
           }
         },
@@ -47,7 +49,7 @@ angular.module('PathOfDamage')
           tables: {
             flat: {
               placeholder: "Flat Reduction",
-              totalName: "Flat Reduction",
+              totalName: "Flat Physical Reduction",
               total: 0
             },
             reduced: {
@@ -56,7 +58,9 @@ angular.module('PathOfDamage')
               total: 0
             },
             less: {
-              placeholder: "Less Taken"
+              placeholder: "Less Taken",
+              totalName: "Less Damage Taken",
+              total: 0
             }
           }
         }
