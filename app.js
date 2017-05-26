@@ -6,6 +6,11 @@ angular.module('PathOfDamage', [])
   $scope.resistance = 75;
   $scope.healthPool = 5000;
 
+  $scope.clear = function () {
+    window.location.search = '';
+    window.location.reload();
+  };
+
   $scope.add = function (table) {
     var lastEntry = table.values[table.values.length - 1];
     if (lastEntry.name !== '' || lastEntry.value !== null) {
