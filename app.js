@@ -5,7 +5,7 @@ angular.module('PathOfDamage', [])
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000},
     {hit: 4000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
   $scope.resistance = 75;
-  $scope.health = 7000;
+  $scope.healthPool = 7000;
 
   $scope.updateHit = function (index, skipStringify) {
     if ($scope.hits[index].hit === null) {
@@ -93,7 +93,7 @@ angular.module('PathOfDamage', [])
       hit: initialHit,
       taken: Math.round(hit || 0),
       shifted: Math.round(shifted),
-      remaining: Math.round($scope.health - hit || 0)
+      remaining: Math.round($scope.healthPool - hit || 0)
     }
   }
 
@@ -107,7 +107,7 @@ angular.module('PathOfDamage', [])
   };
 
   $scope.getWidth = function(damage) {
-    var percent = (damage / $scope.health) * 100;
+    var percent = (damage / $scope.healthPool) * 100;
     if (percent > 100) {
       percent = 100;
     }
@@ -126,7 +126,8 @@ angular.module('PathOfDamage', [])
       d: DataService.generateDataList($scope.sections.taken.tables.reduced.values),
       l: DataService.generateDataList($scope.sections.taken.tables.less.values),
       h: DataService.generateHitList($scope.hits.slice(0,-1)),
-      t: $scope.resistance
+      t: $scope.resistance,
+      p: $scope.healthPool
     };
     var stringified = rison.encode(data);
     stringified = LZString.compressToEncodedURIComponent(stringified);
@@ -145,6 +146,7 @@ angular.module('PathOfDamage', [])
     $scope.sections.taken.tables.less.values = DataService.generateDataTable(data.l);
     $scope.hits = DataService.generateHitObject(data.h) || $scope.hits;
     $scope.resistance = data.t;
+    $scope.healthPool = data.p;
   }
 
   // Load data from URL
