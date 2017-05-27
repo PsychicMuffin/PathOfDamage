@@ -28,7 +28,7 @@ angular.module('PathOfDamage', [])
     $scope.updateTotal(table);
   };
 
-  $scope.inverse = function(table, index) {
+  $scope.inverse = function (table, index) {
     table.values[index].value *= -1;
   };
 

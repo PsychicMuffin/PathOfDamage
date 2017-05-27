@@ -140,6 +140,7 @@ input#charges, input#resistance {
 input#flat {
     width: 2.75em;
 }
+
 .tableContainer {
     display: inline-block;
     padding-right: 0.5em;
@@ -185,9 +186,9 @@ input[type='number'] {
     background-color: #C2CED7;
     -moz-user-select: none;
     -webkit-user-select: none;
-    -ms-user-select:none;
-    user-select:none;
-    -o-user-select:none;
+    -ms-user-select: none;
+    user-select: none;
+    -o-user-select: none;
 }
 
 .section .borderLine {
