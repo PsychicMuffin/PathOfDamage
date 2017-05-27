@@ -1,5 +1,23 @@
 angular.module('PathOfDamage')
 .service('DataService', function () {
+  var NAME_DELIMITER = '\r';
+  var ROW_DELIMITER = '\f';
+  var SECTION_DELIMITER = '\0';
+
+  function parseIntOrNull(string) {
+    var int = parseInt(string);
+    return isNaN(int) ? null : int;
+  }
+
+  function checkTotal(table) {
+    if (table.totalMin) {
+      table.total = Math.max(table.total, table.totalMin);
+    }
+    if (table.totalMax) {
+      table.total = Math.min(table.total, table.totalMax);
+    }
+  }
+
   return {
     getSections: function () {
       return {
@@ -10,12 +28,13 @@ angular.module('PathOfDamage')
             increase: {
               placeholder: "Increased Damage",
               totalName: "Increased Monster Damage",
-              total: 0
+              totalMin: -100
             },
             more: {
               placeholder: "More Damage",
-              totalName: "More Monster Damage",
-              total: 0
+              totalName: "More Damage Taken",
+              totalMin: -100,
+              totalCalc: this.multiplicative
             }
           }
         },
@@ -26,20 +45,21 @@ angular.module('PathOfDamage')
             shifts: {
               placeholder: "Shift Source",
               totalName: "Damage Shifted",
-              total: 0
+              totalMin: 0,
+              totalMax: 100
             }
           }
         },
         mitigation: {
           name: "Damage Mitigation",
           description: "Elemental and chaos damage is mitigated by its respective resistance. Physical damage is mitigated by the sum of all '% additional Physical Damage Reduction' modifiers, up to its 90% cap. This includes armor, endurance charges, and things like Basalt Flasks and Chaos Golem.",
-          armor: null,
-          charges: null,
+          armor: 0,
+          charges: 0,
           tables: {
             reduction: {
               placeholder: "Reduction Name",
               totalName: "Additional Physical Damage Reduction",
-              total: 0
+              totalMax: 90
             }
           }
         },
@@ -48,53 +68,118 @@ angular.module('PathOfDamage')
           description: "After damage mitigation, modifiers to damage taken are applied. Flat amounts (±X Damage taken from Y, like Astramentis) are applied first, then the sum of all increases/reductions (% increased/reduced X Damage taken, like Fortify, Shock, and Abyssus) and lastly more/less multipliers (% more/less X Damage taken, like Arctic Armour).",
           tables: {
             flat: {
-              placeholder: "Flat Reduction",
-              totalName: "Flat Physical Reduction",
-              total: 0
+              placeholder: "Flat Increase",
+              totalName: "Flat Increase"
             },
-            reduced: {
-              placeholder: "Reduced Taken",
-              totalName: "Reduced Damage Taken",
-              total: 0
+            increased: {
+              placeholder: "Increased Taken",
+              totalName: "Increased Damage Taken",
+              totalMax: 100
             },
-            less: {
-              placeholder: "Less Taken",
-              totalName: "Less Damage Taken",
-              total: 0
+            more: {
+              placeholder: "More Taken",
+              totalName: "More Damage Taken",
+              totalMax: 100,
+              totalCalc: this.multiplicative
             }
           }
         }
       };
     },
-    serializeDataTable: function (table) {
-      var data = [];
+    additive: function () {
+      this.total = 0;
+      for (var i = 0; i < this.values.length - 1; i++) {
+        if (this.values[i].enabled && this.values[i].value) {
+          this.total += this.values[i].value;
+        }
+      }
+      checkTotal(this);
+    },
+    multiplicative: function () {
+      this.total = 100;
+      for (var i = 0; i < this.values.length - 1; i++) {
+        if (this.values[i].enabled && this.values[i].value) {
+          this.total *= (1 + this.values[i].value / 100);
+        }
+      }
+      this.total -= 100;
+      checkTotal(this);
+    },
+    encodeData: function (scope) {
+      var dataString = '';
+      dataString += this.encodeTable(scope.sections.monster.tables.increase.values);
+      dataString += this.encodeTable(scope.sections.monster.tables.more.values);
+      dataString += this.encodeTable(scope.sections.shift.tables.shifts.values);
+      dataString += this.encodeTable(scope.sections.mitigation.tables.reduction.values);
+      dataString += this.encodeTable(scope.sections.taken.tables.flat.values);
+      dataString += this.encodeTable(scope.sections.taken.tables.increased.values);
+      dataString += this.encodeTable(scope.sections.taken.tables.more.values);
+      scope.hits.slice(0, -1).map(function (hit, index, array) {
+        var delimiter = index === array.length - 1 ? SECTION_DELIMITER : ROW_DELIMITER;
+        dataString += hit.hit + delimiter;
+      });
+      dataString += scope.sections.mitigation.armor + SECTION_DELIMITER;
+      dataString += scope.sections.mitigation.charges + SECTION_DELIMITER;
+      dataString += scope.resistance + SECTION_DELIMITER;
+      dataString += scope.healthPool;
+      return dataString;
+    },
+    encodeTable: function (table) {
+      var tableData = '';
       for (var i = 0; i < table.length - 1; i++) {
-        data.push(+table[i].enabled);
-        data.push(table[i].name);
-        data.push(table[i].value);
+        tableData += +table[i].enabled;
+        if (table[i].name) {
+          tableData += table[i].name;
+          tableData += NAME_DELIMITER;
+        }
+        if (table[i].value) {
+          tableData += table[i].value;
+        }
+        if (i !== table.length - 2) {
+          tableData += ROW_DELIMITER;
+        }
       }
-      return data;
+      return tableData + SECTION_DELIMITER;
     },
-    deserializeDataTable: function (list) {
-      var table = [];
-      for (var i = 0; i < list.length / 3; i++) {
-        table.push({
-          enabled: !!list[3 * i],
-          name: list[3 * i + 1],
-          value: list[3 * i + 2]
-        });
+    decodeData: function (scope, dataString) {
+      var sections = dataString.split(SECTION_DELIMITER);
+      scope.sections.monster.tables.increase.values = this.decodeTable(sections[0]);
+      scope.sections.monster.tables.more.values = this.decodeTable(sections[1]);
+      scope.sections.shift.tables.shifts.values = this.decodeTable(sections[2]);
+      scope.sections.mitigation.tables.reduction.values = this.decodeTable(sections[3]);
+      scope.sections.taken.tables.flat.values = this.decodeTable(sections[4]);
+      scope.sections.taken.tables.increased.values = this.decodeTable(sections[5]);
+      scope.sections.taken.tables.more.values = this.decodeTable(sections[6]);
+      scope.hits = sections[7].split(ROW_DELIMITER).map(function (hit) {
+        return {hit: parseIntOrNull(hit)};
+      });
+      scope.sections.mitigation.armor = parseIntOrNull(sections[8]);
+      scope.sections.mitigation.charges = parseIntOrNull(sections[9]);
+      scope.resistance = parseIntOrNull(sections[10]);
+      scope.healthPool = parseIntOrNull(sections[11]);
+    },
+    decodeTable: function (tableString) {
+      if (tableString) {
+        var rows = tableString.split(ROW_DELIMITER);
+        var table = [];
+        for (var i = 0; i < rows.length; i++) {
+          var valueIndex = rows[i].indexOf(NAME_DELIMITER);
+          if (valueIndex > -1) {
+            table.push({
+              enabled: !!rows[i].slice(0, 1),
+              name: rows[i].slice(1, valueIndex),
+              value: parseIntOrNull(rows[i].slice(valueIndex + 1))
+            });
+          } else {
+            table.push({
+              enabled: !!rows[i].slice(0, 1),
+              name: '',
+              value: parseIntOrNull(rows[i].slice(1))
+            });
+          }
+        }
+        return table;
       }
-      return table;
-    },
-    serializeHits: function (hits) {
-      return hits.slice(0, -1).map(function (hit) {
-        return hit.hit;
-      });
-    },
-    deserializeHits: function (hits) {
-      return hits.map(function (hit) {
-        return {hit: hit};
-      });
     }
   };
 });

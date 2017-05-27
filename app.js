@@ -33,14 +33,7 @@ angular.module('PathOfDamage', [])
   };
 
   $scope.updateTotal = function (table, skipUpdates) {
-    if (table.total !== undefined) {
-      table.total = 0;
-      for (var i = 0; i < table.values.length - 1; i++) {
-        if (table.values[i].enabled && !isNaN(table.values[i].value)) {
-          table.total += table.values[i].value;
-        }
-      }
-    }
+    table.totalCalc();
     if (!skipUpdates) {
       $scope.updateDamageValues();
     }
@@ -84,13 +77,12 @@ angular.module('PathOfDamage', [])
     var monsterIncrease = $scope.sections.monster.tables.increase.total / 100;
     hit *= (1 + monsterIncrease);
 
-    $scope.sections.monster.tables.more.values.forEach(function (monsterMore) {
-      hit *= (1 + monsterMore.value / 100)
-    });
+    var monsterMore = $scope.sections.monster.tables.more.total / 100;
+    hit *= (1 + monsterMore);
 
     var shifts = $scope.sections.shift.tables.shifts.total / 100;
     var shifted = hit * shifts * (1 - $scope.resistance / 100);
-    hit *= (1 - shifts);
+    hit -= shifted;
 
     var armor = $scope.sections.mitigation.armor / ($scope.sections.mitigation.armor + 10 * hit);
     var endurance = $scope.sections.mitigation.charges * .04;
@@ -101,14 +93,14 @@ angular.module('PathOfDamage', [])
     }
     hit *= (1 - reduction);
 
-    hit -= $scope.sections.taken.tables.flat.total;
+    hit += $scope.sections.taken.tables.flat.total;
+    hit = Math.max(hit, 0);
 
-    var reducedTaken = $scope.sections.taken.tables.reduced.total / 100;
-    hit *= (1 - reducedTaken);
+    var increasedTaken = $scope.sections.taken.tables.increased.total / 100;
+    hit *= (1 + increasedTaken);
 
-    $scope.sections.taken.tables.less.values.forEach(function (lessTaken) {
-      hit *= (1 - lessTaken.value / 100)
-    });
+    var moreTaken = $scope.sections.taken.tables.more.total / 100;
+    hit *= (1 + moreTaken);
 
     return {
       hit: initialHit,
@@ -119,46 +111,16 @@ angular.module('PathOfDamage', [])
   }
 
   function serializeData() {
-    var data = {
-      i: DataService.serializeDataTable($scope.sections.monster.tables.increase.values),
-      m: DataService.serializeDataTable($scope.sections.monster.tables.more.values),
-      s: DataService.serializeDataTable($scope.sections.shift.tables.shifts.values),
-      a: $scope.sections.mitigation.armor,
-      c: $scope.sections.mitigation.charges,
-      r: DataService.serializeDataTable($scope.sections.mitigation.tables.reduction.values),
-      f: DataService.serializeDataTable($scope.sections.taken.tables.flat.values),
-      d: DataService.serializeDataTable($scope.sections.taken.tables.reduced.values),
-      l: DataService.serializeDataTable($scope.sections.taken.tables.less.values),
-      h: DataService.serializeHits($scope.hits),
-      t: $scope.resistance,
-      p: $scope.healthPool
-    };
-    var stringified = rison.encode(data);
+    var stringified = DataService.encodeData($scope);
     stringified = LZString.compressToEncodedURIComponent(stringified);
     window.history.pushState({}, '', '?' + stringified);
   }
 
-  function deserializeData(data) {
-    $scope.sections.monster.tables.increase.values = DataService.deserializeDataTable(data.i);
-    $scope.sections.monster.tables.more.values = DataService.deserializeDataTable(data.m);
-    $scope.sections.shift.tables.shifts.values = DataService.deserializeDataTable(data.s);
-    $scope.sections.mitigation.armor = data.a;
-    $scope.sections.mitigation.charges = data.c;
-    $scope.sections.mitigation.tables.reduction.values = DataService.deserializeDataTable(data.r);
-    $scope.sections.taken.tables.flat.values = DataService.deserializeDataTable(data.f);
-    $scope.sections.taken.tables.reduced.values = DataService.deserializeDataTable(data.d);
-    $scope.sections.taken.tables.less.values = DataService.deserializeDataTable(data.l);
-    $scope.hits = DataService.deserializeHits(data.h);
-    $scope.resistance = data.t;
-    $scope.healthPool = data.p;
-  }
-
   // Load data from URL
-  var data = window.location.search;
-  if (data) {
-    data = LZString.decompressFromEncodedURIComponent(data.substring(1));
-    data = rison.decode(data);
-    deserializeData(data)
+  var dataString = window.location.search;
+  if (dataString) {
+    dataString = LZString.decompressFromEncodedURIComponent(dataString.substring(1));
+    DataService.decodeData($scope, dataString);
   }
 
   // Add empty last row to tables
@@ -166,6 +128,7 @@ angular.module('PathOfDamage', [])
     var section = $scope.sections[sectionKey];
     Object.keys(section.tables).forEach(function (tableKey) {
       var table = section.tables[tableKey];
+      table.totalCalc = table.totalCalc || DataService.additive;
       table.values = table.values || [];
       table.values.push({
         enabled: true,
