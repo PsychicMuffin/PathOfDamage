@@ -29,14 +29,7 @@ angular.module('PathOfDamage', [])
   };
 
   $scope.updateTotal = function (table, skipUpdates) {
-    if (table.total !== undefined) {
-      table.total = 0;
-      for (var i = 0; i < table.values.length - 1; i++) {
-        if (table.values[i].enabled && !isNaN(table.values[i].value)) {
-          table.total += table.values[i].value;
-        }
-      }
-    }
+    table.totalCalc(table);
     if (!skipUpdates) {
       $scope.updateDamageValues();
     }
@@ -80,9 +73,8 @@ angular.module('PathOfDamage', [])
     var monsterIncrease = $scope.sections.monster.tables.increase.total / 100;
     hit *= (1 + monsterIncrease);
 
-    $scope.sections.monster.tables.more.values.forEach(function (monsterMore) {
-      hit *= (1 + monsterMore.value / 100)
-    });
+    var monsterMore = $scope.sections.monster.tables.more.total / 100;
+    hit *= (1 + monsterMore);
 
     var shifts = $scope.sections.shift.tables.shifts.total / 100;
     var shifted = hit * shifts * (1 - $scope.resistance / 100);
@@ -97,14 +89,14 @@ angular.module('PathOfDamage', [])
     }
     hit *= (1 - reduction);
 
-    hit -= $scope.sections.taken.tables.flat.total;
+    hit += $scope.sections.taken.tables.flat.total;
+    hit = Math.max(hit, 0);
 
-    var reducedTaken = $scope.sections.taken.tables.reduced.total / 100;
-    hit *= (1 - reducedTaken);
+    var increasedTaken = $scope.sections.taken.tables.increased.total / 100;
+    hit *= (1 + increasedTaken);
 
-    $scope.sections.taken.tables.less.values.forEach(function (lessTaken) {
-      hit *= (1 - lessTaken.value / 100)
-    });
+    var moreTaken = $scope.sections.taken.tables.more.total / 100;
+    hit *= (1 + moreTaken);
 
     return {
       hit: initialHit,
@@ -132,6 +124,7 @@ angular.module('PathOfDamage', [])
     var section = $scope.sections[sectionKey];
     Object.keys(section.tables).forEach(function (tableKey) {
       var table = section.tables[tableKey];
+      table.totalCalc = table.totalCalc || DataService.additive;
       table.values = table.values || [];
       table.values.push({
         enabled: true,
