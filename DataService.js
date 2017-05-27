@@ -9,6 +9,15 @@ angular.module('PathOfDamage')
     return isNaN(int) ? null : int;
   }
 
+  function checkTotal(table) {
+    if (table.totalMin) {
+      table.total = Math.max(table.total, table.totalMin);
+    }
+    if (table.totalMax) {
+      table.total = Math.min(table.total, table.totalMax);
+    }
+  }
+
   return {
     getSections: function () {
       return {
@@ -19,10 +28,13 @@ angular.module('PathOfDamage')
             increase: {
               placeholder: "Increased Damage",
               totalName: "Increased Monster Damage",
-              total: 0
+              totalMin: -100
             },
             more: {
-              placeholder: "More Damage"
+              placeholder: "More Damage",
+              totalName: "More Damage Taken",
+              totalMin: -100,
+              totalCalc: this.multiplicative
             }
           }
         },
@@ -33,7 +45,8 @@ angular.module('PathOfDamage')
             shifts: {
               placeholder: "Shift Source",
               totalName: "Damage Shifted",
-              total: 0
+              totalMin: 0,
+              totalMax: 100
             }
           }
         },
@@ -46,7 +59,7 @@ angular.module('PathOfDamage')
             reduction: {
               placeholder: "Reduction Name",
               totalName: "Additional Physical Damage Reduction",
-              total: 0
+              totalMax: 90
             }
           }
         },
@@ -55,21 +68,42 @@ angular.module('PathOfDamage')
           description: "After damage mitigation, modifiers to damage taken are applied. Flat amounts (±X Damage taken from Y, like Astramentis) are applied first, then the sum of all increases/reductions (% increased/reduced X Damage taken, like Fortify, Shock, and Abyssus) and lastly more/less multipliers (% more/less X Damage taken, like Arctic Armour).",
           tables: {
             flat: {
-              placeholder: "Flat Reduction",
-              totalName: "Flat Reduction",
-              total: 0
+              placeholder: "Flat Increase",
+              totalName: "Flat Increase"
             },
-            reduced: {
-              placeholder: "Reduced Taken",
-              totalName: "Reduced Damage Taken",
-              total: 0
+            increased: {
+              placeholder: "Increased Taken",
+              totalName: "Increased Damage Taken",
+              totalMax: 100
             },
-            less: {
-              placeholder: "Less Taken"
+            more: {
+              placeholder: "More Taken",
+              totalName: "More Damage Taken",
+              totalMax: 100,
+              totalCalc: this.multiplicative
             }
           }
         }
       };
+    },
+    additive: function () {
+      this.total = 0;
+      for (var i = 0; i < this.values.length - 1; i++) {
+        if (this.values[i].enabled && this.values[i].value) {
+          this.total += this.values[i].value;
+        }
+      }
+      checkTotal(this);
+    },
+    multiplicative: function () {
+      this.total = 100;
+      for (var i = 0; i < this.values.length - 1; i++) {
+        if (this.values[i].enabled && this.values[i].value) {
+          this.total *= (1 + this.values[i].value / 100);
+        }
+      }
+      this.total -= 100;
+      checkTotal(this);
     },
     encodeData: function (scope) {
       var dataString = '';
@@ -78,8 +112,8 @@ angular.module('PathOfDamage')
       dataString += this.encodeTable(scope.sections.shift.tables.shifts.values);
       dataString += this.encodeTable(scope.sections.mitigation.tables.reduction.values);
       dataString += this.encodeTable(scope.sections.taken.tables.flat.values);
-      dataString += this.encodeTable(scope.sections.taken.tables.reduced.values);
-      dataString += this.encodeTable(scope.sections.taken.tables.less.values);
+      dataString += this.encodeTable(scope.sections.taken.tables.increased.values);
+      dataString += this.encodeTable(scope.sections.taken.tables.more.values);
       scope.hits.slice(0, -1).map(function (hit, index, array) {
         var delimiter = index === array.length - 1 ? SECTION_DELIMITER : ROW_DELIMITER;
         dataString += hit.hit + delimiter;
@@ -114,8 +148,8 @@ angular.module('PathOfDamage')
       scope.sections.shift.tables.shifts.values = this.decodeTable(sections[2]);
       scope.sections.mitigation.tables.reduction.values = this.decodeTable(sections[3]);
       scope.sections.taken.tables.flat.values = this.decodeTable(sections[4]);
-      scope.sections.taken.tables.reduced.values = this.decodeTable(sections[5]);
-      scope.sections.taken.tables.less.values = this.decodeTable(sections[6]);
+      scope.sections.taken.tables.increased.values = this.decodeTable(sections[5]);
+      scope.sections.taken.tables.more.values = this.decodeTable(sections[6]);
       scope.hits = sections[7].split(ROW_DELIMITER).map(function (hit) {
         return {hit: parseIntOrNull(hit)};
       });
