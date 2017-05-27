@@ -28,6 +28,10 @@ angular.module('PathOfDamage', [])
     $scope.updateTotal(table);
   };
 
+  $scope.inverse = function (table, index) {
+    table.values[index].value *= -1;
+  };
+
   $scope.updateTotal = function (table, skipUpdates) {
     table.totalCalc();
     if (!skipUpdates) {
