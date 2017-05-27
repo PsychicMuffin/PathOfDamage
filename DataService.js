@@ -26,13 +26,11 @@ angular.module('PathOfDamage')
           description: "These are things that directly change a monster's damage before they attack, such as map mods or curses",
           tables: {
             increase: {
-              placeholder: "Increased Damage",
               totalName: "Increased Monster Damage",
               totalMin: -100
             },
             more: {
-              placeholder: "More Damage",
-              totalName: "More Damage Taken",
+              totalName: "More Monster Damage",
               totalMin: -100,
               totalCalc: this.multiplicative
             }
@@ -43,7 +41,6 @@ angular.module('PathOfDamage')
           description: "Modifiers that shift physical damage to elemental, typically reading like '% of Physical Damage taken as Y', such as Taste of Hate or Lightning Coil",
           tables: {
             shifts: {
-              placeholder: "Shift Source",
               totalName: "Damage Shifted",
               totalMin: 0,
               totalMax: 100
@@ -57,7 +54,6 @@ angular.module('PathOfDamage')
           charges: 0,
           tables: {
             reduction: {
-              placeholder: "Reduction Name",
               totalName: "Additional Physical Damage Reduction",
               totalMax: 90
             }
@@ -68,16 +64,13 @@ angular.module('PathOfDamage')
           description: "After damage mitigation, modifiers to damage taken are applied. Flat amounts (±X Damage taken from Y, like Astramentis) are applied first, then the sum of all increases/reductions (% increased/reduced X Damage taken, like Fortify, Shock, and Abyssus) and lastly more/less multipliers (% more/less X Damage taken, like Arctic Armour).",
           tables: {
             flat: {
-              placeholder: "Flat Increase",
               totalName: "Flat Increase"
             },
             increased: {
-              placeholder: "Increased Taken",
               totalName: "Increased Damage Taken",
               totalMax: 100
             },
             more: {
-              placeholder: "More Taken",
               totalName: "More Damage Taken",
               totalMax: 100,
               totalCalc: this.multiplicative
