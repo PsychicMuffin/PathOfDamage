@@ -78,7 +78,7 @@ angular.module('PathOfDamage', [])
 
     var shifts = $scope.sections.shift.tables.shifts.total / 100;
     var shifted = hit * shifts * (1 - $scope.resistance / 100);
-    hit *= (1 - shifts);
+    hit -= shifted;
 
     var armor = $scope.sections.mitigation.armor / ($scope.sections.mitigation.armor + 10 * hit);
     var endurance = $scope.sections.mitigation.charges * .04;
