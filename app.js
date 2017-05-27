@@ -29,7 +29,7 @@ angular.module('PathOfDamage', [])
   };
 
   $scope.updateTotal = function (table, skipUpdates) {
-    table.totalCalc(table);
+    table.totalCalc();
     if (!skipUpdates) {
       $scope.updateDamageValues();
     }
