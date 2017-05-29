@@ -63,7 +63,7 @@
           </tr>
         </table>
         <div class="total" ng-if="table.values.length > 1">
-          Total: <b>{{table.total}}{{tableName !== 'flat' ? '%' : ''}}</b>
+          Total: <b>{{getDisplayTotal(table)}}{{tableName !== 'flat' ? '%' : ''}}</b>
         </div>
       </div>
       <hr class="borderLine">
