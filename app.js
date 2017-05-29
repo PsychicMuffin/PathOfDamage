@@ -68,6 +68,10 @@ angular.module('PathOfDamage', [])
     return {width: (percent || 0) + "%"};
   };
 
+  $scope.getDisplayTotal = function (table) {
+    return Math.round(table.total);
+  };
+
   function calcDamage(hit) {
     if (hit === null) {
       return {};
