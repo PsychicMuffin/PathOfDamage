@@ -1,0 +1,99 @@
+.damageTable {
+    position: fixed;
+    right: 10px;
+    top: 90px;
+    width: 17em;
+}
+
+.damageTable .control-label {
+    padding-top: 5px;
+    width: 100%;
+    text-align: center;
+    display: inline-block;
+}
+
+.damageTable .damageInput input {
+    width: 7em;
+    background-color: transparent;
+    font-size: 14px;
+}
+
+.damageTable .damageInput,
+.damageTable .damageOutput {
+    padding: 0;
+}
+
+.damageTable .damageOutput {
+    padding-left: 5px;
+}
+
+.damageTable .damageOutput {
+    position: relative;
+    width: 9em;
+}
+
+.damageTable .damageOutput .taken {
+    padding-left: 5px;
+}
+
+.damageTable .damageOutput .healthBarContainer {
+    font-size: 0;
+    padding-right: 5px;
+}
+
+.damageTable .damageOutput .bar {
+    height: 3px;
+    display: inline-block;
+}
+
+.damageTable .damageOutput .health {
+    background-color: #FF0000;
+    border-bottom: 1px solid #8B0000;
+}
+
+.damageTable .damageOutput .physical {
+    background-color: #708090;
+    border-bottom: 1px solid #2F4F4F;
+}
+
+/* Tooltip text */
+.damageTable .damageOutput .tooltip {
+    visibility: hidden;
+    width: 160px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+
+    /* Position the tooltip text */
+    position: absolute;
+    z-index: 1;
+    top: 125%;
+    left: 50%;
+    margin-left: -7em;
+
+    /* Fade in tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.damageTable .damageOutput .tooltip::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border: 5px solid transparent;
+    border-bottom-color: #555;
+}
+
+.damageTable .damageOutput:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.damageTable .table-striped tr:nth-of-type(odd) {
+    background-color: #F3FAFA;
+}
