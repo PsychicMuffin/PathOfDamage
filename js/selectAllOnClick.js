@@ -7,7 +7,7 @@ angular.module('PathOfDamage')
       element.on('click', function($event) {
         if (!hasSelectedAll) {
           try {
-            //WOrks with IOs, Safari. Thows exception on Chrome etc
+            //Works with IOs, Safari. Thows exception on Chrome etc
             this.selectionStart = 0;
             this.selectionEnd = this.value.length + 1;
             hasSelectedAll = true;
