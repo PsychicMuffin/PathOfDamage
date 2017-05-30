@@ -26,7 +26,7 @@
       </h4>
       <div class="tableContainer" ng-if="section.armor !== undefined || section.charges !== undefined">
         <label ng-if="section.armor !== undefined" class="control-label">Armor:
-          <input class="form-control"
+          <input class="input number noIncrement"
                  type="number"
                  ng-model="section.armor"
                  ng-model-options="{debounce: 500}"
@@ -36,7 +36,7 @@
         </label>
 
         <label class="control-label" ng-if="section.charges !== undefined">Endurance Charges:
-          <input class="form-control"
+          <input class="input number"
                  type="number"
                  ng-model="section.charges"
                  ng-model-options="{debounce: 500}"
@@ -50,10 +50,10 @@
         <table class="table table-condensed">
           <tr ng-repeat="value in table.values track by $index">
             <td>
-              <input type="checkbox" ng-model="value.enabled" ng-change="updateTotal(table)">
+              <input type="checkbox" class="checkbox" ng-model="value.enabled" ng-change="updateTotal(table)">
             </td>
             <td class="name">
-              <input class="form-control"
+              <input class="input"
                      type="text"
                      placeholder="Source Name"
                      ng-model="value.name"
@@ -62,7 +62,7 @@
             </td>
             <td class="percent">
               <div class="input-group">
-                <input class="form-control"
+                <input class="input number noIncrement"
                        type="number"
                        placeholder="+/-"
                        ng-model="value.value"
@@ -109,7 +109,7 @@
     </tr>
     <tr ng-repeat="hit in hits track by $index">
       <td class="damageInput">
-        <input class="form-control"
+        <input class="input number noIncrement"
                type="number"
                ng-model="hits[$index].hit"
                ng-model-options="{debounce: 500}"
@@ -131,7 +131,7 @@
     </tr>
   </table>
   <label class="control-label">Elemental Resistance:
-    <input class="form-control"
+    <input class="input number noIncrement"
            type="number"
            ng-model="resistance"
            ng-model-options="{debounce: 500}"
@@ -140,7 +140,7 @@
            select-all-on-click>
   </label>
   <label class="control-label">Health and ES Pool:
-    <input class="form-control"
+    <input class="input number noIncrement"
            type="number"
            ng-model="healthPool"
            ng-model-options="{debounce: 500}"
