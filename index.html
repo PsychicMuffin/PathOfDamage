@@ -7,6 +7,7 @@
   <script src="libs/lz-string.min.js"></script>
   <script src="app.js"></script>
   <script src="DataService.js"></script>
+  <script src="selectAllOnClick.js"></script>
   <link rel="stylesheet" href="style.css">
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico"/>
 </head>
@@ -14,7 +15,7 @@
 <div class="background">
   <div class="header">
     <div class="title">Path of Damage</div>
-    <div>The Path of Exile physical hit damage calculator</div>
+    <div>The Path of Exile physical hit damage mitigation calculator</div>
   </div>
   <div class="input">
     <div class="section" ng-repeat="(sectionName, section) in sections">
@@ -23,13 +24,23 @@
       </h4>
       <div class="tableContainer" ng-if="section.armor !== undefined || section.charges !== undefined">
         <label ng-if="section.armor !== undefined" class="control-label">Armor:
-          <input class="form-control input-sm" type="number" ng-model="section.armor" ng-model-options="{debounce: 500}"
-                 id="armor" ng-change="updateDamageValues()">
+          <input class="form-control input-sm"
+                 type="number"
+                 ng-model="section.armor"
+                 ng-model-options="{debounce: 500}"
+                 id="armor"
+                 ng-change="updateDamageValues()"
+                 select-all-on-click>
         </label>
 
-        <label ng-if="section.charges !== undefined" class="control-label">Endurance Charges:
-          <input class="form-control input-sm" type="number" ng-model="section.charges"
-                 ng-model-options="{debounce: 500}" id="charges" ng-change="updateDamageValues()">
+        <label class="control-label" ng-if="section.charges !== undefined">Endurance Charges:
+          <input class="form-control input-sm"
+                 type="number"
+                 ng-model="section.charges"
+                 ng-model-options="{debounce: 500}"
+                 id="charges"
+                 ng-change="updateDamageValues()"
+                 select-all-on-click>
         </label>
       </div>
       <div class="tableContainer" ng-repeat="(tableName, table) in section.tables">
@@ -40,23 +51,41 @@
               <input type="checkbox" ng-model="value.enabled" ng-change="updateTotal(table)">
             </td>
             <td class="name">
-              <input class="form-control input-sm" type="text" placeholder="Source Name" ng-model="value.name"
-                     ng-change="add(table)" ng-model-options="{debounce: 500}">
+              <input class="form-control input-sm"
+                     type="text"
+                     placeholder="Source Name"
+                     ng-model="value.name"
+                     ng-change="add(table)"
+                     ng-model-options="{debounce: 500}">
             </td>
             <td class="percent">
               <div class="input-group">
-                <input class="form-control input-sm" type="number" placeholder="+/-" ng-model="value.value"
-                       ng-change="add(table)" ng-model-options="{debounce: 500}" ng-attr-id="{{tableName}}">
+                <input class="form-control input-sm"
+                       type="number"
+                       placeholder="+/-"
+                       ng-model="value.value"
+                       ng-change="add(table)"
+                       ng-model-options="{debounce: 500}"
+                       ng-attr-id="{{tableName}}"
+                       select-all-on-click>
                 <div ng-if="tableName !== 'flat'" class="input-group-addon">%</div>
-                <div ng-if="tableName == 'flat'" class="input-group-addon flat" ng-click="inverse(table, $index)"
-                     unselectable="on" onselectstart="return false;" onmousedown="return false;">
+                <div ng-if="tableName == 'flat'"
+                     class="input-group-addon flat"
+                     ng-click="inverse(table, $index)"
+                     unselectable="on"
+                     onselectstart="return false;"
+                     onmousedown="return false;">
                   +/-
                 </div>
               </div>
             </td>
             <td>
               <div class="buttonContainer">
-                <button ng-if="!$last" class="btn btn-danger btn-sm" ng-click="delete(table, $index)">X</button>
+                <button ng-if="!$last"
+                        class="btn btn-danger btn-sm"
+                        ng-click="delete(table, $index)">
+                  X
+                </button>
               </div>
             </td>
           </tr>
@@ -78,8 +107,12 @@
     </tr>
     <tr ng-repeat="hit in hits track by $index">
       <td class="damageInput">
-        <input class="form-control input-sm" type="number" ng-model="hits[$index].hit"
-               ng-model-options="{debounce: 500}" ng-change="updateHitRow($index)">
+        <input class="form-control input-sm"
+               type="number"
+               ng-model="hits[$index].hit"
+               ng-model-options="{debounce: 500}"
+               ng-change="updateHitRow($index)"
+               select-all-on-click>
       </td>
       <td class="damageOutput"><span class="taken">{{hit.taken}}</span>
         <div class="healthBarContainer">
@@ -96,12 +129,22 @@
     </tr>
   </table>
   <label class="control-label">Elemental Resistance:
-    <input class="form-control input-sm" type="number" ng-model="resistance" ng-model-options="{debounce: 500}"
-           id="resistance" ng-change="updateDamageValues()">
+    <input class="form-control input-sm"
+           type="number"
+           ng-model="resistance"
+           ng-model-options="{debounce: 500}"
+           id="resistance"
+           ng-change="updateDamageValues()"
+           select-all-on-click>
   </label>
   <label class="control-label">Health and ES Pool:
-    <input class="form-control input-sm" type="number" ng-model="healthPool" ng-model-options="{debounce: 500}"
-           id="health" ng-change="updateDamageValues()">
+    <input class="form-control input-sm"
+           type="number"
+           ng-model="healthPool"
+           ng-model-options="{debounce: 500}"
+           id="health"
+           ng-change="updateDamageValues()"
+           select-all-on-click>
   </label>
 </div>
 </body>
