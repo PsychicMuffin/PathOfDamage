@@ -2,7 +2,7 @@ angular.module('PathOfDamage')
 .directive('selectAllOnClick', [function() {
   return {
     restrict: 'A',
-    link: function(scope, element, attrs) {
+    link: function(scope, element) {
       var hasSelectedAll = false;
       element.on('click', function($event) {
         if (!hasSelectedAll) {
