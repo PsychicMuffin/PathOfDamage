@@ -33,35 +33,34 @@
     padding: 5px;
     color: #555;
     background-color: #fff;
-    background-image: none;
     border: 1px solid #ccc;
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
 
 .input:focus {
     border-color: #66afe9;
     outline: 0;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
 }
 
-.input-group {
+.inputGroup {
     border-collapse: separate;
     position: relative;
     display: table;
     width: 4em;
 }
 
-.input-group .input:first-child {
+.inputGroup .input:first-child {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
 
-.input-group .input {
+.inputGroup .input {
     display: table-cell;
     position: relative;
     z-index: 2;
@@ -70,7 +69,7 @@
     margin-bottom: 0;
 }
 
-.input-group .input-group-addon {
+.inputGroup .inputGroupAddon {
     background-color: #D8E5EF;
     padding: 5px;
     font-size: 14px;
@@ -86,16 +85,15 @@
     display: table-cell;
 }
 
-.input-group .input-group-addon.flat:hover {
+.inputGroup .inputGroupAddon.flat:hover {
     background-color: #C2CED7;
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    -o-user-select: none;
 }
 
-.input-group .input-group-addon:last-child {
+.inputGroup .inputGroupAddon:last-child {
     border-left: 0;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
@@ -107,6 +105,6 @@
     -webkit-appearance: none;
 }
 
-.number.noIncrement{
+.number.noIncrement {
     -moz-appearance: textfield;
 }

@@ -24,6 +24,12 @@
     vertical-align: top;
 }
 
+.inputContainer {
+    margin-top: 1.7em;
+    padding-right: 0.5em;
+    display: inline-block;
+}
+
 .table {
     width: auto;
     margin-bottom: auto;
@@ -31,7 +37,6 @@
     border-spacing: 0;
     border-collapse: collapse;
 }
-
 
 .table td {
     vertical-align: middle;
@@ -80,25 +85,25 @@
     width: 30px;
 }
 
-.section .btn {
+.section .button {
     font-weight: bold;
     opacity: 0;
     transition: opacity .35s ease;
 }
 
-.btn-danger {
+.deleteButton {
     color: #fff;
     background-color: #d9534f;
     border-color: #d43f3a;
 }
 
-.btn-danger:hover {
+.deleteButton:hover {
     color: #fff;
     background-color: #c9302c;
     border-color: #ac2925;
 }
 
-.btn {
+.button {
     display: inline-block;
     margin-bottom: 0;
     line-height: 1.42857143;
@@ -120,7 +125,7 @@
     overflow: visible;
 }
 
-.tableContainer tr:hover .btn {
+.tableContainer tr:hover .button {
     opacity: 1;
 }
 
@@ -142,7 +147,7 @@ h4 small {
 }
 
 body {
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 1.42857143;
     color: #333;

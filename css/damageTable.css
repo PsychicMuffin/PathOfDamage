@@ -5,7 +5,7 @@
     width: 17em;
 }
 
-.damageTable .control-label {
+.damageTable .label {
     padding-top: 5px;
     width: 100%;
     text-align: center;
@@ -24,12 +24,9 @@
 }
 
 .damageTable .damageOutput {
-    padding-left: 5px;
-}
-
-.damageTable .damageOutput {
     position: relative;
     width: 9em;
+    padding-left: 5px;
 }
 
 .damageTable .damageOutput .taken {

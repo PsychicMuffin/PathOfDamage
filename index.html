@@ -24,7 +24,7 @@
       <h4>{{section.name}}<br>
         <small><i>{{section.description}}</i></small>
       </h4>
-      <div class="tableContainer" ng-if="section.armor !== undefined || section.charges !== undefined">
+      <div class="inputContainer" ng-if="section.armor !== undefined || section.charges !== undefined">
         <label ng-if="section.armor !== undefined" class="control-label">Armor:
           <input class="input number noIncrement"
                  type="number"
@@ -61,7 +61,7 @@
                      ng-model-options="{debounce: 500}">
             </td>
             <td class="percent">
-              <div class="input-group">
+              <div class="inputGroup">
                 <input class="input number noIncrement"
                        type="number"
                        placeholder="+/-"
@@ -70,9 +70,9 @@
                        ng-model-options="{debounce: 500}"
                        ng-attr-id="{{tableName}}"
                        select-all-on-click>
-                <div ng-if="tableName !== 'flat'" class="input-group-addon">%</div>
+                <div ng-if="tableName !== 'flat'" class="inputGroupAddon">%</div>
                 <div ng-if="tableName == 'flat'"
-                     class="input-group-addon flat"
+                     class="inputGroupAddon flat"
                      ng-click="inverse(table, $index)"
                      unselectable="on"
                      onselectstart="return false;"
@@ -84,7 +84,7 @@
             <td>
               <div class="buttonContainer">
                 <button ng-if="!$last"
-                        class="btn btn-danger"
+                        class="button deleteButton"
                         ng-click="delete(table, $index)">
                   X
                 </button>
@@ -130,7 +130,7 @@
       </td>
     </tr>
   </table>
-  <label class="control-label">Elemental Resistance:
+  <label class="label">Elemental Resistance:
     <input class="input number noIncrement"
            type="number"
            ng-model="resistance"
@@ -139,7 +139,7 @@
            ng-change="updateDamageValues()"
            select-all-on-click>
   </label>
-  <label class="control-label">Health and ES Pool:
+  <label class="label">Health and ES Pool:
     <input class="input number noIncrement"
            type="number"
            ng-model="healthPool"
