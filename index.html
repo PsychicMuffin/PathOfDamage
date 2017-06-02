@@ -130,19 +130,18 @@
       </td>
     </tr>
   </table>
-  <label class="label">Elemental Resistance:
-    <input class="input number noIncrement"
+  <label ng-repeat="(name, value) in sections.mitigation.resistance" class="label">{{capitalize(name)}} Resistance:
+    <input class="input number noIncrement resistance"
            type="number"
-           ng-model="resistance"
+           ng-model="sections.mitigation.resistance[name]"
            ng-model-options="{debounce: 500}"
-           id="resistance"
            ng-change="updateDamageValues()"
            select-all-on-click>
   </label>
   <label class="label">Health and ES Pool:
     <input class="input number noIncrement"
            type="number"
-           ng-model="healthPool"
+           ng-model="sections.mitigation.healthPool"
            ng-model-options="{debounce: 500}"
            id="health"
            ng-change="updateDamageValues()"

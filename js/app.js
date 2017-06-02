@@ -3,8 +3,6 @@ angular.module('PathOfDamage', [])
   $scope.sections = DataService.getSections();
 
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
-  $scope.resistance = 75;
-  $scope.healthPool = 5000;
 
   $scope.clear = function () {
     window.location.search = '';
@@ -61,7 +59,7 @@ angular.module('PathOfDamage', [])
   };
 
   $scope.getBarWidth = function (damage) {
-    var percent = (damage / $scope.healthPool) * 100;
+    var percent = (damage / $scope.sections.mitigation.healthPool) * 100;
     if (percent > 100) {
       percent = 100;
     }
@@ -70,6 +68,10 @@ angular.module('PathOfDamage', [])
 
   $scope.getDisplayTotal = function (table) {
     return Math.round(table.total);
+  };
+
+  $scope.capitalize = function (string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
   function calcDamage(hit) {
@@ -110,7 +112,7 @@ angular.module('PathOfDamage', [])
       hit: initialHit,
       taken: Math.round(hit || 0),
       shifted: Math.round(shifted),
-      remaining: Math.round($scope.healthPool - hit || 0)
+      remaining: Math.round($scope.sections.mitigation.healthPool - hit || 0)
     }
   }
 

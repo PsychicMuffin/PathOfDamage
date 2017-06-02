@@ -50,8 +50,15 @@ angular.module('PathOfDamage')
         mitigation: {
           name: "Damage Mitigation",
           description: "Elemental and chaos damage is mitigated by its respective resistance. Physical damage is mitigated by the sum of all '% additional Physical Damage Reduction' modifiers, up to its 90% cap. This includes armor, endurance charges, and things like Basalt Flasks and Chaos Golem.",
+          healthPool: 5000,
           armor: 0,
           charges: 0,
+          resistance: {
+            fire: 75,
+            cold: 75,
+            lightning: 75,
+            chaos: -60
+          },
           tables: {
             reduction: {
               totalName: "Additional Physical Damage Reduction",
@@ -68,11 +75,11 @@ angular.module('PathOfDamage')
             },
             increased: {
               totalName: "Increased Damage Taken",
-              totalMax: 100
+              totalMin: -100
             },
             more: {
               totalName: "More Damage Taken",
-              totalMax: 100,
+              totalMin: -100,
               totalCalc: this.multiplicative
             }
           }
@@ -113,8 +120,11 @@ angular.module('PathOfDamage')
       });
       dataString += scope.sections.mitigation.armor + SECTION_DELIMITER;
       dataString += scope.sections.mitigation.charges + SECTION_DELIMITER;
-      dataString += scope.resistance + SECTION_DELIMITER;
-      dataString += scope.healthPool;
+      dataString += scope.sections.mitigation.resistance.fire + SECTION_DELIMITER;
+      dataString += scope.sections.mitigation.resistance.cold + SECTION_DELIMITER;
+      dataString += scope.sections.mitigation.resistance.lightning + SECTION_DELIMITER;
+      dataString += scope.sections.mitigation.resistance.chaos + SECTION_DELIMITER;
+      dataString += scope.sections.mitigation.healthPool;
       return dataString;
     },
     encodeTable: function (table) {
@@ -148,8 +158,11 @@ angular.module('PathOfDamage')
       });
       scope.sections.mitigation.armor = parseIntOrNull(sections[8]);
       scope.sections.mitigation.charges = parseIntOrNull(sections[9]);
-      scope.resistance = parseIntOrNull(sections[10]);
-      scope.healthPool = parseIntOrNull(sections[11]);
+      scope.sections.mitigation.resistance.fire = parseIntOrNull(sections[10]);
+      scope.sections.mitigation.resistance.cold = parseIntOrNull(sections[11]);
+      scope.sections.mitigation.resistance.lightning = parseIntOrNull(sections[12]);
+      scope.sections.mitigation.resistance.chaos = parseIntOrNull(sections[13]);
+      scope.sections.mitigation.healthPool = parseIntOrNull(sections[14]);
     },
     decodeTable: function (tableString) {
       if (tableString) {
