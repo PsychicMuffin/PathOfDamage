@@ -122,9 +122,9 @@
           <div class="physical bar" ng-style="getBarWidth(hit.taken)"></div>
         </div>
         <div class="tooltip">
-          Phys Damage Taken: {{hit.taken-hit.shifted}} <br/>
-          Ele Damage Taken: {{hit.shifted}} <br/>
-          Damage Mitigated: {{hit.hit-hit.taken}} <br/>
+          Phys Damage Taken: {{hit.physTaken}} <br/>
+          Ele Damage Taken: {{hit.eleTaken}} <br/>
+          Damage Mitigated: {{hit.mitigated}} <br/>
           Health Remaining: {{hit.remaining}}
         </div>
       </td>

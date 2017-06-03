@@ -78,41 +78,45 @@ angular.module('PathOfDamage', [])
     if (hit === null) {
       return {};
     }
-    var initialHit = hit;
+    var physDamage = hit;
 
     var monsterIncrease = $scope.sections.monster.tables.increase.total / 100;
-    hit *= (1 + monsterIncrease);
+    physDamage *= (1 + monsterIncrease);
 
     var monsterMore = $scope.sections.monster.tables.more.total / 100;
-    hit *= (1 + monsterMore);
+    physDamage *= (1 + monsterMore);
 
     var shifts = $scope.sections.shift.tables.shifts.total / 100;
-    var shifted = hit * shifts * (1 - $scope.resistance / 100);
-    hit -= shifted;
+    var eleDamage = physDamage * shifts;
+    physDamage -= eleDamage;
+    eleDamage *= (1 - 75 / 100);
 
-    var armor = $scope.sections.mitigation.armor / ($scope.sections.mitigation.armor + 10 * hit);
+    var armor = $scope.sections.mitigation.armor / ($scope.sections.mitigation.armor + 10 * physDamage);
     var endurance = $scope.sections.mitigation.charges * .04;
     var additional = $scope.sections.mitigation.tables.reduction.total / 100;
     var reduction = armor + endurance + additional;
     if (reduction > .9) {
       reduction = .9;
     }
-    hit *= (1 - reduction);
+    physDamage *= (1 - reduction);
 
-    hit += $scope.sections.taken.tables.flat.total;
-    hit = Math.max(hit, 0);
+    physDamage += $scope.sections.taken.tables.flat.total;
+    physDamage = Math.max(physDamage, 0);
 
     var increasedTaken = $scope.sections.taken.tables.increased.total / 100;
-    hit *= (1 + increasedTaken);
+    physDamage *= (1 + increasedTaken);
 
     var moreTaken = $scope.sections.taken.tables.more.total / 100;
-    hit *= (1 + moreTaken);
+    physDamage *= (1 + moreTaken);
 
+    var totalTaken = Math.round(physDamage + eleDamage);
     return {
-      hit: initialHit,
-      taken: Math.round(hit || 0),
-      shifted: Math.round(shifted),
-      remaining: Math.round($scope.sections.mitigation.healthPool - hit || 0)
+      hit: hit,
+      taken: totalTaken,
+      physTaken: Math.round(physDamage),
+      eleTaken: Math.round(eleDamage),
+      mitigated: hit - totalTaken,
+      remaining: $scope.sections.mitigation.healthPool - totalTaken
     }
   }
 
