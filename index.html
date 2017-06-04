@@ -81,6 +81,14 @@
                 </div>
               </div>
             </td>
+            <td class="select" ng-if="tableName==='shifts'">
+              <select ng-model="value.element" ng-change="updateDamageValues()">
+                <option ng-repeat="(name, value) in sections.mitigation.resistance"
+                        ng-value="name">
+                  {{capitalize(name)}}
+                </option>
+              </select>
+            </td>
             <td>
               <div class="buttonContainer">
                 <button ng-if="!$last"

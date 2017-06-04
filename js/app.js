@@ -86,10 +86,17 @@ angular.module('PathOfDamage', [])
     var monsterMore = $scope.sections.monster.tables.more.total / 100;
     physDamage *= (1 + monsterMore);
 
-    var shifts = $scope.sections.shift.tables.shifts.total / 100;
-    var eleDamage = physDamage * shifts;
-    physDamage -= eleDamage;
-    eleDamage *= (1 - 75 / 100);
+    var eleDamage = 0;
+    var totalShifted = 0;
+    for (var i = 0; i < $scope.sections.shift.tables.shifts.values.length - 1; i++) {
+      var shift = $scope.sections.shift.tables.shifts.values[i];
+      if (shift.enabled && shift.value && shift.element) {
+        var shifted = physDamage * shift.value / 100;
+        eleDamage += shifted * (1 - $scope.sections.mitigation.resistance[shift.element] / 100);
+        totalShifted += shifted;
+      }
+    }
+    physDamage -= totalShifted;
 
     var armor = $scope.sections.mitigation.armor / ($scope.sections.mitigation.armor + 10 * physDamage);
     var endurance = $scope.sections.mitigation.charges * .04;
