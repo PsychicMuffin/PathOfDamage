@@ -1,8 +1,22 @@
 angular.module('PathOfDamage')
 .service('DataService', function () {
-  var NAME_DELIMITER = '\r';
+  var VALUE_DELIMITER = '\r';
   var ROW_DELIMITER = '\f';
   var SECTION_DELIMITER = '\0';
+
+  var elementToIndex = {
+    fire: 0,
+    cold: 1,
+    lightning: 2,
+    chaos: 3
+  };
+
+  var indexToElement = {
+    0: 'fire',
+    1: 'cold',
+    2: 'lightning',
+    3: 'chaos'
+  };
 
   function parseIntOrNull(string) {
     var int = parseInt(string);
@@ -133,10 +147,14 @@ angular.module('PathOfDamage')
         tableData += +table[i].enabled;
         if (table[i].name) {
           tableData += table[i].name;
-          tableData += NAME_DELIMITER;
         }
+        tableData += VALUE_DELIMITER;
         if (table[i].value) {
           tableData += table[i].value;
+        }
+        if (table[i].element) {
+          tableData += VALUE_DELIMITER;
+          tableData += elementToIndex[table[i].element];
         }
         if (i !== table.length - 2) {
           tableData += ROW_DELIMITER;
@@ -166,23 +184,19 @@ angular.module('PathOfDamage')
     },
     decodeTable: function (tableString) {
       if (tableString) {
-        var rows = tableString.split(ROW_DELIMITER);
         var table = [];
+        var rows = tableString.split(ROW_DELIMITER);
         for (var i = 0; i < rows.length; i++) {
-          var valueIndex = rows[i].indexOf(NAME_DELIMITER);
-          if (valueIndex > -1) {
-            table.push({
-              enabled: !!rows[i].slice(0, 1),
-              name: rows[i].slice(1, valueIndex),
-              value: parseIntOrNull(rows[i].slice(valueIndex + 1))
-            });
-          } else {
-            table.push({
-              enabled: !!rows[i].slice(0, 1),
-              name: '',
-              value: parseIntOrNull(rows[i].slice(1))
-            });
+          var values = rows[i].split(VALUE_DELIMITER);
+          var tableEntry = {
+            enabled: !!values[0].slice(0, 1),
+            name: values[0].slice(1),
+            value: parseIntOrNull(values[1])
+          };
+          if (values[2]) {
+            tableEntry.element = indexToElement[values[2]];
           }
+          table.push(tableEntry);
         }
         return table;
       }

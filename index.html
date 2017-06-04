@@ -34,7 +34,6 @@
                  ng-change="updateDamageValues()"
                  select-all-on-click>
         </label>
-
         <label class="control-label" ng-if="section.charges !== undefined">Endurance Charges:
           <input class="input number"
                  type="number"
@@ -82,11 +81,9 @@
               </div>
             </td>
             <td class="select" ng-if="tableName==='shifts'">
-              <select ng-model="value.element" ng-change="updateDamageValues()">
-                <option ng-repeat="(name, value) in sections.mitigation.resistance"
-                        ng-value="name">
-                  {{capitalize(name)}}
-                </option>
+              <select ng-options="name as capitalize(name) for (name, value) in sections.mitigation.resistance"
+                      ng-model="value.element"
+                      ng-change="updateDamageValues()">
               </select>
             </td>
             <td>
