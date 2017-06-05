@@ -1,8 +1,9 @@
 angular.module('PathOfDamage')
 .service('DataService', function () {
-  var NAME_DELIMITER = '\r';
+  var VALUE_DELIMITER = '\r';
   var ROW_DELIMITER = '\f';
   var SECTION_DELIMITER = '\0';
+  var ELEMENTS = ['fire', 'cold', 'lightning', 'chaos'];
 
   function parseIntOrNull(string) {
     var int = parseInt(string);
@@ -50,8 +51,15 @@ angular.module('PathOfDamage')
         mitigation: {
           name: "Damage Mitigation",
           description: "Elemental and chaos damage is mitigated by its respective resistance. Physical damage is mitigated by the sum of all '% additional Physical Damage Reduction' modifiers, up to its 90% cap. This includes armor, endurance charges, and things like Basalt Flasks and Chaos Golem.",
+          healthPool: 5000,
           armor: 0,
           charges: 0,
+          resistance: {
+            fire: 75,
+            cold: 75,
+            lightning: 75,
+            chaos: -60
+          },
           tables: {
             reduction: {
               totalName: "Additional Physical Damage Reduction",
@@ -68,11 +76,11 @@ angular.module('PathOfDamage')
             },
             increased: {
               totalName: "Increased Damage Taken",
-              totalMax: 100
+              totalMin: -100
             },
             more: {
               totalName: "More Damage Taken",
-              totalMax: 100,
+              totalMin: -100,
               totalCalc: this.multiplicative
             }
           }
@@ -113,8 +121,11 @@ angular.module('PathOfDamage')
       });
       dataString += scope.sections.mitigation.armor + SECTION_DELIMITER;
       dataString += scope.sections.mitigation.charges + SECTION_DELIMITER;
-      dataString += scope.resistance + SECTION_DELIMITER;
-      dataString += scope.healthPool;
+      dataString += scope.sections.mitigation.resistance.fire + SECTION_DELIMITER;
+      dataString += scope.sections.mitigation.resistance.cold + SECTION_DELIMITER;
+      dataString += scope.sections.mitigation.resistance.lightning + SECTION_DELIMITER;
+      dataString += scope.sections.mitigation.resistance.chaos + SECTION_DELIMITER;
+      dataString += scope.sections.mitigation.healthPool;
       return dataString;
     },
     encodeTable: function (table) {
@@ -123,10 +134,14 @@ angular.module('PathOfDamage')
         tableData += +table[i].enabled;
         if (table[i].name) {
           tableData += table[i].name;
-          tableData += NAME_DELIMITER;
         }
+        tableData += VALUE_DELIMITER;
         if (table[i].value) {
           tableData += table[i].value;
+        }
+        if (table[i].element) {
+          tableData += VALUE_DELIMITER;
+          tableData += ELEMENTS.indexOf(table[i].element);
         }
         if (i !== table.length - 2) {
           tableData += ROW_DELIMITER;
@@ -148,28 +163,27 @@ angular.module('PathOfDamage')
       });
       scope.sections.mitigation.armor = parseIntOrNull(sections[8]);
       scope.sections.mitigation.charges = parseIntOrNull(sections[9]);
-      scope.resistance = parseIntOrNull(sections[10]);
-      scope.healthPool = parseIntOrNull(sections[11]);
+      scope.sections.mitigation.resistance.fire = parseIntOrNull(sections[10]);
+      scope.sections.mitigation.resistance.cold = parseIntOrNull(sections[11]);
+      scope.sections.mitigation.resistance.lightning = parseIntOrNull(sections[12]);
+      scope.sections.mitigation.resistance.chaos = parseIntOrNull(sections[13]);
+      scope.sections.mitigation.healthPool = parseIntOrNull(sections[14]);
     },
     decodeTable: function (tableString) {
       if (tableString) {
-        var rows = tableString.split(ROW_DELIMITER);
         var table = [];
+        var rows = tableString.split(ROW_DELIMITER);
         for (var i = 0; i < rows.length; i++) {
-          var valueIndex = rows[i].indexOf(NAME_DELIMITER);
-          if (valueIndex > -1) {
-            table.push({
-              enabled: !!rows[i].slice(0, 1),
-              name: rows[i].slice(1, valueIndex),
-              value: parseIntOrNull(rows[i].slice(valueIndex + 1))
-            });
-          } else {
-            table.push({
-              enabled: !!rows[i].slice(0, 1),
-              name: '',
-              value: parseIntOrNull(rows[i].slice(1))
-            });
+          var values = rows[i].split(VALUE_DELIMITER);
+          var tableEntry = {
+            enabled: !!values[0].slice(0, 1),
+            name: values[0].slice(1),
+            value: parseIntOrNull(values[1])
+          };
+          if (values[2]) {
+            tableEntry.element = ELEMENTS[values[2]];
           }
+          table.push(tableEntry);
         }
         return table;
       }

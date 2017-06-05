@@ -34,7 +34,6 @@
                  ng-change="updateDamageValues()"
                  select-all-on-click>
         </label>
-
         <label class="control-label" ng-if="section.charges !== undefined">Endurance Charges:
           <input class="input number"
                  type="number"
@@ -81,6 +80,12 @@
                 </div>
               </div>
             </td>
+            <td class="select" ng-if="tableName==='shifts'">
+              <select ng-options="name as capitalize(name) for (name, value) in sections.mitigation.resistance"
+                      ng-model="value.element"
+                      ng-change="updateDamageValues()">
+              </select>
+            </td>
             <td>
               <div class="buttonContainer">
                 <button ng-if="!$last"
@@ -122,27 +127,26 @@
           <div class="physical bar" ng-style="getBarWidth(hit.taken)"></div>
         </div>
         <div class="tooltip">
-          Phys Damage Taken: {{hit.taken-hit.shifted}} <br/>
-          Ele Damage Taken: {{hit.shifted}} <br/>
-          Damage Mitigated: {{hit.hit-hit.taken}} <br/>
+          Phys Damage Taken: {{hit.physTaken}} <br/>
+          Ele Damage Taken: {{hit.eleTaken}} <br/>
+          Damage Mitigated: {{hit.mitigated}} <br/>
           Health Remaining: {{hit.remaining}}
         </div>
       </td>
     </tr>
   </table>
-  <label class="label">Elemental Resistance:
-    <input class="input number noIncrement"
+  <label ng-repeat="(name, value) in sections.mitigation.resistance" class="label">{{capitalize(name)}} Resistance:
+    <input class="input number noIncrement resistance"
            type="number"
-           ng-model="resistance"
+           ng-model="sections.mitigation.resistance[name]"
            ng-model-options="{debounce: 500}"
-           id="resistance"
            ng-change="updateDamageValues()"
            select-all-on-click>
   </label>
   <label class="label">Health and ES Pool:
     <input class="input number noIncrement"
            type="number"
-           ng-model="healthPool"
+           ng-model="sections.mitigation.healthPool"
            ng-model-options="{debounce: 500}"
            id="health"
            ng-change="updateDamageValues()"

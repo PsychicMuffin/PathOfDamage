@@ -11,12 +11,12 @@
     width: 4em;
 }
 
-#resistance {
-    width: 2.5em;
-}
-
 #flat {
     width: 3.25em;
+}
+
+.resistance {
+    width: 2.5em;
 }
 
 .checkbox {
