@@ -3,20 +3,7 @@ angular.module('PathOfDamage')
   var VALUE_DELIMITER = '\r';
   var ROW_DELIMITER = '\f';
   var SECTION_DELIMITER = '\0';
-
-  var elementToIndex = {
-    fire: 0,
-    cold: 1,
-    lightning: 2,
-    chaos: 3
-  };
-
-  var indexToElement = {
-    0: 'fire',
-    1: 'cold',
-    2: 'lightning',
-    3: 'chaos'
-  };
+  var ELEMENTS = ['fire', 'cold', 'lightning', 'chaos'];
 
   function parseIntOrNull(string) {
     var int = parseInt(string);
@@ -154,7 +141,7 @@ angular.module('PathOfDamage')
         }
         if (table[i].element) {
           tableData += VALUE_DELIMITER;
-          tableData += elementToIndex[table[i].element];
+          tableData += ELEMENTS.indexOf(table[i].element);
         }
         if (i !== table.length - 2) {
           tableData += ROW_DELIMITER;
@@ -194,7 +181,7 @@ angular.module('PathOfDamage')
             value: parseIntOrNull(values[1])
           };
           if (values[2]) {
-            tableEntry.element = indexToElement[values[2]];
+            tableEntry.element = ELEMENTS[values[2]];
           }
           table.push(tableEntry);
         }
