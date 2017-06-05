@@ -78,49 +78,56 @@ angular.module('PathOfDamage', [])
     if (hit === null) {
       return {};
     }
-    var physDamage = hit;
+
+    var damage = {
+      physical: hit,
+      fire: 0,
+      cold: 0,
+      lightning: 0,
+      chaos: 0
+    };
 
     var monsterIncrease = $scope.sections.monster.tables.increase.total / 100;
-    physDamage *= (1 + monsterIncrease);
+    damage.physical *= (1 + monsterIncrease);
 
     var monsterMore = $scope.sections.monster.tables.more.total / 100;
-    physDamage *= (1 + monsterMore);
+    damage.physical *= (1 + monsterMore);
 
-    var eleDamage = 0;
     var totalShifted = 0;
     for (var i = 0; i < $scope.sections.shift.tables.shifts.values.length - 1; i++) {
       var shift = $scope.sections.shift.tables.shifts.values[i];
       if (shift.enabled && shift.value && shift.element) {
-        var shifted = physDamage * shift.value / 100;
-        eleDamage += shifted * (1 - $scope.sections.mitigation.resistance[shift.element] / 100);
+        var shifted = damage.physical * shift.value / 100;
+        damage[shift.element] += shifted * (1 - $scope.sections.mitigation.resistance[shift.element] / 100);
         totalShifted += shifted;
       }
     }
-    physDamage -= totalShifted;
+    damage.physical -= totalShifted;
 
-    var armor = $scope.sections.mitigation.armor / ($scope.sections.mitigation.armor + 10 * physDamage);
+    var armor = $scope.sections.mitigation.armor / ($scope.sections.mitigation.armor + 10 * damage.physical);
     var endurance = $scope.sections.mitigation.charges * .04;
     var additional = $scope.sections.mitigation.tables.reduction.total / 100;
     var reduction = armor + endurance + additional;
     if (reduction > .9) {
       reduction = .9;
     }
-    physDamage *= (1 - reduction);
+    damage.physical *= (1 - reduction);
 
-    physDamage += $scope.sections.taken.tables.flat.total;
-    physDamage = Math.max(physDamage, 0);
+    damage.physical += $scope.sections.taken.tables.flat.total;
+    damage.physical = Math.max(damage.physical, 0);
 
     var increasedTaken = $scope.sections.taken.tables.increased.total / 100;
-    physDamage *= (1 + increasedTaken);
+    damage.physical *= (1 + increasedTaken);
 
     var moreTaken = $scope.sections.taken.tables.more.total / 100;
-    physDamage *= (1 + moreTaken);
+    damage.physical *= (1 + moreTaken);
 
-    var totalTaken = Math.round(physDamage + eleDamage);
+    var eleDamage = damage.fire + damage.cold + damage.lightning + damage.chaos;
+    var totalTaken = Math.round(damage.physical + eleDamage);
     return {
       hit: hit,
       taken: totalTaken,
-      physTaken: Math.round(physDamage),
+      physTaken: Math.round(damage.physical),
       eleTaken: Math.round(eleDamage),
       mitigated: hit - totalTaken,
       remaining: $scope.sections.mitigation.healthPool - totalTaken

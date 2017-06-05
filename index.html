@@ -25,7 +25,7 @@
         <small><i>{{section.description}}</i></small>
       </h4>
       <div class="inputContainer" ng-if="section.armor !== undefined || section.charges !== undefined">
-        <label ng-if="section.armor !== undefined" class="control-label">Armor:
+        <label>Armor:
           <input class="input number noIncrement"
                  type="number"
                  ng-model="section.armor"
@@ -34,7 +34,7 @@
                  ng-change="updateDamageValues()"
                  select-all-on-click>
         </label>
-        <label class="control-label" ng-if="section.charges !== undefined">Endurance Charges:
+        <label>Endurance Charges:
           <input class="input number"
                  type="number"
                  ng-model="section.charges"
@@ -80,8 +80,9 @@
                 </div>
               </div>
             </td>
-            <td class="select" ng-if="tableName==='shifts'">
+            <td ng-if="tableName==='shifts'">
               <select ng-options="name as capitalize(name) for (name, value) in sections.mitigation.resistance"
+                      class="input"
                       ng-model="value.element"
                       ng-change="updateDamageValues()">
               </select>
