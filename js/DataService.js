@@ -195,6 +195,9 @@ angular.module('PathOfDamage')
         if (table[i].element) {
           tableData += VALUE_DELIMITER;
           tableData += scope.DAMAGE_TYPES.indexOf(table[i].element);
+        } else if (table[i].types) {
+          tableData += VALUE_DELIMITER;
+          tableData += this.encodeTypes(scope, table[i].types);
         }
         if (i !== table.length - 2) {
           tableData += ROW_DELIMITER;
@@ -202,15 +205,22 @@ angular.module('PathOfDamage')
       }
       return tableData + SECTION_DELIMITER;
     },
+    encodeTypes: function (scope, types) {
+      var encoded = '';
+      scope.DAMAGE_TYPES.forEach(function (type) {
+        encoded += +types.includes(type);
+      });
+      return parseInt(encoded, 2).toString(36);
+    },
     decodeData: function (scope, dataString) {
       var sections = dataString.split(SECTION_DELIMITER);
       scope.sections.monster.tables.increase.values = this.decodeTable(scope, sections[0]);
       scope.sections.monster.tables.more.values = this.decodeTable(scope, sections[1]);
-      scope.sections.shift.tables.shifts.values = this.decodeTable(scope, sections[2]);
+      scope.sections.shift.tables.shifts.values = this.decodeTable(scope, sections[2], this.decodeElement);
       scope.sections.mitigation.tables.reduction.values = this.decodeTable(scope, sections[3]);
-      scope.sections.taken.tables.flat.values = this.decodeTable(scope, sections[4]);
-      scope.sections.taken.tables.increased.values = this.decodeTable(scope, sections[5]);
-      scope.sections.taken.tables.more.values = this.decodeTable(scope, sections[6]);
+      scope.sections.taken.tables.flat.values = this.decodeTable(scope, sections[4], this.decodeTypes);
+      scope.sections.taken.tables.increased.values = this.decodeTable(scope, sections[5], this.decodeTypes);
+      scope.sections.taken.tables.more.values = this.decodeTable(scope, sections[6], this.decodeTypes);
       scope.hits = sections[7].split(ROW_DELIMITER).map(function (hit) {
         return {hit: parseIntOrNull(hit)};
       });
@@ -222,23 +232,41 @@ angular.module('PathOfDamage')
       scope.sections.mitigation.resistance.chaos = parseIntOrNull(sections[13]);
       scope.sections.mitigation.healthPool = parseIntOrNull(sections[14]);
     },
-    decodeTable: function (scope, tableString) {
+    decodeTable: function (scope, tableString, extraParsing) {
       if (tableString) {
         var table = [];
         var rows = tableString.split(ROW_DELIMITER);
         for (var i = 0; i < rows.length; i++) {
           var values = rows[i].split(VALUE_DELIMITER);
           var tableEntry = {
-            enabled: !!values[0].slice(0, 1),
+            enabled: values[0].slice(0, 1) === '1',
             name: values[0].slice(1),
             value: parseIntOrNull(values[1])
           };
-          if (values[2]) {
-            tableEntry.element = scope.DAMAGE_TYPES[values[2]];
+          if (extraParsing) {
+            extraParsing(scope, values, tableEntry);
           }
           table.push(tableEntry);
         }
         return table;
+      }
+    },
+    decodeElement: function (scope, values, tableEntry) {
+      if (values[2]) {
+        tableEntry.element = scope.DAMAGE_TYPES[values[2]];
+      }
+    },
+    decodeTypes: function (scope, values, tableEntry) {
+      if (values[2]) {
+        var types = [];
+        var booleans = parseInt(values[2], 36).toString(2).split('');
+        var index = booleans.length;
+        for (var i = scope.DAMAGE_TYPES.length; i-- > 0;) {
+          if (booleans[--index] === '1') {
+            types.push(scope.DAMAGE_TYPES[i]);
+          }
+        }
+        tableEntry.types = types;
       }
     }
   };
