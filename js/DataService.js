@@ -3,7 +3,6 @@ angular.module('PathOfDamage')
   var VALUE_DELIMITER = '\r';
   var ROW_DELIMITER = '\f';
   var SECTION_DELIMITER = '\0';
-  var ELEMENTS = ['fire', 'cold', 'lightning', 'chaos'];
 
   function parseIntOrNull(string) {
     var int = parseInt(string);
@@ -27,13 +26,13 @@ angular.module('PathOfDamage')
           description: "These are things that directly change a monster's damage before they attack, such as map mods or curses",
           tables: {
             increase: {
-              totalName: "Increased Monster Damage",
+              name: "Increased Monster Damage",
               totalMin: -100
             },
             more: {
-              totalName: "More Monster Damage",
+              name: "More Monster Damage",
               totalMin: -100,
-              totalCalc: this.multiplicative
+              calcTotal: this.multiplicative
             }
           }
         },
@@ -42,9 +41,19 @@ angular.module('PathOfDamage')
           description: "Modifiers that shift physical damage to elemental, typically reading like '% of Physical Damage taken as Y', such as Taste of Hate or Lightning Coil",
           tables: {
             shifts: {
-              totalName: "Damage Shifted",
-              totalMin: 0,
-              totalMax: 100
+              name: "Damage Shifted",
+              calcTotal: function () {
+               var totals = {};
+               var total = 0;
+                this.values.forEach(function (shift) {
+                  if (shift.enabled && shift.value && shift.element) {
+                    totals[shift.element] = totals[shift.element] + shift.value || shift.value;
+                    total += shift.value;
+                  }
+                });
+                this.totals = totals;
+                this.total = total;
+              }
             }
           }
         },
@@ -62,7 +71,7 @@ angular.module('PathOfDamage')
           },
           tables: {
             reduction: {
-              totalName: "Additional Physical Damage Reduction",
+              name: "Additional Physical Damage Reduction",
               totalMax: 90
             }
           }
@@ -72,16 +81,57 @@ angular.module('PathOfDamage')
           description: "After damage mitigation, modifiers to damage taken are applied. Flat amounts (±X Damage taken from Y, like Astramentis) are applied first, then the sum of all increases/reductions (% increased/reduced X Damage taken, like Fortify, Shock, and Abyssus) and lastly more/less multipliers (% more/less X Damage taken, like Arctic Armour).",
           tables: {
             flat: {
-              totalName: "Flat Increase"
+              name: "Flat Increase",
+              calcTotal: function () {
+                var totals = {};
+                this.values.forEach(function (flat) {
+                  if (flat.enabled && flat.value && flat.types) {
+                    flat.types.forEach(function (type) {
+                      totals[type] = totals[type] + flat.value || flat.value;
+                    });
+                  }
+                });
+                this.totals = totals;
+              },
+              getTotal: function () {
+                return this.totals.physical || 0;
+              }
             },
             increased: {
-              totalName: "Increased Damage Taken",
-              totalMin: -100
+              name: "Increased Damage Taken",
+              calcTotal: function () {
+                var totals = {};
+                this.values.forEach(function (increased) {
+                  if (increased.enabled && increased.value && increased.types) {
+                    increased.types.forEach(function (type) {
+                      totals[type] = Math.max(totals[type] + increased.value || increased.value, -100);
+                    });
+                  }
+                });
+                this.totals = totals;
+              },
+              getTotal: function () {
+                return this.totals.physical || 0;
+              }
             },
             more: {
-              totalName: "More Damage Taken",
-              totalMin: -100,
-              totalCalc: this.multiplicative
+              name: "More Damage Taken",
+              calcTotal: function () {
+                var totals = {};
+                this.values.forEach(function (more) {
+                  if (more.enabled && more.value && more.types) {
+                    more.types.forEach(function (type) {
+                      var multiplier = 1 + more.value / 100;
+                      var newTotal = (totals[type] + 100) * multiplier - 100;
+                      totals[type] = Math.max(newTotal || more.value, -100);
+                    });
+                  }
+                });
+                this.totals = totals;
+              },
+              getTotal: function () {
+                return this.totals.physical || 0;
+              }
             }
           }
         }
@@ -106,15 +156,18 @@ angular.module('PathOfDamage')
       this.total -= 100;
       checkTotal(this);
     },
+    getTotal: function () {
+      return this.total;
+    },
     encodeData: function (scope) {
       var dataString = '';
-      dataString += this.encodeTable(scope.sections.monster.tables.increase.values);
-      dataString += this.encodeTable(scope.sections.monster.tables.more.values);
-      dataString += this.encodeTable(scope.sections.shift.tables.shifts.values);
-      dataString += this.encodeTable(scope.sections.mitigation.tables.reduction.values);
-      dataString += this.encodeTable(scope.sections.taken.tables.flat.values);
-      dataString += this.encodeTable(scope.sections.taken.tables.increased.values);
-      dataString += this.encodeTable(scope.sections.taken.tables.more.values);
+      dataString += this.encodeTable(scope, scope.sections.monster.tables.increase.values);
+      dataString += this.encodeTable(scope, scope.sections.monster.tables.more.values);
+      dataString += this.encodeTable(scope, scope.sections.shift.tables.shifts.values);
+      dataString += this.encodeTable(scope, scope.sections.mitigation.tables.reduction.values);
+      dataString += this.encodeTable(scope, scope.sections.taken.tables.flat.values);
+      dataString += this.encodeTable(scope, scope.sections.taken.tables.increased.values);
+      dataString += this.encodeTable(scope, scope.sections.taken.tables.more.values);
       scope.hits.slice(0, -1).map(function (hit, index, array) {
         var delimiter = index === array.length - 1 ? SECTION_DELIMITER : ROW_DELIMITER;
         dataString += hit.hit + delimiter;
@@ -128,7 +181,7 @@ angular.module('PathOfDamage')
       dataString += scope.sections.mitigation.healthPool;
       return dataString;
     },
-    encodeTable: function (table) {
+    encodeTable: function (scope, table) {
       var tableData = '';
       for (var i = 0; i < table.length - 1; i++) {
         tableData += +table[i].enabled;
@@ -141,7 +194,7 @@ angular.module('PathOfDamage')
         }
         if (table[i].element) {
           tableData += VALUE_DELIMITER;
-          tableData += ELEMENTS.indexOf(table[i].element);
+          tableData += scope.DAMAGE_TYPES.indexOf(table[i].element);
         }
         if (i !== table.length - 2) {
           tableData += ROW_DELIMITER;
@@ -151,13 +204,13 @@ angular.module('PathOfDamage')
     },
     decodeData: function (scope, dataString) {
       var sections = dataString.split(SECTION_DELIMITER);
-      scope.sections.monster.tables.increase.values = this.decodeTable(sections[0]);
-      scope.sections.monster.tables.more.values = this.decodeTable(sections[1]);
-      scope.sections.shift.tables.shifts.values = this.decodeTable(sections[2]);
-      scope.sections.mitigation.tables.reduction.values = this.decodeTable(sections[3]);
-      scope.sections.taken.tables.flat.values = this.decodeTable(sections[4]);
-      scope.sections.taken.tables.increased.values = this.decodeTable(sections[5]);
-      scope.sections.taken.tables.more.values = this.decodeTable(sections[6]);
+      scope.sections.monster.tables.increase.values = this.decodeTable(scope, sections[0]);
+      scope.sections.monster.tables.more.values = this.decodeTable(scope, sections[1]);
+      scope.sections.shift.tables.shifts.values = this.decodeTable(scope, sections[2]);
+      scope.sections.mitigation.tables.reduction.values = this.decodeTable(scope, sections[3]);
+      scope.sections.taken.tables.flat.values = this.decodeTable(scope, sections[4]);
+      scope.sections.taken.tables.increased.values = this.decodeTable(scope, sections[5]);
+      scope.sections.taken.tables.more.values = this.decodeTable(scope, sections[6]);
       scope.hits = sections[7].split(ROW_DELIMITER).map(function (hit) {
         return {hit: parseIntOrNull(hit)};
       });
@@ -169,7 +222,7 @@ angular.module('PathOfDamage')
       scope.sections.mitigation.resistance.chaos = parseIntOrNull(sections[13]);
       scope.sections.mitigation.healthPool = parseIntOrNull(sections[14]);
     },
-    decodeTable: function (tableString) {
+    decodeTable: function (scope, tableString) {
       if (tableString) {
         var table = [];
         var rows = tableString.split(ROW_DELIMITER);
@@ -181,7 +234,7 @@ angular.module('PathOfDamage')
             value: parseIntOrNull(values[1])
           };
           if (values[2]) {
-            tableEntry.element = ELEMENTS[values[2]];
+            tableEntry.element = scope.DAMAGE_TYPES[values[2]];
           }
           table.push(tableEntry);
         }
