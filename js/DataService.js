@@ -32,7 +32,7 @@ angular.module('PathOfDamage')
             more: {
               name: "More Monster Damage",
               totalMin: -100,
-              calcTotal: this.multiplicative
+              calcTotal: this.multiplicativeTotal
             }
           }
         },
@@ -43,15 +43,15 @@ angular.module('PathOfDamage')
             shifts: {
               name: "Damage Shifted",
               calcTotal: function () {
-               var totals = {};
+               var subTotals = {};
                var total = 0;
                 this.values.forEach(function (shift) {
                   if (shift.enabled && shift.value && shift.element) {
-                    totals[shift.element] = totals[shift.element] + shift.value || shift.value;
+                    subTotals[shift.element] = subTotals[shift.element] + shift.value || shift.value;
                     total += shift.value;
                   }
                 });
-                this.totals = totals;
+                this.subTotals = subTotals;
                 this.total = total;
               }
             }
@@ -83,61 +83,61 @@ angular.module('PathOfDamage')
             flat: {
               name: "Flat Increase",
               calcTotal: function () {
-                var totals = {};
+                var subTotals = {};
                 this.values.forEach(function (flat) {
                   if (flat.enabled && flat.value && flat.types) {
                     flat.types.forEach(function (type) {
-                      totals[type] = totals[type] + flat.value || flat.value;
+                      subTotals[type] = subTotals[type] + flat.value || flat.value;
                     });
                   }
                 });
-                this.totals = totals;
+                this.subTotals = subTotals;
               },
               getTotal: function () {
-                return this.totals.physical || 0;
+                return this.subTotals.physical || 0;
               }
             },
             increased: {
               name: "Increased Damage Taken",
               calcTotal: function () {
-                var totals = {};
+                var subTotals = {};
                 this.values.forEach(function (increased) {
                   if (increased.enabled && increased.value && increased.types) {
                     increased.types.forEach(function (type) {
-                      totals[type] = Math.max(totals[type] + increased.value || increased.value, -100);
+                      subTotals[type] = Math.max(subTotals[type] + increased.value || increased.value, -100);
                     });
                   }
                 });
-                this.totals = totals;
+                this.subTotals = subTotals;
               },
               getTotal: function () {
-                return this.totals.physical || 0;
+                return this.subTotals.physical || 0;
               }
             },
             more: {
               name: "More Damage Taken",
               calcTotal: function () {
-                var totals = {};
+                var subTotals = {};
                 this.values.forEach(function (more) {
                   if (more.enabled && more.value && more.types) {
                     more.types.forEach(function (type) {
                       var multiplier = 1 + more.value / 100;
-                      var newTotal = (totals[type] + 100) * multiplier - 100;
-                      totals[type] = Math.max(newTotal || more.value, -100);
+                      var newTotal = (subTotals[type] + 100) * multiplier - 100;
+                      subTotals[type] = Math.max(newTotal || more.value, -100);
                     });
                   }
                 });
-                this.totals = totals;
+                this.subTotals = subTotals;
               },
               getTotal: function () {
-                return this.totals.physical || 0;
+                return this.subTotals.physical || 0;
               }
             }
           }
         }
       };
     },
-    additive: function () {
+    additiveTotal: function () {
       this.total = 0;
       for (var i = 0; i < this.values.length - 1; i++) {
         if (this.values[i].enabled && this.values[i].value) {
@@ -146,7 +146,7 @@ angular.module('PathOfDamage')
       }
       checkTotal(this);
     },
-    multiplicative: function () {
+    multiplicativeTotal: function () {
       this.total = 100;
       for (var i = 0; i < this.values.length - 1; i++) {
         if (this.values[i].enabled && this.values[i].value) {
@@ -161,13 +161,13 @@ angular.module('PathOfDamage')
     },
     encodeData: function (scope) {
       var dataString = '';
-      dataString += this.encodeTable(scope, scope.sections.monster.tables.increase.values);
-      dataString += this.encodeTable(scope, scope.sections.monster.tables.more.values);
-      dataString += this.encodeTable(scope, scope.sections.shift.tables.shifts.values);
-      dataString += this.encodeTable(scope, scope.sections.mitigation.tables.reduction.values);
-      dataString += this.encodeTable(scope, scope.sections.taken.tables.flat.values);
-      dataString += this.encodeTable(scope, scope.sections.taken.tables.increased.values);
-      dataString += this.encodeTable(scope, scope.sections.taken.tables.more.values);
+      dataString += this.encodeTable(scope.sections.monster.tables.increase.values, scope.DAMAGE_TYPES);
+      dataString += this.encodeTable(scope.sections.monster.tables.more.values, scope.DAMAGE_TYPES);
+      dataString += this.encodeTable(scope.sections.shift.tables.shifts.values, scope.DAMAGE_TYPES);
+      dataString += this.encodeTable(scope.sections.mitigation.tables.reduction.values, scope.DAMAGE_TYPES);
+      dataString += this.encodeTable(scope.sections.taken.tables.flat.values, scope.DAMAGE_TYPES);
+      dataString += this.encodeTable(scope.sections.taken.tables.increased.values, scope.DAMAGE_TYPES);
+      dataString += this.encodeTable(scope.sections.taken.tables.more.values, scope.DAMAGE_TYPES);
       scope.hits.slice(0, -1).map(function (hit, index, array) {
         var delimiter = index === array.length - 1 ? SECTION_DELIMITER : ROW_DELIMITER;
         dataString += hit.hit + delimiter;
@@ -181,7 +181,7 @@ angular.module('PathOfDamage')
       dataString += scope.sections.mitigation.healthPool;
       return dataString;
     },
-    encodeTable: function (scope, table) {
+    encodeTable: function (table, damageTypes) {
       var tableData = '';
       for (var i = 0; i < table.length - 1; i++) {
         tableData += +table[i].enabled;
@@ -194,10 +194,10 @@ angular.module('PathOfDamage')
         }
         if (table[i].element) {
           tableData += VALUE_DELIMITER;
-          tableData += scope.DAMAGE_TYPES.indexOf(table[i].element);
+          tableData += damageTypes.indexOf(table[i].element);
         } else if (table[i].types) {
           tableData += VALUE_DELIMITER;
-          tableData += this.encodeTypes(scope, table[i].types);
+          tableData += this.encodeTypes(table[i].types, damageTypes);
         }
         if (i !== table.length - 2) {
           tableData += ROW_DELIMITER;
@@ -205,22 +205,22 @@ angular.module('PathOfDamage')
       }
       return tableData + SECTION_DELIMITER;
     },
-    encodeTypes: function (scope, types) {
+    encodeTypes: function (types, damageTypes) {
       var encoded = '';
-      scope.DAMAGE_TYPES.forEach(function (type) {
+      damageTypes.forEach(function (type) {
         encoded += +types.includes(type);
       });
       return parseInt(encoded, 2).toString(36);
     },
     decodeData: function (scope, dataString) {
       var sections = dataString.split(SECTION_DELIMITER);
-      scope.sections.monster.tables.increase.values = this.decodeTable(scope, sections[0]);
-      scope.sections.monster.tables.more.values = this.decodeTable(scope, sections[1]);
-      scope.sections.shift.tables.shifts.values = this.decodeTable(scope, sections[2], this.decodeElement);
-      scope.sections.mitigation.tables.reduction.values = this.decodeTable(scope, sections[3]);
-      scope.sections.taken.tables.flat.values = this.decodeTable(scope, sections[4], this.decodeTypes);
-      scope.sections.taken.tables.increased.values = this.decodeTable(scope, sections[5], this.decodeTypes);
-      scope.sections.taken.tables.more.values = this.decodeTable(scope, sections[6], this.decodeTypes);
+      scope.sections.monster.tables.increase.values = this.decodeTable(sections[0], scope.DAMAGE_TYPES);
+      scope.sections.monster.tables.more.values = this.decodeTable(sections[1], scope.DAMAGE_TYPES);
+      scope.sections.shift.tables.shifts.values = this.decodeTable(sections[2], scope.DAMAGE_TYPES, this.decodeElement);
+      scope.sections.mitigation.tables.reduction.values = this.decodeTable(sections[3], scope.DAMAGE_TYPES);
+      scope.sections.taken.tables.flat.values = this.decodeTable(sections[4], scope.DAMAGE_TYPES, this.decodeTypes);
+      scope.sections.taken.tables.increased.values = this.decodeTable(sections[5], scope.DAMAGE_TYPES, this.decodeTypes);
+      scope.sections.taken.tables.more.values = this.decodeTable(sections[6], scope.DAMAGE_TYPES, this.decodeTypes);
       scope.hits = sections[7].split(ROW_DELIMITER).map(function (hit) {
         return {hit: parseIntOrNull(hit)};
       });
@@ -232,7 +232,7 @@ angular.module('PathOfDamage')
       scope.sections.mitigation.resistance.chaos = parseIntOrNull(sections[13]);
       scope.sections.mitigation.healthPool = parseIntOrNull(sections[14]);
     },
-    decodeTable: function (scope, tableString, extraParsing) {
+    decodeTable: function (tableString, damageTypes, extraParsing) {
       if (tableString) {
         var table = [];
         var rows = tableString.split(ROW_DELIMITER);
@@ -244,26 +244,26 @@ angular.module('PathOfDamage')
             value: parseIntOrNull(values[1])
           };
           if (extraParsing) {
-            extraParsing(scope, values, tableEntry);
+            extraParsing(values, tableEntry, damageTypes);
           }
           table.push(tableEntry);
         }
         return table;
       }
     },
-    decodeElement: function (scope, values, tableEntry) {
+    decodeElement: function (values, tableEntry, damageTypes) {
       if (values[2]) {
-        tableEntry.element = scope.DAMAGE_TYPES[values[2]];
+        tableEntry.element = damageTypes[values[2]];
       }
     },
-    decodeTypes: function (scope, values, tableEntry) {
+    decodeTypes: function (values, tableEntry, damageTypes) {
       if (values[2]) {
         var types = [];
         var booleans = parseInt(values[2], 36).toString(2).split('');
         var index = booleans.length;
-        for (var i = scope.DAMAGE_TYPES.length; i-- > 0;) {
+        for (var i = damageTypes.length; i-- > 0;) {
           if (booleans[--index] === '1') {
-            types.push(scope.DAMAGE_TYPES[i]);
+            types.push(damageTypes[i]);
           }
         }
         tableEntry.types = types;
