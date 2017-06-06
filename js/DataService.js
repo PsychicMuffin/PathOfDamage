@@ -21,42 +21,6 @@ angular.module('PathOfDamage')
   return {
     getSections: function () {
       return {
-        monster: {
-          name: "Monster Modifications",
-          description: "These are things that directly change a monster's damage before they attack, such as map mods or curses",
-          tables: {
-            increase: {
-              name: "Increased Monster Damage",
-              totalMin: -100
-            },
-            more: {
-              name: "More Monster Damage",
-              totalMin: -100,
-              calcTotal: this.multiplicativeTotal
-            }
-          }
-        },
-        shift: {
-          name: "Damage Shifts",
-          description: "Modifiers that shift physical damage to elemental, typically reading like '% of Physical Damage taken as Y', such as Taste of Hate or Lightning Coil",
-          tables: {
-            shifts: {
-              name: "Damage Shifted",
-              calcTotal: function () {
-               var subTotals = {};
-               var total = 0;
-                this.values.forEach(function (shift) {
-                  if (shift.enabled && shift.value && shift.element) {
-                    subTotals[shift.element] = subTotals[shift.element] + shift.value || shift.value;
-                    total += shift.value;
-                  }
-                });
-                this.subTotals = subTotals;
-                this.total = total;
-              }
-            }
-          }
-        },
         mitigation: {
           name: "Damage Mitigation",
           description: "Elemental and chaos damage is mitigated by its respective resistance. Physical damage is mitigated by the sum of all '% additional Physical Damage Reduction' modifiers, up to its 90% cap. This includes armor, endurance charges, and things like Basalt Flasks and Chaos Golem.",
@@ -132,6 +96,42 @@ angular.module('PathOfDamage')
               getTotal: function () {
                 return this.subTotals.physical || 0;
               }
+            }
+          }
+        },
+        shift: {
+          name: "Damage Shifts",
+          description: "Modifiers that shift physical damage to elemental, typically reading like '% of Physical Damage taken as Y', such as Taste of Hate or Lightning Coil",
+          tables: {
+            shifts: {
+              name: "Damage Shifted",
+              calcTotal: function () {
+                var subTotals = {};
+                var total = 0;
+                this.values.forEach(function (shift) {
+                  if (shift.enabled && shift.value && shift.element) {
+                    subTotals[shift.element] = subTotals[shift.element] + shift.value || shift.value;
+                    total += shift.value;
+                  }
+                });
+                this.subTotals = subTotals;
+                this.total = total;
+              }
+            }
+          }
+        },
+        monster: {
+          name: "Monster Modifications",
+          description: "These are things that directly change a monster's damage before they attack, such as map mods or curses",
+          tables: {
+            increase: {
+              name: "Increased Monster Damage",
+              totalMin: -100
+            },
+            more: {
+              name: "More Monster Damage",
+              totalMin: -100,
+              calcTotal: this.multiplicativeTotal
             }
           }
         }
