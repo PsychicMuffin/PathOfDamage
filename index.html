@@ -25,7 +25,7 @@
         <small><i>{{section.description}}</i></small>
       </h4>
       <div class="inputContainer" ng-if="section.armor !== undefined || section.charges !== undefined">
-        <label ng-if="section.armor !== undefined" class="control-label">Armor:
+        <label>Armor:
           <input class="input number noIncrement"
                  type="number"
                  ng-model="section.armor"
@@ -34,7 +34,7 @@
                  ng-change="updateDamageValues()"
                  select-all-on-click>
         </label>
-        <label class="control-label" ng-if="section.charges !== undefined">Endurance Charges:
+        <label>Endurance Charges:
           <input class="input number"
                  type="number"
                  ng-model="section.charges"
@@ -45,7 +45,7 @@
         </label>
       </div>
       <div class="tableContainer" ng-repeat="(tableName, table) in section.tables">
-        <div class="tableTitle">{{table.totalName}}</div>
+        <div class="tableTitle">{{table.name}}</div>
         <table class="table table-condensed">
           <tr ng-repeat="value in table.values track by $index">
             <td>
@@ -82,11 +82,18 @@
                 </div>
               </div>
             </td>
-            <td class="select" ng-if="tableName==='shifts'">
-              <select class="input"
-                      ng-options="name as capitalize(name) for (name, value) in sections.mitigation.resistance"
+            <td ng-if="tableName==='shifts'">
+              <select ng-options="type as capitalize(type) for type in DAMAGE_TYPES.slice(1)"
                       ng-model="value.element"
-                      ng-change="updateDamageValues()">
+                      ng-change="updateTotal(table)"
+                      class="input">
+              </select>
+            </td>
+            <td ng-if="sectionName==='taken'">
+              <select ng-options="type as capitalize(type) for type in DAMAGE_TYPES"
+                      ng-model="value.types"
+                      ng-change="updateTotal(table)"
+                      class="input" multiple>
               </select>
             </td>
             <td>
@@ -101,7 +108,7 @@
           </tr>
         </table>
         <div class="total" ng-if="table.values.length > 1">
-          Total: <b>{{getDisplayTotal(table)}}{{tableName !== 'flat' ? '%' : ''}}</b>
+          Total: <b>{{table.getTotal()}}{{tableName !== 'flat' ? '%' : ''}}</b>
         </div>
       </div>
       <hr class="borderLine">
