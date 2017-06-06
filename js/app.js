@@ -5,8 +5,7 @@ angular.module('PathOfDamage', [])
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
 
   $scope.clear = function () {
-    window.location.search = '';
-    window.location.reload();
+    window.location.href = window.location.pathname;
   };
 
   $scope.add = function (table) {
@@ -28,6 +27,7 @@ angular.module('PathOfDamage', [])
 
   $scope.inverse = function (table, index) {
     table.values[index].value *= -1;
+    $scope.updateTotal(table);
   };
 
   $scope.updateTotal = function (table, skipUpdates) {
@@ -136,8 +136,13 @@ angular.module('PathOfDamage', [])
   // Load data from URL
   var dataString = window.location.search;
   if (dataString) {
-    dataString = LZString.decompressFromEncodedURIComponent(dataString.substring(1));
-    DataService.decodeData($scope, dataString);
+    try {
+      dataString = LZString.decompressFromEncodedURIComponent(dataString.substring(1));
+      DataService.decodeData($scope, dataString);
+    } catch (e) {
+      alert("Invalid URL: Unable to load data.");
+      $scope.clear();
+    }
   }
 
   // Add empty last row to tables

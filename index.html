@@ -49,7 +49,9 @@
         <table class="table table-condensed">
           <tr ng-repeat="value in table.values track by $index">
             <td>
-              <input type="checkbox" class="checkbox" ng-model="value.enabled" ng-change="updateTotal(table)">
+              <label class="checkboxContainer">
+                <input type="checkbox" class="checkbox " ng-model="value.enabled" ng-change="updateTotal(table)">
+              </label>
             </td>
             <td class="name">
               <input class="input"
@@ -81,7 +83,8 @@
               </div>
             </td>
             <td class="select" ng-if="tableName==='shifts'">
-              <select ng-options="name as capitalize(name) for (name, value) in sections.mitigation.resistance"
+              <select class="input"
+                      ng-options="name as capitalize(name) for (name, value) in sections.mitigation.resistance"
                       ng-model="value.element"
                       ng-change="updateDamageValues()">
               </select>

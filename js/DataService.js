@@ -22,32 +22,6 @@ angular.module('PathOfDamage')
   return {
     getSections: function () {
       return {
-        monster: {
-          name: "Monster Modifications",
-          description: "These are things that directly change a monster's damage before they attack, such as map mods or curses",
-          tables: {
-            increase: {
-              totalName: "Increased Monster Damage",
-              totalMin: -100
-            },
-            more: {
-              totalName: "More Monster Damage",
-              totalMin: -100,
-              totalCalc: this.multiplicative
-            }
-          }
-        },
-        shift: {
-          name: "Damage Shifts",
-          description: "Modifiers that shift physical damage to elemental, typically reading like '% of Physical Damage taken as Y', such as Taste of Hate or Lightning Coil",
-          tables: {
-            shifts: {
-              totalName: "Damage Shifted",
-              totalMin: 0,
-              totalMax: 100
-            }
-          }
-        },
         mitigation: {
           name: "Damage Mitigation",
           description: "Elemental and chaos damage is mitigated by its respective resistance. Physical damage is mitigated by the sum of all '% additional Physical Damage Reduction' modifiers, up to its 90% cap. This includes armor, endurance charges, and things like Basalt Flasks and Chaos Golem.",
@@ -80,6 +54,32 @@ angular.module('PathOfDamage')
             },
             more: {
               totalName: "More Damage Taken",
+              totalMin: -100,
+              totalCalc: this.multiplicative
+            }
+          }
+        },
+        shift: {
+          name: "Damage Shifts",
+          description: "Modifiers that shift physical damage to elemental, typically reading like '% of Physical Damage taken as Y', such as Taste of Hate or Lightning Coil",
+          tables: {
+            shifts: {
+              totalName: "Damage Shifted",
+              totalMin: 0,
+              totalMax: 100
+            }
+          }
+        },
+        monster: {
+          name: "Monster Modifications",
+          description: "These are things that directly change a monster's damage before they attack, such as map mods or curses",
+          tables: {
+            increase: {
+              totalName: "Increased Monster Damage",
+              totalMin: -100
+            },
+            more: {
+              totalName: "More Monster Damage",
               totalMin: -100,
               totalCalc: this.multiplicative
             }

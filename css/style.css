@@ -125,6 +125,10 @@
     overflow: visible;
 }
 
+.checkboxContainer {
+    padding: 10px 5px;
+}
+
 .tableContainer tr:hover .button {
     opacity: 1;
 }
