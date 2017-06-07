@@ -129,8 +129,7 @@
                ng-model="hits[$index].hit"
                ng-model-options="{debounce: 500}"
                ng-change="updateHitRow($index)"
-               ng-focus="updateHitFocus($index, true)"
-               ng-blur="updateHitFocus($index, false)"
+               ng-blur="deleteEmptyRow($index)"
                select-all-on-click>
       </td>
       <td class="damageOutput"><span class="taken">{{hit.taken}}</span>
