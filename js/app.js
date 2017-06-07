@@ -53,7 +53,7 @@ angular.module('PathOfDamage', [])
       if ($scope.hits[$scope.hits.length - 1].hit !== null) {
         $scope.hits.push({hit: null});
       }
-    } else if (!$scope.hits[index].focus && index != $scope.hits.length - 1){
+    } else if (!$scope.hits[index].focus && index !== $scope.hits.length - 1){
       $scope.hits.splice(index, 1);
     }
     serializeData();
