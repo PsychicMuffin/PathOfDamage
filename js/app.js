@@ -137,13 +137,10 @@ angular.module('PathOfDamage', [])
   }
 
   $scope.getMaximumSurvivableHit = function() {
-      var startTime = new Date();
       var hit = 1;
       while (calcDamage(hit).remaining > 0){
         hit++;
       }
-      var endTime = new Date();
-      console.log(endTime- startTime);
       return hit - 1;
   };
 
