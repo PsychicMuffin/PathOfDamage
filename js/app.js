@@ -48,21 +48,24 @@ angular.module('PathOfDamage', [])
   };
 
   $scope.updateHitRow = function (index) {
-    if (index === $scope.hits.length - 1 || $scope.hits[index].hit !== null) {
-      $scope.hits[index] = calcDamage($scope.hits[index].hit);
-      if ($scope.hits[$scope.hits.length - 1].hit !== null) {
-        $scope.hits.push({hit: null});
-      }
-    } else {
-      $scope.hits.splice(index, 1);
+    $scope.hits[index] = calcDamage($scope.hits[index].hit);
+    if ($scope.hits[$scope.hits.length - 1].hit !== null) {
+      $scope.hits.push({hit: null});
     }
     serializeData();
   };
 
+  $scope.deleteEmptyRow = function (index) {
+    if (!$scope.hits[index].hit && index !== $scope.hits.length - 1) {
+      $scope.hits.splice(index, 1);
+      serializeData();
+    }
+  };
+
   $scope.getBarWidth = function (damage) {
-    var percent = (damage / $scope.sections.mitigation.healthPool) * 100;
-    if (percent > 100) {
-      percent = 100;
+    var percent = (damage / $scope.sections.mitigation.healthPool) * 99;
+    if (percent > 99) {
+      percent = 99;
     }
     return {width: (percent || 0) + "%"};
   };
