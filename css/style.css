@@ -11,6 +11,12 @@
     font-size: 30px;
 }
 
+.clearButtonContainer {
+    position: absolute;
+    right: 30px;
+    top: 15px;
+}
+
 .inputSection {
     padding: 10px;
     width: calc(100% - 17em - 10px);

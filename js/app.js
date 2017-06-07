@@ -136,6 +136,14 @@ angular.module('PathOfDamage', [])
     }
   }
 
+  $scope.getMaximumSurvivableHit = function() {
+      var hit = 1;
+      while (calcDamage(hit).remaining > 0){
+        hit++;
+      }
+      return hit - 1;
+  };
+
   function serializeData() {
     var stringified = DataService.encodeData($scope);
     stringified = LZString.compressToEncodedURIComponent(stringified);
