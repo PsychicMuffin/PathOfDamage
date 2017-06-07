@@ -16,8 +16,13 @@
 <body ng-controller="Damage">
 <div class="background">
   <div class="header">
-    <div class="title">Path of Damage</div>
-    <div>The Path of Exile physical hit damage mitigation calculator</div>
+    <div class="titleContainer">
+      <div class="title">Path of Damage</div>
+      <div>The Path of Exile physical hit damage mitigation calculator</div>
+    </div>
+    <div class="clearButtonContainer">
+      <button class="button deleteButton" ng-click="clear()">Clear Form</button>
+    </div>
   </div>
   <div class="inputSection">
     <div class="section" ng-repeat="(sectionName, section) in sections">
@@ -146,6 +151,7 @@
       </td>
     </tr>
   </table>
+  <div class="maxHit">Maximum survivable hit: {{getMaximumSurvivableHit()}}</div>
   <label ng-repeat="(name, value) in sections.mitigation.resistance" class="label">{{capitalize(name)}} Resistance:
     <input class="input number noIncrement resistance"
            type="number"
