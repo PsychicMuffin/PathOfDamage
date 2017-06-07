@@ -48,15 +48,22 @@ angular.module('PathOfDamage', [])
   };
 
   $scope.updateHitRow = function (index) {
-    if (index === $scope.hits.length - 1 || $scope.hits[index].hit !== null) {
+    if ($scope.hits[index].hit) {
       $scope.hits[index] = calcDamage($scope.hits[index].hit);
       if ($scope.hits[$scope.hits.length - 1].hit !== null) {
         $scope.hits.push({hit: null});
       }
-    } else {
+    } else if (!$scope.hits[index].focus && index != $scope.hits.length - 1){
       $scope.hits.splice(index, 1);
     }
     serializeData();
+  };
+
+  $scope.updateHitFocus = function (index, hasFocus) {
+    $scope.hits[index].focus = hasFocus;
+    if (!hasFocus && !$scope.hits[index].hit) {
+      $scope.updateHitRow(index);
+    }
   };
 
   $scope.getBarWidth = function (damage) {
