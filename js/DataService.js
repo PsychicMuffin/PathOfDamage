@@ -1,8 +1,8 @@
 angular.module('PathOfDamage')
 .service('DataService', function () {
-  var VALUE_DELIMITER = '\r';
-  var ROW_DELIMITER = '\f';
-  var SECTION_DELIMITER = '\0';
+  const VALUE_DELIMITER = '\r';
+  const ROW_DELIMITER = '\f';
+  const SECTION_DELIMITER = '\0';
 
   function parseIntOrNull(string) {
     var int = parseInt(string);
