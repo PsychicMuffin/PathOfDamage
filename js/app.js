@@ -1,6 +1,7 @@
 angular.module('PathOfDamage', [])
 .controller('Damage', function ($scope, DataService) {
   $scope.DAMAGE_TYPES = ['physical', 'fire', 'cold', 'lightning', 'chaos'];
+  const ELEMENTS = ['fire', 'cold', 'lightning', 'chaos'];
 
   $scope.sections = DataService.getSections();
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
@@ -39,9 +40,7 @@ angular.module('PathOfDamage', [])
   };
 
   $scope.updateDamageValues = function (skipSerialization) {
-    for (var i = 0; i < $scope.hits.length - 1; i++) {
-      $scope.hits[i] = calcDamage($scope.hits[i].hit);
-    }
+    $scope.hits = $scope.hits.map(function (hit) { return calcDamage(hit.hit) });
     if (!skipSerialization) {
       serializeData();
     }
@@ -91,7 +90,7 @@ angular.module('PathOfDamage', [])
     damage.physical *= (1 + monsterMore);
 
     var shiftTotals = $scope.sections.shift.tables.shifts.subTotals;
-    Object.keys(shiftTotals).forEach(function (element) {
+    ELEMENTS.forEach(function (element) {
       var shifted = damage.physical * shiftTotals[element] / 100;
       damage[element] += shifted * (1 - $scope.sections.mitigation.resistance[element] / 100);
     });
@@ -107,17 +106,17 @@ angular.module('PathOfDamage', [])
     damage.physical *= (1 - reduction);
 
     var flatTotals = $scope.sections.taken.tables.flat.subTotals;
-    Object.keys(flatTotals).forEach(function (type) {
+    DAMAGE_TYPES.forEach(function (type) {
       damage[type] = Math.max(damage[type] + flatTotals[type], 0);
     });
 
     var increasedTotals = $scope.sections.taken.tables.increased.subTotals;
-    Object.keys(increasedTotals).forEach(function (type) {
+    DAMAGE_TYPES.forEach(function (type) {
       damage[type] *= 1 + increasedTotals[type] / 100;
     });
 
     var moreTotals = $scope.sections.taken.tables.more.subTotals;
-    Object.keys(moreTotals).forEach(function (type) {
+    DAMAGE_TYPES.forEach(function (type) {
       damage[type] *= 1 + moreTotals[type] / 100;
     });
 
