@@ -1,6 +1,7 @@
 angular.module('PathOfDamage', [])
 .controller('Damage', function ($scope, DataService) {
   $scope.DAMAGE_TYPES = ['physical', 'fire', 'cold', 'lightning', 'chaos'];
+  const ELEMENTS = ['fire', 'cold', 'lightning', 'chaos'];
 
   $scope.sections = DataService.getSections();
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
@@ -88,7 +89,7 @@ angular.module('PathOfDamage', [])
     damage.physical *= (1 + monsterMore);
 
     var shiftTotals = $scope.sections.shift.tables.shifts.totals;
-    Object.keys(shiftTotals).forEach(function (element) {
+    ELEMENTS.forEach(function (element) {
       var shifted = damage.physical * shiftTotals[element] / 100;
       damage[element] += shifted * (1 - $scope.sections.mitigation.resistance[element] / 100);
     });
@@ -104,17 +105,17 @@ angular.module('PathOfDamage', [])
     damage.physical *= (1 - reduction);
 
     var flatTotals = $scope.sections.taken.tables.flat.totals;
-    Object.keys(flatTotals).forEach(function (element) {
+    DAMAGE_TYPES.forEach(function (element) {
       damage[element] = Math.max(damage[element] + flatTotals[element], 0);
     });
 
     var increasedTotals = $scope.sections.taken.tables.increased.totals;
-    Object.keys(increasedTotals).forEach(function (element) {
+    DAMAGE_TYPES.forEach(function (element) {
       damage[element] *= 1 + increasedTotals[element] / 100;
     });
 
     var moreTotals = $scope.sections.taken.tables.more.totals;
-    Object.keys(moreTotals).forEach(function (element) {
+    DAMAGE_TYPES.forEach(function (element) {
       damage[element] *= 1 + moreTotals[element] / 100;
     });
 
