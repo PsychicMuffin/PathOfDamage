@@ -39,7 +39,7 @@ angular.module('PathOfDamage', [])
   };
 
   $scope.updateDamageValues = function (skipSerialization) {
-    $scope.hits = $scope.hits.map(function (hit) { return calcDamage(hit.hit) });
+    $scope.hits = $scope.hits.map(function (hit) { return hit.hit ? calcDamage(hit.hit) : null });
     if (!skipSerialization) {
       serializeData();
     }
