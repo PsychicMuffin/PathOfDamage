@@ -1,7 +1,6 @@
 angular.module('PathOfDamage', [])
 .controller('Damage', function ($scope, DataService) {
   $scope.DAMAGE_TYPES = ['physical', 'fire', 'cold', 'lightning', 'chaos'];
-  const ELEMENTS = ['fire', 'cold', 'lightning', 'chaos'];
 
   $scope.sections = DataService.getSections();
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
