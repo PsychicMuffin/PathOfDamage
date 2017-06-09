@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/input.css">
   <link rel="stylesheet" href="css/damageTable.css">
-  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico"/>
+  <link rel="shortcut icon" type="image/x-icon" href="icon/favicon.ico"/>
 </head>
 <body ng-controller="Damage">
 <div class="background">
@@ -95,11 +95,19 @@
               </select>
             </td>
             <td ng-if="sectionName==='taken'">
-              <select ng-options="element as capitalize(element) for element in DAMAGE_TYPES"
-                      ng-model="row.elements"
-                      ng-change="updateTotal(table)"
-                      class="input" multiple>
-              </select>
+              <table class="multiSelect">
+                <tr>
+                  <td><label class="select physical" ng-class="{selected: value.types.physical}"><input type="checkbox" ng-model="value.types.physical"></label></td>
+                  <td><label class="select selectAll"><input type="checkbox" ng-click=""></label></td>
+                  <td><label class="select fire" ng-class="{selected: value.types.fire}"><input type="checkbox" ng-model="value.types.fire"></label></td>
+                </tr>
+                <tr>
+                  <td><label class="select fire" ng-class="{selected: value.types.fire}"><input type="checkbox" ng-model="value.types.fire"></label></td>
+                  <td><label class="select fire" ng-class="{selected: value.types.fire}"><input type="checkbox" ng-model="value.types.fire"></label></td>
+                  <td><label class="select fire" ng-class="{selected: value.types.fire}"><input type="checkbox" ng-model="value.types.fire"></label></td>
+                </tr>
+
+              </table>
             </td>
             <td>
               <div class="buttonContainer">
