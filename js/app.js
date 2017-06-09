@@ -65,7 +65,8 @@ angular.module('PathOfDamage', [])
   };
 
   $scope.selectAll = function (table, index) {
-    //TODO
+    //TODO: deselect all if all selected
+    table.values[index].types = {physical: true, fire: true, cold: true, lightning: true, chaos: true};
   };
 
   $scope.capitalize = function (string) {
