@@ -144,21 +144,26 @@
     background-image: url("../icon/cold.png");
     border-color: blue;
 }
+
 .multiSelect label.lightning {
     background-image: url("../icon/lightning.png");
     border-color: orange;
 }
+
 .multiSelect label.chaos {
     background-image: url("../icon/chaos.png");
     border-color: purple;
 }
+
 .multiSelect label.physical {
     background-image: url("../icon/physical.png");
     border-color: slategrey;
 }
+
 .multiSelect label.selectAll {
     background-image: url("../icon/selectAll.png");
 }
+
 .multiSelect input {
     visibility: hidden;
 }
