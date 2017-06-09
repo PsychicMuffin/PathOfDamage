@@ -98,7 +98,7 @@
               <table class="multiSelect">
                 <tr>
                   <td><label class="select physical" ng-class="{selected: value.types.physical}">
-                    <input type="checkbox" ng-model="value.types.physical"></label></td>
+                    <input type="checkbox" ng-model="value.types.physical" ng-change="add(table)"></label></td>
                   <td><label class="select fire" ng-class="{selected: value.types.fire}">
                     <input type="checkbox" ng-model="value.types.fire"></label></td>
                   <td><label class="select cold" ng-class="{selected: value.types.cold}">
