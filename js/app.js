@@ -64,6 +64,10 @@ angular.module('PathOfDamage', [])
     return {width: (percent || 0) + "%"};
   };
 
+  $scope.selectAll = function (table, index) {
+    //TODO
+  };
+
   $scope.capitalize = function (string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };

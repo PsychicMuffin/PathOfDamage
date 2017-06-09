@@ -97,16 +97,21 @@
             <td ng-if="sectionName==='taken'">
               <table class="multiSelect">
                 <tr>
-                  <td><label class="select physical" ng-class="{selected: value.types.physical}"><input type="checkbox" ng-model="value.types.physical"></label></td>
-                  <td><label class="select selectAll"><input type="checkbox" ng-click=""></label></td>
-                  <td><label class="select fire" ng-class="{selected: value.types.fire}"><input type="checkbox" ng-model="value.types.fire"></label></td>
+                  <td><label class="select physical" ng-class="{selected: value.types.physical}">
+                    <input type="checkbox" ng-model="value.types.physical"></label></td>
+                  <td><label class="select fire" ng-class="{selected: value.types.fire}">
+                    <input type="checkbox" ng-model="value.types.fire"></label></td>
+                  <td><label class="select cold" ng-class="{selected: value.types.cold}">
+                    <input type="checkbox" ng-model="value.types.cold"></label></td>
                 </tr>
                 <tr>
-                  <td><label class="select fire" ng-class="{selected: value.types.fire}"><input type="checkbox" ng-model="value.types.fire"></label></td>
-                  <td><label class="select fire" ng-class="{selected: value.types.fire}"><input type="checkbox" ng-model="value.types.fire"></label></td>
-                  <td><label class="select fire" ng-class="{selected: value.types.fire}"><input type="checkbox" ng-model="value.types.fire"></label></td>
+                  <td><label class="select selectAll">
+                    <input type="checkbox" ng-click="selectAll(table, $index)"></label></td>
+                  <td><label class="select lightning" ng-class="{selected: value.types.lightning}">
+                    <input type="checkbox" ng-model="value.types.lightning"></label></td>
+                  <td><label class="select chaos" ng-class="{selected: value.types.chaos}">
+                    <input type="checkbox" ng-model="value.types.chaos"></label></td>
                 </tr>
-
               </table>
             </td>
             <td>
