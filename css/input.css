@@ -109,15 +109,15 @@
     -moz-appearance: textfield;
 }
 
-.multiSelect {
+.elementSelector {
     border-collapse: collapse;
 }
 
-.multiSelect td {
+.elementSelector td {
     padding: 1px;
 }
 
-.multiSelect label {
+.elementSelector label {
     margin: 0;
     border: 1px solid;
     background-repeat: no-repeat;
@@ -126,39 +126,39 @@
     display: block;
 }
 
-.multiSelect label.select:not(.selected) {
+.elementSelector label.select:not(.selected) {
     border-color: transparent ;
 }
 
-.multiSelect label.fire {
+.elementSelector label.fire {
     background-image: url("../icon/fire.png");
     border-color: red;
 }
 
-.multiSelect label.cold {
+.elementSelector label.cold {
     background-image: url("../icon/cold.png");
     border-color: blue;
 }
 
-.multiSelect label.lightning {
+.elementSelector label.lightning {
     background-image: url("../icon/lightning.png");
     border-color: orange;
 }
 
-.multiSelect label.chaos {
+.elementSelector label.chaos {
     background-image: url("../icon/chaos.png");
     border-color: purple;
 }
 
-.multiSelect label.physical {
+.elementSelector label.physical {
     background-image: url("../icon/physical.png");
     border-color: slategrey;
 }
 
-.multiSelect label.selectAll {
+.elementSelector label.selectAll {
     background-image: url("../icon/selectAll.png");
 }
 
-.multiSelect input {
+.elementSelector input {
     visibility: hidden;
 }
