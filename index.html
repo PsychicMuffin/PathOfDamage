@@ -47,17 +47,17 @@
       <div class="tableContainer" ng-repeat="(tableName, table) in section.tables">
         <div class="tableTitle">{{table.name}}</div>
         <table class="table table-condensed">
-          <tr ng-repeat="value in table.values track by $index">
+          <tr ng-repeat="row in table.rows track by $index">
             <td>
               <label class="checkboxContainer">
-                <input type="checkbox" class="checkbox " ng-model="value.enabled" ng-change="updateTotal(table)">
+                <input type="checkbox" class="checkbox " ng-model="row.enabled" ng-change="updateTotal(table)">
               </label>
             </td>
             <td class="name">
               <input class="input"
                      type="text"
                      placeholder="Source Name"
-                     ng-model="value.name"
+                     ng-model="row.name"
                      ng-change="add(table)"
                      ng-model-options="{debounce: 500}">
             </td>
@@ -66,7 +66,7 @@
                 <input class="input number noIncrement"
                        type="number"
                        placeholder="+/-"
-                       ng-model="value.value"
+                       ng-model="row.value"
                        ng-change="add(table)"
                        ng-model-options="{debounce: 500}"
                        ng-attr-id="{{tableName}}"
@@ -84,14 +84,14 @@
             </td>
             <td ng-if="tableName==='shifts'">
               <select ng-options="type as capitalize(type) for type in DAMAGE_TYPES.slice(1)"
-                      ng-model="value.element"
+                      ng-model="row.element"
                       ng-change="updateTotal(table)"
                       class="input">
               </select>
             </td>
             <td ng-if="sectionName==='taken'">
               <select ng-options="type as capitalize(type) for type in DAMAGE_TYPES"
-                      ng-model="value.types"
+                      ng-model="row.types"
                       ng-change="updateTotal(table)"
                       class="input" multiple>
               </select>
@@ -107,8 +107,10 @@
             </td>
           </tr>
         </table>
-        <div class="total" ng-if="table.values.length > 1">
-          Total: <b>{{table.getTotal()}}{{tableName !== 'flat' ? '%' : ''}}</b>
+        <div class="total" ng-if="table.rows.length > 1">
+          <div class="subTotal" ng-repeat="(totalName, total) in table.totals">
+            {{capitalize(totalName)}}: <b>{{total}}{{tableName !== 'flat' ? '%' : ''}}</b>
+          </div>
         </div>
       </div>
       <hr class="borderLine">
