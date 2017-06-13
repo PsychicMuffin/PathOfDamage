@@ -91,15 +91,19 @@
               <table class="radio elementSelector">
                 <tr>
                   <td><label class="select fire" ng-class="{selected: row.elements.fire}">
-                    <input type="radio" name="shift" value="fire" ng-model="row.elements.fire"></label></td>
+                    <input type="radio" name="shift" value="fire" ng-model="row.elements.model"
+                        ng-change="setElement(table, row, 'fire')"></label></td>
                   <td><label class="select cold" ng-class="{selected: row.elements.cold}">
-                    <input type="radio" name="shift" value="cold" ng-model="row.elements.cold"></label></td>
+                    <input type="radio" name="shift" value="cold" ng-model="row.elements.model"
+                           ng-change="setElement(table, row, 'cold')"></label></td>
                 </tr>
                 <tr>
                   <td><label class="select lightning" ng-class="{selected: row.elements.lightning}">
-                    <input type="radio" name="shift" value="lightning" ng-model="row.elements.lightning"></label></td>
+                    <input type="radio" name="shift" value="lightning" ng-model="row.elements.model"
+                           ng-change="setElement(table, row, 'lightning')"></label></td>
                   <td><label class="select chaos" ng-class="{selected: row.elements.chaos}">
-                    <input type="radio" name="shift" value="chaos" ng-model="row.elements.chaos"></label></td>
+                    <input type="radio" name="shift" value="chaos" ng-model="row.elements.model"
+                           ng-change="setElement(table, row, 'chaos')"></label></td>
                 </tr>
               </table>
             </td>
@@ -107,19 +111,19 @@
               <table class="multi elementSelector">
                 <tr>
                   <td><label class="select physical" ng-class="{selected: row.elements.physical}">
-                    <input type="checkbox" ng-model="row.elements.physical" ng-change="add(table)"></label></td>
+                    <input type="checkbox" ng-model="row.elements.physical" ng-change="updateTotal(table)"></label></td>
                   <td><label class="select fire" ng-class="{selected: row.elements.fire}">
-                    <input type="checkbox" ng-model="row.elements.fire" ng-change="add(table)"></label></td>
+                    <input type="checkbox" ng-model="row.elements.fire" ng-change="updateTotal(table)"></label></td>
                   <td><label class="select cold" ng-class="{selected: row.elements.cold}">
-                    <input type="checkbox" ng-model="row.elements.cold" ng-change="add(table)"></label></td>
+                    <input type="checkbox" ng-model="row.elements.cold" ng-change="updateTotal(table)"></label></td>
                 </tr>
                 <tr>
-                  <td><label class="select selectAll" ng-class="{selected: allSelected(row)}">
+                  <td><label class="select selectAll" ng-class="{allSelected: allSelected(row)}">
                     <input type="checkbox" ng-click="selectAll(table, row)"></label></td>
                   <td><label class="select lightning" ng-class="{selected: row.elements.lightning}">
-                    <input type="checkbox" ng-model="row.elements.lightning" ng-change="add(table)"></label></td>
+                    <input type="checkbox" ng-model="row.elements.lightning" ng-change="updateTotal(table)"></label></td>
                   <td><label class="select chaos" ng-class="{selected: row.elements.chaos}">
-                    <input type="checkbox" ng-model="row.elements.chaos" ng-change="add(table)"></label></td>
+                    <input type="checkbox" ng-model="row.elements.chaos" ng-change="updateTotal(table)"></label></td>
                 </tr>
               </table>
             </td>

@@ -155,7 +155,11 @@
     border-color: slategrey;
 }
 
-.elementSelector label.selectAll {
+.elementSelector label.selectAll.allSelected {
+    background-image: url("../icon/clear.png");
+}
+
+.elementSelector label.selectAll:not(.allSelected) {
     background-image: url("../icon/selectAll.png");
 }
 

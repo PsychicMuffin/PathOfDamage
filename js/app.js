@@ -3,6 +3,12 @@ angular.module('PathOfDamage', [])
   $scope.sections = DataService.getSections();
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
 
+  $scope.setElement = function(table, row, element){
+    row.elements = {physical: false, fire: false, cold: false, lightning: false, chaos: false};
+    row.elements[element] = true;
+    $scope.updateTotal(table);
+  };
+
   $scope.clear = function () {
     window.location.href = window.location.pathname;
   };
