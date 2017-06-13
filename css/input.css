@@ -108,3 +108,61 @@
 .number.noIncrement {
     -moz-appearance: textfield;
 }
+
+.elementSelector {
+    border-collapse: collapse;
+}
+
+.elementSelector td {
+    padding: 1px;
+}
+
+.elementSelector label {
+    margin: 0;
+    border: 1px solid;
+    background-repeat: no-repeat;
+    height: 13px;
+    width: 13px;
+    display: block;
+}
+
+.elementSelector label.select:not(.selected) {
+    border-color: transparent ;
+}
+
+.elementSelector label.fire {
+    background-image: url("../icon/fire.png");
+    border-color: red;
+}
+
+.elementSelector label.cold {
+    background-image: url("../icon/cold.png");
+    border-color: blue;
+}
+
+.elementSelector label.lightning {
+    background-image: url("../icon/lightning.png");
+    border-color: orange;
+}
+
+.elementSelector label.chaos {
+    background-image: url("../icon/chaos.png");
+    border-color: purple;
+}
+
+.elementSelector label.physical {
+    background-image: url("../icon/physical.png");
+    border-color: slategrey;
+}
+
+.elementSelector label.selectAll.allSelected {
+    background-image: url("../icon/clear.png");
+}
+
+.elementSelector label.selectAll:not(.allSelected) {
+    background-image: url("../icon/selectAll.png");
+}
+
+.elementSelector input {
+    visibility: hidden;
+}

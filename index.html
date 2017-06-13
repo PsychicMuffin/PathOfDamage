@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/input.css">
   <link rel="stylesheet" href="css/damageTable.css">
-  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico"/>
+  <link rel="shortcut icon" type="image/x-icon" href="icon/favicon2.ico"/>
 </head>
 <body ng-controller="Damage">
 <div class="background">
@@ -88,18 +88,44 @@
               </div>
             </td>
             <td ng-if="tableName==='shifts'">
-              <select ng-options="element as capitalize(element) for element in DAMAGE_TYPES.slice(1)"
-                      ng-model="row.elements[0]"
-                      ng-change="updateTotal(table)"
-                      class="input">
-              </select>
+              <table class="radio elementSelector">
+                <tr>
+                  <td><label class="select fire" ng-class="{selected: row.elements.fire}">
+                    <input type="radio" name="shift" value="fire" ng-model="row.elements.model"
+                        ng-change="setElement(table, row, 'fire')"></label></td>
+                  <td><label class="select cold" ng-class="{selected: row.elements.cold}">
+                    <input type="radio" name="shift" value="cold" ng-model="row.elements.model"
+                           ng-change="setElement(table, row, 'cold')"></label></td>
+                </tr>
+                <tr>
+                  <td><label class="select lightning" ng-class="{selected: row.elements.lightning}">
+                    <input type="radio" name="shift" value="lightning" ng-model="row.elements.model"
+                           ng-change="setElement(table, row, 'lightning')"></label></td>
+                  <td><label class="select chaos" ng-class="{selected: row.elements.chaos}">
+                    <input type="radio" name="shift" value="chaos" ng-model="row.elements.model"
+                           ng-change="setElement(table, row, 'chaos')"></label></td>
+                </tr>
+              </table>
             </td>
             <td ng-if="sectionName==='taken'">
-              <select ng-options="element as capitalize(element) for element in DAMAGE_TYPES"
-                      ng-model="row.elements"
-                      ng-change="updateTotal(table)"
-                      class="input" multiple>
-              </select>
+              <table class="multi elementSelector">
+                <tr>
+                  <td><label class="select physical" ng-class="{selected: row.elements.physical}">
+                    <input type="checkbox" ng-model="row.elements.physical" ng-change="updateTotal(table)"></label></td>
+                  <td><label class="select fire" ng-class="{selected: row.elements.fire}">
+                    <input type="checkbox" ng-model="row.elements.fire" ng-change="updateTotal(table)"></label></td>
+                  <td><label class="select cold" ng-class="{selected: row.elements.cold}">
+                    <input type="checkbox" ng-model="row.elements.cold" ng-change="updateTotal(table)"></label></td>
+                </tr>
+                <tr>
+                  <td><label class="select selectAll" ng-class="{allSelected: allSelected(row)}">
+                    <input type="checkbox" ng-click="selectAll(table, row)"></label></td>
+                  <td><label class="select lightning" ng-class="{selected: row.elements.lightning}">
+                    <input type="checkbox" ng-model="row.elements.lightning" ng-change="updateTotal(table)"></label></td>
+                  <td><label class="select chaos" ng-class="{selected: row.elements.chaos}">
+                    <input type="checkbox" ng-model="row.elements.chaos" ng-change="updateTotal(table)"></label></td>
+                </tr>
+              </table>
             </td>
             <td>
               <div class="buttonContainer">
@@ -113,7 +139,7 @@
           </tr>
         </table>
         <div class="total" ng-if="table.rows.length > 1">
-          <div class="subTotal" ng-repeat="(totalName, total) in table.totals">
+          <div class="subTotal" ng-if="total != 0" ng-repeat="(totalName, total) in table.totals">
             {{capitalize(totalName)}}: <b>{{total}}{{tableName !== 'flat' ? '%' : ''}}</b>
           </div>
         </div>
