@@ -103,18 +103,18 @@ angular.module('PathOfDamage', [])
     damage.physical *= (1 - reduction);
 
     var flatTotals = $scope.sections.taken.tables.flat.totals;
-    Object.keys(flatTotals).forEach(function (type) {
-      damage[type] = Math.max(damage[type] + flatTotals[type], 0);
+    Object.keys(flatTotals).forEach(function (element) {
+      damage[element] = Math.max(damage[element] + flatTotals[element], 0);
     });
 
     var increasedTotals = $scope.sections.taken.tables.increased.totals;
-    Object.keys(increasedTotals).forEach(function (type) {
-      damage[type] *= 1 + increasedTotals[type] / 100;
+    Object.keys(increasedTotals).forEach(function (element) {
+      damage[element] *= 1 + increasedTotals[element] / 100;
     });
 
     var moreTotals = $scope.sections.taken.tables.more.totals;
-    Object.keys(moreTotals).forEach(function (type) {
-      damage[type] *= 1 + moreTotals[type] / 100;
+    Object.keys(moreTotals).forEach(function (element) {
+      damage[element] *= 1 + moreTotals[element] / 100;
     });
 
     var eleDamage = damage.fire + damage.cold + damage.lightning + damage.chaos;

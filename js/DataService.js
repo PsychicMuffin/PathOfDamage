@@ -9,46 +9,95 @@ angular.module('PathOfDamage')
     return isNaN(int) ? null : int;
   }
   
-  function Row(key, value) {
-    this.enabled = true;
-    this.name = '';
-    this.value = null;
-    if (key !== undefined) {
-      this[key] = value;
-    }
-    this.isEnabled = function () {
+  function Row(enabled, name, value, elements) {
+    this.enabled = enabled || true;
+    this.name = name || '';
+    this.value = value || null;
+    this.elements = elements;
+    this.isValid = function () {
       return this.enabled && this.value;
     }
   }
 
-  function Table(name, addToTotal, key, value) {
+  function Table(name, addToTotal, defaultElements) {
     this.name = name;
+    this.defaultElements = defaultElements;
     this.rows = [];
     this.calcTotals = function () {
-      this.totals = this.getEmptyTotal();
+      this.totals = this.getEmptyTotals();
       for (var i = 0, len = this.rows.length - 1; i < len; i++) {
-        if (this.rows[i].isEnabled()) {
+        if (this.rows[i].isValid()) {
           addToTotal(this.totals, this.rows[i]);
         }
       }
     };
-    this.addRow = function () {
-      this.rows.push(new Row(key, value));
+    this.addRow = function (enabled, name, value, elements) {
+      this.rows.push(new Row(enabled, name, value, elements || this.getDefaultElements()));
     };
-    this.getEmptyTotal = function () {
+    this.getDefaultElements = function () {
+      return this.defaultElements ? defaultElements.slice() : undefined;
+    };
+    this.getEmptyTotals = function () {
       return {total: 0};
     }
   }
 
   function TypedTable(name, addToSubtotal) {
     Table.call(this, name, function (totals, row) {
-      for (var i = 0, len = row.types.length; i < len; i++) {
-        addToSubtotal(totals, row.value, row.types[i]);
+      for (var i = 0, len = row.elements.length; i < len; i++) {
+        addToSubtotal(totals, row.value, row.elements[i]);
       }
-    }, 'types', ['physical']);
-    this.getEmptyTotal = function () {
+    }, ['physical']);
+    this.getEmptyTotals = function () {
       return {};
     }
+  }
+
+  function MonsterIncreaseTable() {
+    Table.call(this, "Increased Monster Damage", function (totals, row) {
+      totals.total = Math.max(totals.total + row.value, -100);
+    });
+  }
+
+  function MonsterMoreTable() {
+    Table.call(this, "More Monster Damage", function (totals, row) {
+      var multiplier = 1 + row.value / 100;
+      var newTotal = (totals.total + 100) * multiplier - 100;
+      totals.total = Math.max(newTotal, -100);
+    });
+  }
+
+  function DamageShiftTable() {
+    Table.call(this, "Damage Shifted", function (totals, row) {
+      totals[row.elements] = totals[row.elements] + row.value || row.value;
+      totals.total += row.value;
+    }, ['fire']);
+  }
+
+  function DamageReductionTable() {
+    Table.call(this, "Additional Physical Damage Reduction", function (totals, row) {
+      totals.total = Math.min(totals.total + row.value, 90);
+    });
+  }
+
+  function FlatTakenTable() {
+    TypedTable.call(this, "Flat Increase", function (totals, value, element) {
+      totals[element] = totals[element] + value || value;
+    });
+  }
+
+  function IncreasedTakenTable() {
+    TypedTable.call(this, "Increased Damage Taken", function (totals, value, element) {
+      totals[element] = Math.max(totals[element] + value || value, -100);
+    });
+  }
+
+  function MoreTakenTable() {
+    TypedTable.call(this, "More Damage Taken", function (totals, value, element) {
+      var multiplier = 1 + value / 100;
+      var newTotal = (totals[element] + 100) * multiplier - 100;
+      totals[element] = Math.max(newTotal || value, -100);
+    });
   }
 
   return {
@@ -67,50 +116,31 @@ angular.module('PathOfDamage')
             chaos: -60
           },
           tables: {
-            reduction: new Table("Additional Physical Damage Reduction", function (totals, value) {
-              totals.total = Math.min(totals.total + value.value, 90);
-            })
+            reduction: new DamageReductionTable()
           }
         },
         taken: {
           name: "Damage Taken",
           description: "After damage mitigation, modifiers to damage taken are applied. Flat amounts (±X Damage taken from Y, like Astramentis) are applied first, then the sum of all increases/reductions (% increased/reduced X Damage taken, like Fortify, Shock, and Abyssus) and lastly more/less multipliers (% more/less X Damage taken, like Arctic Armour).",
           tables: {
-            flat: new TypedTable("Flat Increase", function (totals, value, type) {
-              totals[type] = totals[type] + value || value;
-            }),
-            increased: new TypedTable("Increased Damage Taken", function (totals, value, type) {
-              totals[type] = Math.max(totals[type] + value || value, -100);
-            }),
-            more: new TypedTable("More Damage Taken", function (totals, value, type) {
-              var multiplier = 1 + value / 100;
-              var newTotal = (totals[type] + 100) * multiplier - 100;
-              totals[type] = Math.max(newTotal || value, -100);
-            })
+            flat: new FlatTakenTable(),
+            increased: new IncreasedTakenTable(),
+            more: new MoreTakenTable()
           }
         },
         shift: {
           name: "Damage Shifts",
           description: "Modifiers that shift physical damage to elemental, typically reading like '% of Physical Damage taken as Y', such as Taste of Hate or Lightning Coil",
           tables: {
-            shifts: new Table("Damage Shifted", function (totals, value) {
-              totals[value.element] = totals[value.element] + value.value || value.value;
-              totals.total += value.value;
-            }, 'element', 'fire')
+            shifts: new DamageShiftTable()
           }
         },
         monster: {
           name: "Monster Modifications",
           description: "These are things that directly change a monster's damage before they attack, such as map mods or curses",
           tables: {
-            increase: new Table("Increased Monster Damage", function (totals, value) {
-              totals.total = Math.max(totals.total + value.value, -100);
-            }),
-            more: new Table("More Monster Damage", function (totals, value) {
-              var multiplier = 1 + value.value / 100;
-              var newTotal = (totals.total + 100) * multiplier - 100;
-              totals.total = Math.max(newTotal, -100);
-            })
+            increase: new MonsterIncreaseTable(),
+            more: new MonsterMoreTable()
           }
         }
       };
@@ -148,12 +178,9 @@ angular.module('PathOfDamage')
         if (table[i].value) {
           tableData += table[i].value;
         }
-        if (table[i].element) {
+        if (table[i].elements) {
           tableData += VALUE_DELIMITER;
-          tableData += damageTypes.indexOf(table[i].element);
-        } else if (table[i].types) {
-          tableData += VALUE_DELIMITER;
-          tableData += this.encodeTypes(table[i].types, damageTypes);
+          tableData += this.encodeElements(table[i].elements, damageTypes);
         }
         if (i !== table.length - 2) {
           tableData += ROW_DELIMITER;
@@ -161,22 +188,22 @@ angular.module('PathOfDamage')
       }
       return tableData + SECTION_DELIMITER;
     },
-    encodeTypes: function (types, damageTypes) {
+    encodeElements: function (elements, elementTypes) {
       var encoded = '';
-      damageTypes.forEach(function (type) {
-        encoded += +types.includes(type);
+      elementTypes.forEach(function (element) {
+        encoded += +(elements.indexOf(element) !== -1);
       });
       return parseInt(encoded, 2).toString(36);
     },
     decodeData: function (scope, dataString) {
       var sections = dataString.split(SECTION_DELIMITER);
-      scope.sections.monster.tables.increase.rows = this.decodeTable(sections[0], scope.DAMAGE_TYPES);
-      scope.sections.monster.tables.more.rows = this.decodeTable(sections[1], scope.DAMAGE_TYPES);
-      scope.sections.shift.tables.shifts.rows = this.decodeTable(sections[2], scope.DAMAGE_TYPES, this.decodeElement);
-      scope.sections.mitigation.tables.reduction.rows = this.decodeTable(sections[3], scope.DAMAGE_TYPES);
-      scope.sections.taken.tables.flat.rows = this.decodeTable(sections[4], scope.DAMAGE_TYPES, this.decodeTypes);
-      scope.sections.taken.tables.increased.rows = this.decodeTable(sections[5], scope.DAMAGE_TYPES, this.decodeTypes);
-      scope.sections.taken.tables.more.rows = this.decodeTable(sections[6], scope.DAMAGE_TYPES, this.decodeTypes);
+      this.decodeTable(scope.sections.monster.tables.increase, sections[0], scope.DAMAGE_TYPES);
+      this.decodeTable(scope.sections.monster.tables.more, sections[1], scope.DAMAGE_TYPES);
+      this.decodeTable(scope.sections.shift.tables.shifts, sections[2], scope.DAMAGE_TYPES);
+      this.decodeTable(scope.sections.mitigation.tables.reduction, sections[3], scope.DAMAGE_TYPES);
+      this.decodeTable(scope.sections.taken.tables.flat, sections[4], scope.DAMAGE_TYPES);
+      this.decodeTable(scope.sections.taken.tables.increased, sections[5], scope.DAMAGE_TYPES);
+      this.decodeTable(scope.sections.taken.tables.more, sections[6], scope.DAMAGE_TYPES);
       scope.hits = sections[7].split(ROW_DELIMITER).map(function (hit) {
         return {hit: parseIntOrNull(hit)};
       });
@@ -188,42 +215,31 @@ angular.module('PathOfDamage')
       scope.sections.mitigation.resistance.chaos = parseIntOrNull(sections[13]);
       scope.sections.mitigation.healthPool = parseIntOrNull(sections[14]);
     },
-    decodeTable: function (tableString, damageTypes, extraParsing) {
-      if (!tableString) {
-        return [];
-      }
-      var table = [];
-      var rows = tableString.split(ROW_DELIMITER);
-      for (var i = 0; i < rows.length; i++) {
-        var values = rows[i].split(VALUE_DELIMITER);
-        var tableEntry = {
-          enabled: values[0].slice(0, 1) === '1',
-          name: values[0].slice(1),
-          value: parseIntOrNull(values[1])
-        };
-        if (extraParsing) {
-          extraParsing(values, tableEntry, damageTypes);
+    decodeTable: function (table, tableString, damageTypes) {
+      if (tableString) {
+        var rows = tableString.split(ROW_DELIMITER);
+        for (var i = 0; i < rows.length; i++) {
+          var values = rows[i].split(VALUE_DELIMITER);
+          table.addRow(
+              values[0].slice(0, 1) === '1',
+              values[0].slice(1),
+              parseIntOrNull(values[1]),
+              this.decodeElements(values[2], damageTypes)
+          );
         }
-        table.push(tableEntry);
-      }
-      return table;
-    },
-    decodeElement: function (values, tableEntry, damageTypes) {
-      if (values[2]) {
-        tableEntry.element = damageTypes[values[2]];
       }
     },
-    decodeTypes: function (values, tableEntry, damageTypes) {
-      if (values[2]) {
-        var types = [];
-        var booleans = parseInt(values[2], 36).toString(2).split('');
+    decodeElements: function (encodedElements, elementTypes) {
+      if (encodedElements) {
+        var elements = [];
+        var booleans = parseInt(encodedElements, 36).toString(2).split('');
         var index = booleans.length;
-        for (var i = damageTypes.length; i-- > 0;) {
+        for (var i = elementTypes.length; i-- > 0;) {
           if (booleans[--index] === '1') {
-            types.push(damageTypes[i]);
+            elements.push(elementTypes[i]);
           }
         }
-        tableEntry.types = types;
+        return elements;
       }
     }
   };

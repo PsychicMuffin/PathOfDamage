@@ -83,15 +83,15 @@
               </div>
             </td>
             <td ng-if="tableName==='shifts'">
-              <select ng-options="type as capitalize(type) for type in DAMAGE_TYPES.slice(1)"
-                      ng-model="row.element"
+              <select ng-options="element as capitalize(element) for element in DAMAGE_TYPES.slice(1)"
+                      ng-model="row.elements[0]"
                       ng-change="updateTotal(table)"
                       class="input">
               </select>
             </td>
             <td ng-if="sectionName==='taken'">
-              <select ng-options="type as capitalize(type) for type in DAMAGE_TYPES"
-                      ng-model="row.types"
+              <select ng-options="element as capitalize(element) for element in DAMAGE_TYPES"
+                      ng-model="row.elements"
                       ng-change="updateTotal(table)"
                       class="input" multiple>
               </select>
