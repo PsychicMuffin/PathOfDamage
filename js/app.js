@@ -1,7 +1,5 @@
 angular.module('PathOfDamage', [])
 .controller('Damage', function ($scope, DataService) {
-  $scope.DAMAGE_TYPES = ['physical', 'fire', 'cold', 'lightning', 'chaos'];
-
   $scope.sections = DataService.getSections();
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
 
@@ -35,7 +33,9 @@ angular.module('PathOfDamage', [])
   };
 
   $scope.updateDamageValues = function (skipSerialization) {
-    $scope.hits = $scope.hits.map(function (hit) { return hit && hit.hit ? calcDamage(hit.hit) : null });
+    $scope.hits = $scope.hits.map(function (hit) {
+      return hit && hit.hit ? calcDamage(hit.hit) : null
+    });
     if (!skipSerialization) {
       serializeData();
     }
@@ -64,9 +64,18 @@ angular.module('PathOfDamage', [])
     return {width: (percent || 0) + "%"};
   };
 
-  $scope.selectAll = function (table, index) {
-    //TODO: deselect all if all selected
-    table.values[index].types = {physical: true, fire: true, cold: true, lightning: true, chaos: true};
+  $scope.allSelected = function (row) {
+    return Object.keys(row.elements).every(function (key) {
+      return row.elements[key];
+    })
+  };
+
+  $scope.selectAll = function (table, row) {
+    var bool = !$scope.allSelected(row);
+    Object.keys(row.elements).forEach(function (key) {
+      row.elements[key] = bool;
+    });
+    $scope.updateTotal(table);
   };
 
   $scope.capitalize = function (string) {
@@ -110,7 +119,9 @@ angular.module('PathOfDamage', [])
 
     var flatTotals = $scope.sections.taken.tables.flat.totals;
     Object.keys(flatTotals).forEach(function (element) {
-      damage[element] = Math.max(damage[element] + flatTotals[element], 0);
+      if (damage[element] > 0) {
+        damage[element] = Math.max(damage[element] + flatTotals[element], 0);
+      }
     });
 
     var increasedTotals = $scope.sections.taken.tables.increased.totals;
