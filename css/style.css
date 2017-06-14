@@ -87,8 +87,14 @@
     padding-left: 10em;
 }
 
+.section .element.total {
+    text-align: right;
+    padding-right: 2.1em;
+    padding-left: 0;
+}
+
 .section .buttonContainer {
-    width: 30px;
+    width: 2em;
 }
 
 .section .button {
