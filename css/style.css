@@ -5,7 +5,7 @@
     padding-bottom: 5px;
     background: #07889B;
     color: #FFF;
-    height: 85px;
+    height: 80px;
 }
 
 .title {
@@ -15,7 +15,7 @@
 .clearButtonContainer {
     position: absolute;
     right: 30px;
-    top: 15px;
+    top: 25px;
 }
 
 .inputSection {
