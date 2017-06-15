@@ -90,18 +90,18 @@
             <td ng-if="tableName==='shifts'">
               <table class="radio elementSelector">
                 <tr>
-                  <td><label class="select fire" ng-class="{selected: row.elements.fire}">
+                  <td><label class="select fire" ng-class="{selected: row.elements.fire}" title="Fire">
                     <input type="radio" name="shift" value="fire" ng-model="row.elements.model"
                         ng-change="setElement(table, row, 'fire')"></label></td>
-                  <td><label class="select cold" ng-class="{selected: row.elements.cold}">
+                  <td><label class="select cold" ng-class="{selected: row.elements.cold}" title="Cold">
                     <input type="radio" name="shift" value="cold" ng-model="row.elements.model"
                            ng-change="setElement(table, row, 'cold')"></label></td>
                 </tr>
                 <tr>
-                  <td><label class="select lightning" ng-class="{selected: row.elements.lightning}">
+                  <td><label class="select lightning" ng-class="{selected: row.elements.lightning}" title="Lightning">
                     <input type="radio" name="shift" value="lightning" ng-model="row.elements.model"
                            ng-change="setElement(table, row, 'lightning')"></label></td>
-                  <td><label class="select chaos" ng-class="{selected: row.elements.chaos}">
+                  <td><label class="select chaos" ng-class="{selected: row.elements.chaos}" title="Chaos">
                     <input type="radio" name="shift" value="chaos" ng-model="row.elements.model"
                            ng-change="setElement(table, row, 'chaos')"></label></td>
                 </tr>
@@ -110,19 +110,20 @@
             <td ng-if="sectionName==='taken'">
               <table class="multi elementSelector">
                 <tr>
-                  <td><label class="select physical" ng-class="{selected: row.elements.physical}">
+                  <td><label class="select physical" ng-class="{selected: row.elements.physical}" title="Physical">
                     <input type="checkbox" ng-model="row.elements.physical" ng-change="updateTotal(table)"></label></td>
-                  <td><label class="select fire" ng-class="{selected: row.elements.fire}">
+                  <td><label class="select fire" ng-class="{selected: row.elements.fire}" title="Fire">
                     <input type="checkbox" ng-model="row.elements.fire" ng-change="updateTotal(table)"></label></td>
-                  <td><label class="select cold" ng-class="{selected: row.elements.cold}">
+                  <td><label class="select cold" ng-class="{selected: row.elements.cold}" title="Cold">
                     <input type="checkbox" ng-model="row.elements.cold" ng-change="updateTotal(table)"></label></td>
                 </tr>
                 <tr>
-                  <td><label class="select selectAll" ng-class="{allSelected: allSelected(row)}">
+                  <td><label class="select selectAll" ng-class="{allSelected: allSelected(row)}"
+                             title="{{allSelected(row) ? 'Deselect All' : 'Select All'}}">
                     <input type="checkbox" ng-click="selectAll(table, row)"></label></td>
-                  <td><label class="select lightning" ng-class="{selected: row.elements.lightning}">
+                  <td><label class="select lightning" ng-class="{selected: row.elements.lightning}" title="Lightning">
                     <input type="checkbox" ng-model="row.elements.lightning" ng-change="updateTotal(table)"></label></td>
-                  <td><label class="select chaos" ng-class="{selected: row.elements.chaos}">
+                  <td><label class="select chaos" ng-class="{selected: row.elements.chaos}" title="Chaos">
                     <input type="checkbox" ng-model="row.elements.chaos" ng-change="updateTotal(table)"></label></td>
                 </tr>
               </table>
@@ -183,7 +184,8 @@
   <div class="maxHit">Maximum survivable hit: {{getMaximumSurvivableHit()}}</div>
   <div class="resistanceHeader">Resistances:</div>
   <div class="resistanceContainer">
-    <label ng-repeat="(name, value) in sections.mitigation.resistance" class="label resistance {{name}}">
+    <label ng-repeat="(name, value) in sections.mitigation.resistance"
+           class="label resistance {{name}}" title="{{capitalize(name)}} resistance">
       <input class="input number noIncrement"
              type="number"
              ng-model="sections.mitigation.resistance[name]"
