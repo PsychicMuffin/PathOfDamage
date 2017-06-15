@@ -130,29 +130,39 @@
     border-color: transparent ;
 }
 
-.elementSelector label.fire {
+.elementSelector label.fire,
+.element.total .subTotal.fire {
     background-image: url("../icon/fire.png");
     border-color: red;
+    color: darkred;
 }
 
-.elementSelector label.cold {
+.elementSelector label.cold ,
+.element.total .subTotal.cold {
     background-image: url("../icon/cold.png");
     border-color: blue;
+    color: blue;
 }
 
-.elementSelector label.lightning {
+.elementSelector label.lightning ,
+.element.total .subTotal.lightning {
     background-image: url("../icon/lightning.png");
     border-color: orange;
+    color: darkorange;
 }
 
-.elementSelector label.chaos {
+.elementSelector label.chaos ,
+.element.total .subTotal.chaos {
     background-image: url("../icon/chaos.png");
     border-color: purple;
+    color: purple;
 }
 
-.elementSelector label.physical {
+.elementSelector label.physical ,
+.element.total .subTotal.physical {
     background-image: url("../icon/physical.png");
     border-color: slategrey;
+    color: slategrey;
 }
 
 .elementSelector label.selectAll.allSelected {
@@ -165,4 +175,10 @@
 
 .elementSelector input {
     visibility: hidden;
+}
+
+.element.total .subTotal {
+    background: no-repeat 7px 5px;
+    display: inline-block;
+    padding-left: 20px;
 }

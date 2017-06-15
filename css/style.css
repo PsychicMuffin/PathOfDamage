@@ -87,9 +87,15 @@
     padding-left: 10em;
 }
 
+.section .element.total {
+    text-align: right;
+    padding-right: 2.1em;
+    padding-left: 0;
+}
+
 .section .buttonContainer {
-    width: 30px;
-    height: 30px;
+    width: 2em;
+    height: 2em;
 }
 
 .section .button {
@@ -110,7 +116,7 @@
 }
 
 .deleteButton {
-    background: url("../icon/trash.png") 2px 2px/24px 24px no-repeat;
+    background: url("../icon/trash.png") 1px 1px/24px 24px no-repeat;
 }
 
 .button {
