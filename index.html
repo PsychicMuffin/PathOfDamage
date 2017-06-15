@@ -130,7 +130,9 @@
             </td>
             <td>
               <div class="buttonContainer">
-                <button ng-if="!$last" class="button deleteButton" ng-click="delete(table, $index)"></button>
+                <button ng-if="!$last" class="button deleteButton"
+                        ng-click="delete(table, $index)" title="Delete">
+                </button>
               </div>
             </td>
           </tr>
