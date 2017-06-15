@@ -21,7 +21,7 @@
       <div>The Path of Exile physical hit damage mitigation calculator</div>
     </div>
     <div class="clearButtonContainer">
-      <button class="button deleteButton" ng-click="clear()">Clear Form</button>
+      <button class="button clearButton" ng-click="clear()">Clear Form</button>
     </div>
   </div>
   <div class="inputSection">
@@ -129,11 +129,7 @@
             </td>
             <td>
               <div class="buttonContainer">
-                <button ng-if="!$last"
-                        class="button deleteButton"
-                        ng-click="delete(table, $index)">
-                  X
-                </button>
+                <button ng-if="!$last" class="button deleteButton" ng-click="delete(table, $index)"></button>
               </div>
             </td>
           </tr>

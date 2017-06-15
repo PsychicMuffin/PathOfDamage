@@ -13,7 +13,7 @@
 
 .clearButtonContainer {
     position: absolute;
-    right: 30px;
+    right: 22px;
     top: 15px;
 }
 
@@ -95,6 +95,7 @@
 
 .section .buttonContainer {
     width: 2em;
+    height: 2em;
 }
 
 .section .button {
@@ -103,16 +104,19 @@
     transition: opacity .35s ease;
 }
 
-.deleteButton {
-    color: #fff;
+.deleteButton, .clearButton {
+    color: #FFF;
     background-color: #d9534f;
     border-color: #d43f3a;
 }
 
-.deleteButton:hover {
-    color: #fff;
+.deleteButton:hover, clearButton:hover {
     background-color: #c9302c;
     border-color: #ac2925;
+}
+
+.deleteButton {
+    background: url("../icon/trash.png") 1px 1px/24px 24px no-repeat;
 }
 
 .button {
@@ -131,10 +135,11 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    background-image: none;
     border: 1px solid transparent;
     border-radius: 4px;
     overflow: visible;
+    width: 100%;
+    height: 100%;
 }
 
 .checkboxContainer {
