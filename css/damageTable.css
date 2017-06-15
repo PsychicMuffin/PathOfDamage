@@ -1,5 +1,12 @@
-.damageTable {
+.damageTable.fixed {
     position: fixed;
+    right: 10px;
+    top: 10px;
+    width: 17em;
+}
+
+.damageTable:not(.fixed) {
+    position: absolute;
     right: 10px;
     top: 90px;
     width: 17em;
@@ -63,7 +70,7 @@
 /* Tooltip text */
 .damageTable .damageOutput .tooltip {
     visibility: hidden;
-    width: 160px;
+    width: 180px;
     background-color: #555;
     color: #fff;
     text-align: center;
@@ -100,4 +107,37 @@
 
 .damageTable .table-striped tr:nth-of-type(odd) {
     background-color: #F3FAFA;
+}
+
+.resistanceHeader {
+    text-align: center;
+}
+
+.resistance .input {
+    width: 2.5em;
+    padding: 3px;
+    text-align: center;
+}
+
+.resistanceContainer .resistance {
+    background: 9px 8px no-repeat;
+    padding-left: 23px;
+    padding-right: 0;
+    display: inline;
+}
+
+.resistanceContainer .fire.resistance {
+    background-image: url("../icon/fire.png");
+}
+
+.resistanceContainer .cold.resistance {
+    background-image: url("../icon/cold.png");
+}
+
+.resistanceContainer .lightning.resistance {
+    background-image: url("../icon/lightning.png");
+}
+
+.resistanceContainer .chaos.resistance {
+    background-image: url("../icon/chaos.png");
 }

@@ -1,7 +1,10 @@
 angular.module('PathOfDamage', [])
-.controller('Damage', function ($scope, DataService) {
+.controller('Damage', function ($scope, $document, $window, DataService) {
   $scope.sections = DataService.getSections();
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
+  var damageTable = angular.element(document.getElementById('damageTable'))[0];
+  var windowHeight = $window.innerHeight;
+  var throttled = false;
 
   $scope.setElement = function(table, row, element){
     row.elements = {physical: false, fire: false, cold: false, lightning: false, chaos: false};
@@ -40,7 +43,7 @@ angular.module('PathOfDamage', [])
 
   $scope.updateDamageValues = function (skipSerialization) {
     $scope.hits = $scope.hits.map(function (hit) {
-      return hit && hit.hit ? calcDamage(hit.hit) : null
+      return hit.hit ? calcDamage(hit.hit) : hit;
     });
     if (!skipSerialization) {
       serializeData();
@@ -190,6 +193,25 @@ angular.module('PathOfDamage', [])
       table.addRow();
       $scope.updateTotal(table, true);
     });
+  });
+
+  //Fix damage window to screen only if there is room and the header has been scrolled past.
+  //Only allow scroll handling once per 50ms to not affect page performance
+  $document.on('scroll', function() {
+    if (!throttled){
+      throttled = true;
+      var fixedTable = $window.scrollY > 80 && windowHeight > damageTable.offsetHeight + 20;
+      if ($scope.fixedTable !== fixedTable) {
+        $scope.$apply(function () {
+          $scope.fixedTable = fixedTable
+        });
+      }
+      setTimeout(function() { throttled = false; }, 50);
+    }
+  });
+
+  angular.element($window).bind('resize', function() {
+    windowHeight = $window.innerHeight;
   });
 
   $scope.hits.push({hit: null});

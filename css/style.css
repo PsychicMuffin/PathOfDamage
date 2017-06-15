@@ -5,6 +5,7 @@
     padding-bottom: 5px;
     background: #07889B;
     color: #FFF;
+    height: 80px;
 }
 
 .title {
@@ -13,8 +14,8 @@
 
 .clearButtonContainer {
     position: absolute;
-    right: 22px;
-    top: 15px;
+    right: 30px;
+    top: 25px;
 }
 
 .inputSection {
@@ -39,7 +40,7 @@
 .table {
     width: auto;
     margin-bottom: auto;
-    background-color: transparent;
+    background-color: white;
     border-spacing: 0;
     border-collapse: collapse;
 }
