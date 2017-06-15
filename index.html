@@ -138,9 +138,14 @@
             </td>
           </tr>
         </table>
-        <div class="total" ng-if="table.rows.length > 1">
+        <div class="total" ng-if="table.rows.length > 1 && !table.defaultElements">
           <div class="subTotal" ng-if="total != 0" ng-repeat="(totalName, total) in table.totals">
-            {{capitalize(totalName)}}: <b>{{total}}{{tableName !== 'flat' ? '%' : ''}}</b>
+            {{capitalize(totalName)}}: <b>{{round(total)}}%</b>
+          </div>
+        </div>
+        <div class="element total" ng-if="table.rows.length > 1  && table.defaultElements">
+          <div class="subTotal {{totalName}}" ng-if="total != 0" ng-repeat="(totalName, total) in table.totals">
+            <b>{{round(total)}}{{tableName !== 'flat' ? '%' : ''}}</b>
           </div>
         </div>
       </div>

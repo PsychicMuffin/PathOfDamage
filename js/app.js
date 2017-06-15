@@ -88,6 +88,10 @@ angular.module('PathOfDamage', [])
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
+  $scope.round = function round(value) {
+    return Math.round(value);
+  };
+
   function calcDamage(hit) {
     if (hit === null) {
       return {};
