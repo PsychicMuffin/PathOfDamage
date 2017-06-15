@@ -145,7 +145,7 @@
         </div>
         <div class="element total" ng-if="table.rows.length > 1  && table.defaultElements">
           <div class="subTotal {{totalName}}" ng-if="total != 0" ng-repeat="(totalName, total) in table.totals">
-            <b>{{round(total)}}{{tableName !== 'flat' ? '%' : ''}}</b>
+            <b>{{round(total)}}%</b>
           </div>
         </div>
       </div>
