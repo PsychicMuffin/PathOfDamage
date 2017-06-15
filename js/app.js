@@ -89,7 +89,7 @@ angular.module('PathOfDamage', [])
   };
 
   $scope.round = function round(value) {
-    return Number(Math.round(value + 'e1') + 'e-1');
+    return Math.round(value);
   };
 
   function calcDamage(hit) {
