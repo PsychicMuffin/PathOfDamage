@@ -119,7 +119,7 @@ angular.module('PathOfDamage')
           name: "Damage Mitigation",
           description: "Elemental and chaos damage is mitigated by its respective resistance. Physical damage is mitigated by the sum of all '% additional Physical Damage Reduction' modifiers, up to its 90% cap. This includes armor, endurance charges, and things like Basalt Flasks and Chaos Golem.",
           healthPool: 5000,
-          manaPool: 250,
+          manaPool: 1000,
           armor: 0,
           charges: 0,
           resistance: {

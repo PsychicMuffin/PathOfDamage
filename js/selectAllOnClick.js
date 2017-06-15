@@ -1,13 +1,13 @@
 angular.module('PathOfDamage')
-.directive('selectAllOnClick', [function() {
+.directive('selectAllOnClick', [function () {
   return {
     restrict: 'A',
-    link: function(scope, element) {
+    link: function (scope, element) {
       var hasSelectedAll = false;
-      element.on('click', function($event) {
+      element.on('click', function ($event) {
         if (!hasSelectedAll) {
           try {
-            //Works with IOs, Safari. Thows exception on Chrome etc
+            //Works with IOs, Safari. Throws exception on Chrome etc
             this.selectionStart = 0;
             this.selectionEnd = this.value.length + 1;
             hasSelectedAll = true;
@@ -19,7 +19,7 @@ angular.module('PathOfDamage')
         }
       });
       //On blur reset hasSelectedAll to allow full select
-      element.on('blur', function($event) {
+      element.on('blur', function ($event) {
         hasSelectedAll = false;
       });
     }

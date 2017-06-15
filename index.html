@@ -92,7 +92,7 @@
                 <tr>
                   <td><label class="select fire" ng-class="{selected: row.elements.fire}" title="Fire">
                     <input type="radio" name="shift" value="fire" ng-model="row.elements.model"
-                        ng-change="setElement(table, row, 'fire')"></label></td>
+                           ng-change="setElement(table, row, 'fire')"></label></td>
                   <td><label class="select cold" ng-class="{selected: row.elements.cold}" title="Cold">
                     <input type="radio" name="shift" value="cold" ng-model="row.elements.model"
                            ng-change="setElement(table, row, 'cold')"></label></td>
@@ -122,7 +122,8 @@
                              title="{{allSelected(row) ? 'Deselect All' : 'Select All'}}">
                     <input type="checkbox" ng-click="selectAll(table, row)"></label></td>
                   <td><label class="select lightning" ng-class="{selected: row.elements.lightning}" title="Lightning">
-                    <input type="checkbox" ng-model="row.elements.lightning" ng-change="updateTotal(table)"></label></td>
+                    <input type="checkbox" ng-model="row.elements.lightning" ng-change="updateTotal(table)"></label>
+                  </td>
                   <td><label class="select chaos" ng-class="{selected: row.elements.chaos}" title="Chaos">
                     <input type="checkbox" ng-model="row.elements.chaos" ng-change="updateTotal(table)"></label></td>
                 </tr>
