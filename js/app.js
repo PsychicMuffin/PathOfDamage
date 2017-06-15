@@ -149,10 +149,12 @@ angular.module('PathOfDamage', [])
 
     var mana = $scope.sections.mitigation.manaPool;
     var manaTotals = $scope.sections.shift.tables.mana.totals;
+    var totalManaLost = 0;
     Object.keys(manaTotals).forEach(function (element) {
       var taken = Math.min(damage[element] * manaTotals[element] / 100, mana);
       damage[element] -= taken;
       mana -= taken;
+      totalManaLost += taken;
     });
 
     var eleDamage = damage.fire + damage.cold + damage.lightning + damage.chaos;
@@ -162,6 +164,7 @@ angular.module('PathOfDamage', [])
       taken: totalTaken,
       physTaken: Math.round(damage.physical),
       eleTaken: Math.round(eleDamage),
+      manaTaken: totalManaLost,
       mitigated: hit - totalTaken,
       remaining: $scope.sections.mitigation.healthPool - totalTaken
     }

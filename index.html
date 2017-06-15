@@ -176,7 +176,8 @@
         </div>
         <div class="tooltip">
           Phys Damage Taken: {{hit.physTaken}} <br/>
-          <b ng-if="hit.eleTaken">Ele Damage Taken: {{hit.eleTaken}} <br/></b>
+          <span ng-if="hit.eleTaken">Ele Damage Taken: {{hit.eleTaken}} <br/></span>
+          <span ng-if="hit.manaTaken">Mana Damage Taken: {{hit.manaTaken}} <br/></span>
           Damage Mitigated: {{hit.mitigated}} <br/>
           Health Remaining: {{hit.remaining}}
         </div>
