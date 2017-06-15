@@ -1,5 +1,5 @@
 angular.module('PathOfDamage', [])
-.controller('Damage', function ($scope, DataService) {
+.controller('Damage', function ($scope, $document, $window, DataService) {
   $scope.sections = DataService.getSections();
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
 
@@ -190,6 +190,18 @@ angular.module('PathOfDamage', [])
       table.addRow();
       $scope.updateTotal(table, true);
     });
+  });
+
+  //Fix damage window to screen only if there is room and the header has been scrolled past
+  $document.on('scroll', function() {
+    var scroll = $window.scrollY;
+    var tableHeight = angular.element(document.getElementById('damageTable'))[0].offsetHeight;
+    var windowHeight = $window.innerHeight;
+
+    var fixed = scroll > 80 && windowHeight > tableHeight + 20;
+    if ($scope.documentScrolledDown !== fixed){
+      $scope.$apply(function() {$scope.documentScrolledDown = fixed});
+    }
   });
 
   $scope.hits.push({hit: null});

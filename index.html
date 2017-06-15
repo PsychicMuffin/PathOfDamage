@@ -154,7 +154,7 @@
   </div>
 </div>
 
-<div class="damageTable">
+<div class="damageTable" id="damageTable" ng-class="{fixed: documentScrolledDown}">
   <table class="table table-bordered table-striped">
     <tr>
       <th>Physical Hit</th>
@@ -177,7 +177,7 @@
         </div>
         <div class="tooltip">
           Phys Damage Taken: {{hit.physTaken}} <br/>
-          Ele Damage Taken: {{hit.eleTaken}} <br/>
+          <b ng-if="hit.eleTaken">Ele Damage Taken: {{hit.eleTaken}} <br/></b>
           Damage Mitigated: {{hit.mitigated}} <br/>
           Health Remaining: {{hit.remaining}}
         </div>
@@ -185,14 +185,17 @@
     </tr>
   </table>
   <div class="maxHit">Maximum survivable hit: {{getMaximumSurvivableHit()}}</div>
-  <label ng-repeat="(name, value) in sections.mitigation.resistance" class="label">{{capitalize(name)}} Resistance:
-    <input class="input number noIncrement resistance"
-           type="number"
-           ng-model="sections.mitigation.resistance[name]"
-           ng-model-options="{debounce: 500}"
-           ng-change="updateDamageValues()"
-           select-all-on-click>
-  </label>
+  <div class="resistanceHeader">Resistances:</div>
+  <div class="resistanceContainer">
+    <label ng-repeat="(name, value) in sections.mitigation.resistance" class="label resistance {{name}}">
+      <input class="input number noIncrement"
+             type="number"
+             ng-model="sections.mitigation.resistance[name]"
+             ng-model-options="{debounce: 500}"
+             ng-change="updateDamageValues()"
+             select-all-on-click>
+    </label>
+  </div>
   <label class="label">Health and ES Pool:
     <input class="input number noIncrement"
            type="number"
