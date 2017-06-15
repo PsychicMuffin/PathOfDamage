@@ -6,7 +6,7 @@ angular.module('PathOfDamage', [])
   var windowHeight = $window.innerHeight;
   var throttled = false;
 
-  $scope.setElement = function(table, row, element){
+  $scope.setElement = function (table, row, element) {
     row.elements = {physical: false, fire: false, cold: false, lightning: false, chaos: false};
     row.elements[element] = true;
     $scope.updateTotal(table);
@@ -70,7 +70,7 @@ angular.module('PathOfDamage', [])
     if (percent > 99) {
       percent = 99;
     }
-    return {width: (percent || 0) + "%"};
+    return {width: (percent || 0) + '%'};
   };
 
   $scope.allSelected = function (row) {
@@ -147,6 +147,14 @@ angular.module('PathOfDamage', [])
       damage[element] *= 1 + moreTotals[element] / 100;
     });
 
+    var manaLeft = $scope.sections.mitigation.manaPool;
+    var manaTotals = $scope.sections.shift.tables.mana.totals;
+    Object.keys(manaTotals).forEach(function (element) {
+      var taken = Math.min(damage[element] * manaTotals[element] / 100, manaLeft);
+      damage[element] -= taken;
+      manaLeft -= taken;
+    });
+
     var eleDamage = damage.fire + damage.cold + damage.lightning + damage.chaos;
     var totalTaken = Math.round(damage.physical + eleDamage);
     return {
@@ -154,17 +162,18 @@ angular.module('PathOfDamage', [])
       taken: totalTaken,
       physTaken: Math.round(damage.physical),
       eleTaken: Math.round(eleDamage),
+      manaTaken: $scope.sections.mitigation.manaPool - manaLeft,
       mitigated: hit - totalTaken,
       remaining: $scope.sections.mitigation.healthPool - totalTaken
     }
   }
 
-  $scope.getMaximumSurvivableHit = function() {
-      var hit = 1;
-      while (calcDamage(hit).remaining > 0){
-        hit++;
-      }
-      return hit - 1;
+  $scope.getMaximumSurvivableHit = function () {
+    var hit = 1;
+    while (calcDamage(hit).remaining > 0) {
+      hit++;
+    }
+    return hit - 1;
   };
 
   function serializeData() {
@@ -180,7 +189,7 @@ angular.module('PathOfDamage', [])
       dataString = LZString.decompressFromEncodedURIComponent(dataString.substring(1));
       DataService.decodeData($scope, dataString);
     } catch (e) {
-      alert("Invalid URL: Unable to load data.");
+      alert('Invalid URL: Unable to load data.');
       $scope.clear();
     }
   }
@@ -197,8 +206,8 @@ angular.module('PathOfDamage', [])
 
   //Fix damage window to screen only if there is room and the header has been scrolled past.
   //Only allow scroll handling once per 50ms to not affect page performance
-  $document.on('scroll', function() {
-    if (!throttled){
+  $document.on('scroll', function () {
+    if (!throttled) {
       throttled = true;
       var fixedTable = $window.scrollY > 80 && windowHeight > damageTable.offsetHeight + 20;
       if ($scope.fixedTable !== fixedTable) {
@@ -206,11 +215,13 @@ angular.module('PathOfDamage', [])
           $scope.fixedTable = fixedTable
         });
       }
-      setTimeout(function() { throttled = false; }, 50);
+      setTimeout(function () {
+        throttled = false;
+      }, 50);
     }
   });
 
-  angular.element($window).bind('resize', function() {
+  angular.element($window).bind('resize', function () {
     windowHeight = $window.innerHeight;
   });
 

@@ -92,7 +92,7 @@
                 <tr>
                   <td><label class="select fire" ng-class="{selected: row.elements.fire}" title="Fire">
                     <input type="radio" name="shift" value="fire" ng-model="row.elements.model"
-                        ng-change="setElement(table, row, 'fire')"></label></td>
+                           ng-change="setElement(table, row, 'fire')"></label></td>
                   <td><label class="select cold" ng-class="{selected: row.elements.cold}" title="Cold">
                     <input type="radio" name="shift" value="cold" ng-model="row.elements.model"
                            ng-change="setElement(table, row, 'cold')"></label></td>
@@ -107,7 +107,7 @@
                 </tr>
               </table>
             </td>
-            <td ng-if="sectionName==='taken'">
+            <td ng-if="sectionName==='taken' || tableName==='mana'">
               <table class="multi elementSelector">
                 <tr>
                   <td><label class="select physical" ng-class="{selected: row.elements.physical}" title="Physical">
@@ -122,7 +122,8 @@
                              title="{{allSelected(row) ? 'Deselect All' : 'Select All'}}">
                     <input type="checkbox" ng-click="selectAll(table, row)"></label></td>
                   <td><label class="select lightning" ng-class="{selected: row.elements.lightning}" title="Lightning">
-                    <input type="checkbox" ng-model="row.elements.lightning" ng-change="updateTotal(table)"></label></td>
+                    <input type="checkbox" ng-model="row.elements.lightning" ng-change="updateTotal(table)"></label>
+                  </td>
                   <td><label class="select chaos" ng-class="{selected: row.elements.chaos}" title="Chaos">
                     <input type="checkbox" ng-model="row.elements.chaos" ng-change="updateTotal(table)"></label></td>
                 </tr>
@@ -176,7 +177,8 @@
         </div>
         <div class="tooltip">
           Phys Damage Taken: {{hit.physTaken}} <br/>
-          <b ng-if="hit.eleTaken">Ele Damage Taken: {{hit.eleTaken}} <br/></b>
+          <span ng-if="hit.eleTaken">Ele Damage Taken: {{hit.eleTaken}} <br/></span>
+          <span ng-if="hit.manaTaken">Mana Damage Taken: {{hit.manaTaken}} <br/></span>
           Damage Mitigated: {{hit.mitigated}} <br/>
           Health Remaining: {{hit.remaining}}
         </div>
@@ -197,11 +199,18 @@
     </label>
   </div>
   <label class="label">Health and ES Pool:
-    <input class="input number noIncrement"
+    <input class="input number noIncrement pool"
            type="number"
            ng-model="sections.mitigation.healthPool"
            ng-model-options="{debounce: 500}"
-           id="health"
+           ng-change="updateDamageValues()"
+           select-all-on-click>
+  </label>
+  <label class="label">Unreserved Mana:
+    <input class="input number noIncrement pool"
+           type="number"
+           ng-model="sections.mitigation.manaPool"
+           ng-model-options="{debounce: 500}"
            ng-change="updateDamageValues()"
            select-all-on-click>
   </label>

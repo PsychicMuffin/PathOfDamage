@@ -39,14 +39,14 @@ angular.module('PathOfDamage')
     }
   }
 
-  function TypedTable(name, updateTotals) {
+  function TypedTable(name, updateTotals, defaultElements) {
     Table.call(this, name, function (totals, row) {
       Object.keys(row.elements).forEach(function (element) {
         if (row.elements[element]) {
           updateTotals(totals, row.value, element);
         }
       });
-    }, {physical: true, fire: false, cold: false, lightning: false, chaos: false});
+    }, defaultElements || {physical: true, fire: false, cold: false, lightning: false, chaos: false});
     this.getEmptyTotals = function () {
       return {physical: 0, fire: 0, cold: 0, lightning: 0, chaos: 0};
     }
@@ -78,6 +78,12 @@ angular.module('PathOfDamage')
     this.getEmptyTotals = function () {
       return {total: 0, fire: 0, cold: 0, lightning: 0, chaos: 0};
     }
+  }
+
+  function DamageFromManaTable() {
+    TypedTable.call(this, "Damage Taken From Mana Before Life", function (totals, value, element) {
+      totals[element] = Math.max(totals[element] + value, 0);
+    }, {physical: true, fire: true, cold: true, lightning: true, chaos: true})
   }
 
   function DamageReductionTable() {
@@ -113,6 +119,7 @@ angular.module('PathOfDamage')
           name: "Damage Mitigation",
           description: "Elemental and chaos damage is mitigated by its respective resistance. Physical damage is mitigated by the sum of all '% additional Physical Damage Reduction' modifiers, up to its 90% cap. This includes armor, endurance charges, and things like Basalt Flasks and Chaos Golem.",
           healthPool: 5000,
+          manaPool: 1000,
           armor: 0,
           charges: 0,
           resistance: {
@@ -136,9 +143,10 @@ angular.module('PathOfDamage')
         },
         shift: {
           name: "Damage Shifts",
-          description: "Modifiers that shift physical damage to elemental, typically reading like '% of Physical Damage taken as Y', such as Taste of Hate or Lightning Coil",
+          description: "Modifiers that shift physical damage to elemental, typically reading like '% of Physical Damage taken as Y', such as Taste of Hate or Lightning Coil. Additionally, damage can be taken from mana like Mind over Matter.",
           tables: {
-            shifts: new DamageShiftTable()
+            shifts: new DamageShiftTable(),
+            mana: new DamageFromManaTable()
           }
         },
         monster: {
@@ -156,6 +164,7 @@ angular.module('PathOfDamage')
       dataString += encodeTable(scope.sections.monster.tables.increase.rows);
       dataString += encodeTable(scope.sections.monster.tables.more.rows);
       dataString += encodeTable(scope.sections.shift.tables.shifts.rows);
+      dataString += encodeTable(scope.sections.shift.tables.mana.rows);
       dataString += encodeTable(scope.sections.mitigation.tables.reduction.rows);
       dataString += encodeTable(scope.sections.taken.tables.flat.rows);
       dataString += encodeTable(scope.sections.taken.tables.increased.rows);
@@ -170,28 +179,32 @@ angular.module('PathOfDamage')
       dataString += scope.sections.mitigation.resistance.cold + SECTION_DELIMITER;
       dataString += scope.sections.mitigation.resistance.lightning + SECTION_DELIMITER;
       dataString += scope.sections.mitigation.resistance.chaos + SECTION_DELIMITER;
-      dataString += scope.sections.mitigation.healthPool;
+      dataString += scope.sections.mitigation.healthPool + SECTION_DELIMITER;
+      dataString += scope.sections.mitigation.manaPool;
       return dataString;
     },
     decodeData: function (scope, dataString) {
+      var i = 0;
       var sections = dataString.split(SECTION_DELIMITER);
-      decodeTable(scope.sections.monster.tables.increase, sections[0]);
-      decodeTable(scope.sections.monster.tables.more, sections[1]);
-      decodeTable(scope.sections.shift.tables.shifts, sections[2]);
-      decodeTable(scope.sections.mitigation.tables.reduction, sections[3]);
-      decodeTable(scope.sections.taken.tables.flat, sections[4]);
-      decodeTable(scope.sections.taken.tables.increased, sections[5]);
-      decodeTable(scope.sections.taken.tables.more, sections[6]);
-      scope.hits = sections[7].split(ROW_DELIMITER).map(function (hit) {
+      decodeTable(scope.sections.monster.tables.increase, sections[i++]);
+      decodeTable(scope.sections.monster.tables.more, sections[i++]);
+      decodeTable(scope.sections.shift.tables.shifts, sections[i++]);
+      decodeTable(scope.sections.shift.tables.mana, sections[i++]);
+      decodeTable(scope.sections.mitigation.tables.reduction, sections[i++]);
+      decodeTable(scope.sections.taken.tables.flat, sections[i++]);
+      decodeTable(scope.sections.taken.tables.increased, sections[i++]);
+      decodeTable(scope.sections.taken.tables.more, sections[i++]);
+      scope.hits = sections[i++].split(ROW_DELIMITER).map(function (hit) {
         return {hit: parseIntOrNull(hit)};
       });
-      scope.sections.mitigation.armor = parseIntOrNull(sections[8]);
-      scope.sections.mitigation.charges = parseIntOrNull(sections[9]);
-      scope.sections.mitigation.resistance.fire = parseIntOrNull(sections[10]);
-      scope.sections.mitigation.resistance.cold = parseIntOrNull(sections[11]);
-      scope.sections.mitigation.resistance.lightning = parseIntOrNull(sections[12]);
-      scope.sections.mitigation.resistance.chaos = parseIntOrNull(sections[13]);
-      scope.sections.mitigation.healthPool = parseIntOrNull(sections[14]);
+      scope.sections.mitigation.armor = parseIntOrNull(sections[i++]);
+      scope.sections.mitigation.charges = parseIntOrNull(sections[i++]);
+      scope.sections.mitigation.resistance.fire = parseIntOrNull(sections[i++]);
+      scope.sections.mitigation.resistance.cold = parseIntOrNull(sections[i++]);
+      scope.sections.mitigation.resistance.lightning = parseIntOrNull(sections[i++]);
+      scope.sections.mitigation.resistance.chaos = parseIntOrNull(sections[i++]);
+      scope.sections.mitigation.healthPool = parseIntOrNull(sections[i++]);
+      scope.sections.mitigation.manaPool = parseIntOrNull(sections[i]);
     }
   };
 
