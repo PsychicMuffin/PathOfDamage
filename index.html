@@ -107,7 +107,7 @@
                 </tr>
               </table>
             </td>
-            <td ng-if="sectionName==='taken'">
+            <td ng-if="sectionName==='taken' || tableName==='mana'">
               <table class="multi elementSelector">
                 <tr>
                   <td><label class="select physical" ng-class="{selected: row.elements.physical}" title="Physical">
@@ -197,11 +197,18 @@
     </label>
   </div>
   <label class="label">Health and ES Pool:
-    <input class="input number noIncrement"
+    <input class="input number noIncrement pool"
            type="number"
            ng-model="sections.mitigation.healthPool"
            ng-model-options="{debounce: 500}"
-           id="health"
+           ng-change="updateDamageValues()"
+           select-all-on-click>
+  </label>
+  <label class="label">Unreserved Mana:
+    <input class="input number noIncrement pool"
+           type="number"
+           ng-model="sections.mitigation.manaPool"
+           ng-model-options="{debounce: 500}"
            ng-change="updateDamageValues()"
            select-all-on-click>
   </label>

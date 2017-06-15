@@ -7,12 +7,12 @@
     width: 3.5em;
 }
 
-#health {
-    width: 4em;
-}
-
 #flat {
     width: 3.25em;
+}
+
+.pool {
+    width: 4em;
 }
 
 .checkbox {
