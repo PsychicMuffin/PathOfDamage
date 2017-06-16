@@ -31,6 +31,10 @@ angular.module('PathOfDamage')
     this.addRow = function (enabled, name, value, elements) {
       this.rows.push(new Row(enabled, name, value, elements || this.getDefaultElements()));
     };
+    this.quickAddRow = function (name, value, elements) {
+      this.rows[this.rows.length - 1] = new Row(true, name, value, elements);
+      this.addRow();
+    };
     this.getDefaultElements = function () {
       return this.defaultElements ? Object.assign({}, defaultElements) : undefined;
     };

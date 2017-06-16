@@ -6,6 +6,25 @@ angular.module('PathOfDamage', [])
   var windowHeight = $window.innerHeight;
   var throttled = false;
 
+  $scope.items = [
+    {name: 'Basalt Flask', value: 20, section: 'mitigation', table: 'reduction'},
+    {name: 'Taste of Hate', value: 20, elements: ['cold'], section: 'shift', table: 'shifts'}
+  ];
+
+  $scope.quickAdd = function () {
+    var item = $scope.quickAddItem;
+    var table = $scope.sections[item.section].tables[item.table];
+    if (item.elements) {
+      var elements = table.getDefaultElements();
+      item.element.forEach(function (element) {
+        elements[element] = true;
+      });
+    }
+    table.quickAddRow(item.name, item.value, elements);
+    $scope.updateTotal(table);
+    $scope.quickAddItem = {};
+  };
+
   $scope.setElement = function (table, row, element) {
     row.elements = {physical: false, fire: false, cold: false, lightning: false, chaos: false};
     row.elements[element] = true;

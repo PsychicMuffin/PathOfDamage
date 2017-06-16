@@ -20,6 +20,12 @@
       <div class="title">Path of Damage</div>
       <div>The Path of Exile physical hit damage mitigation calculator</div>
     </div>
+    <select class="input"
+            ng-model="quickAddItem"
+            ng-options="item as item.name for item in items">
+      <option value="">Quick Add...</option>
+    </select>
+    <button class="button" ng-click="quickAdd()">Add</button>
     <div class="clearButtonContainer">
       <button class="button clearButton" ng-click="clear()">Clear Form</button>
     </div>
