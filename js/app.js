@@ -1,4 +1,4 @@
-angular.module('PathOfDamage', [])
+angular.module('PathOfDamage', ['ngSanitize', 'ui.select'])
 .controller('Damage', function ($scope, $document, $window, DataService) {
   $scope.sections = DataService.getSections();
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
@@ -7,16 +7,17 @@ angular.module('PathOfDamage', [])
   var throttled = false;
 
   $scope.items = [
-    {name: 'Basalt Flask', value: 20, section: 'mitigation', table: 'reduction'},
-    {name: 'Taste of Hate', value: 20, elements: ['cold'], section: 'shift', table: 'shifts'}
+    {id: 1, name: 'Basalt Flask', value: 20, section: 'mitigation', table: 'reduction'},
+    {id: 2, name: 'Taste of Hate', value: 20, elements: ['cold'], section: 'shift', table: 'shifts'}
   ];
+  $scope.selected = { item: $scope.items[0] };
 
   $scope.quickAdd = function () {
-    var item = $scope.quickAddItem;
+    var item = $scope.selected.item;
     var table = $scope.sections[item.section].tables[item.table];
     if (item.elements) {
       var elements = table.getDefaultElements();
-      item.element.forEach(function (element) {
+      item.elements.forEach(function (element) {
         elements[element] = true;
       });
     }
