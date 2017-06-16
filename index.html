@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/input.css">
   <link rel="stylesheet" href="css/damageTable.css">
+  <link rel="stylesheet" href="css/select.css">
   <link rel="shortcut icon" type="image/x-icon" href="icon/favicon2.ico"/>
 </head>
 <body ng-controller="Damage">
@@ -23,21 +24,23 @@
       <div class="title">Path of Damage</div>
       <div>The Path of Exile physical hit damage mitigation calculator</div>
     </div>
-    <span>Selected: {name: {{selected.item.name}}, id: {{selected.item.id}} }</span>
-    <ui-select class="input" ng-model="selected.item">
-      <ui-select-match>
-        <span ng-bind="$select.selected.name"></span>
-      </ui-select-match>
-      <ui-select-choices repeat="item in (items | filter: $select.search) track by item.id">
-        <span ng-bind="item.name"></span>
-      </ui-select-choices>
-    </ui-select>
-    <button type="submit" class="button" ng-click="quickAdd()">Add</button>
     <div class="clearButtonContainer">
       <button class="button clearButton" ng-click="clear()">Clear Form</button>
     </div>
   </div>
   <div class="inputSection">
+    <div class="quickAddContainer">
+      <span>Selected: {name: {{selected.item.name}}, id: {{selected.item.id}} }</span>
+      <ui-select class="input" ng-model="selected.item">
+        <ui-select-match>
+          <span ng-bind="$select.selected.name"></span>
+        </ui-select-match>
+        <ui-select-choices repeat="item in (items | filter: $select.search) track by item.id">
+          <span ng-bind="item.name"></span>
+        </ui-select-choices>
+      </ui-select>
+      <button type="submit" class="button" ng-click="quickAdd()">Add</button>
+    </div>
     <div class="section" ng-repeat="(sectionName, section) in sections">
       <h4>{{section.name}}<br>
         <small><i>{{section.description}}</i></small>
