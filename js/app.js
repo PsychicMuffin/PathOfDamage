@@ -1,29 +1,30 @@
 angular.module('PathOfDamage', ['ngSanitize', 'ui.select'])
-.controller('Damage', function ($scope, $document, $window, DataService) {
+.controller('Damage', function ($scope, $document, $window, DataService, Items) {
+  const ELEMENTS = ['physical', 'fire', 'cold', 'lightning', 'chaos'];
+
   $scope.sections = DataService.getSections();
+  $scope.items = Items.getItems();
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
   var damageTable = angular.element(document.getElementById('damageTable'))[0];
   var windowHeight = $window.innerHeight;
   var throttled = false;
 
-  $scope.items = [
-    {id: 1, name: 'Basalt Flask', value: 20, section: 'mitigation', table: 'reduction'},
-    {id: 2, name: 'Taste of Hate', value: 20, elements: ['cold'], section: 'shift', table: 'shifts'}
-  ];
-  $scope.selected = { item: $scope.items[0] };
+  $scope.selected = {};
 
   $scope.quickAdd = function () {
-    var item = $scope.selected.item;
-    var table = $scope.sections[item.section].tables[item.table];
-    if (item.elements) {
-      var elements = table.getDefaultElements();
-      item.elements.forEach(function (element) {
-        elements[element] = true;
-      });
+    if ($scope.selected.item) {
+      var item = $scope.selected.item;
+      if (item.elements) {
+        var elements = {physical: false, fire: false, cold: false, lightning: false, chaos: false};
+        item.elements.forEach(function (elementIndex) {
+          elements[ELEMENTS[elementIndex]] = true;
+        });
+      }
+      var table = $scope.sections[item.section].tables[item.table];
+      table.quickAddRow(item.name, item.value, elements);
+      $scope.updateTotal(table);
+      $scope.selected = {};
     }
-    table.quickAddRow(item.name, item.value, elements);
-    $scope.updateTotal(table);
-    $scope.quickAddItem = {};
   };
 
   $scope.setElement = function (table, row, element) {
