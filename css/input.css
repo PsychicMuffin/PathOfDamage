@@ -44,6 +44,24 @@
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
 }
 
+.input.ng-invalid {
+    text-decoration: underline;
+    -webkit-text-decoration-line: underline;
+    -moz-text-decoration-line: underline;
+    -ms-text-decoration-line: underline;
+    text-decoration-line: underline;
+
+    -webkit-text-decoration-style: dotted;
+    -moz-text-decoration-style: dotted;
+    -ms-text-decoration-style: dotted;
+    text-decoration-style: dotted;
+
+    -webkit-text-decoration-color: red;
+    -moz-text-decoration-color: red;
+    -ms-text-decoration-color: red;
+    text-decoration-color: red;
+}
+
 .inputGroup {
     border-collapse: separate;
     position: relative;
