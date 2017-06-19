@@ -31,16 +31,6 @@
     vertical-align: top;
 }
 
-.inputContainer {
-    margin-top: 1.7em;
-    padding-right: 0.5em;
-    display: inline-block;
-}
-
-.quickAddContainer {
-
-}
-
 .table {
     width: auto;
     margin-bottom: auto;
@@ -71,7 +61,7 @@
     width: 10em;
 }
 
-.section .borderLine {
+.borderLine {
     border-bottom: 1px solid #66B9BF;
     border-top: 1px solid #B2DCDF;
     margin-bottom: 15px;
@@ -104,27 +94,27 @@
 }
 
 .section .button {
-    font-weight: bold;
     opacity: 0;
-    transition: opacity .35s ease;
 }
 
 .deleteButton, .clearButton {
     color: #FFF;
-    background-color: #d9534f;
-    border-color: #d43f3a;
-}
-
-.deleteButton:hover, clearButton:hover {
     background-color: #c9302c;
     border-color: #ac2925;
 }
 
+.deleteButton:hover, .clearButton:hover {
+    background-color: #d9534f;
+    border-color: #d43f3a;
+}
+
 .deleteButton {
-    background: url("../icon/trash.png") 1px 1px/24px 24px no-repeat;
+    background: #c9302c url("../icon/trash.png") 1px 1px/24px 24px no-repeat;
 }
 
 .button {
+    font-weight: bold;
+    transition: opacity .35s ease, background-color 0.2s ease;
     display: inline-block;
     margin-bottom: 0;
     line-height: 1.42857143;
@@ -153,6 +143,10 @@
 
 .tableContainer tr:hover .button {
     opacity: 1;
+}
+
+button:focus {
+    outline:0;
 }
 
 h4 {

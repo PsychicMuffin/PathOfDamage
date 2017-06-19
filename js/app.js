@@ -1,7 +1,8 @@
-angular.module('PathOfDamage', ['ngSanitize', 'ui.select'])
+angular.module('PathOfDamage', ['ui.select'])
 .controller('Damage', function ($scope, $document, $window, DataService, Items) {
   const ELEMENTS = ['physical', 'fire', 'cold', 'lightning', 'chaos'];
 
+  DataService.init(ELEMENTS);
   $scope.sections = DataService.getSections();
   $scope.items = Items.getItems();
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];

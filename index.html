@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Path of Damage</title>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-sanitize.js"></script>
   <script src="libs/lz-string.min.js"></script>
   <script src="js/app.js"></script>
   <script src="js/DataService.js"></script>
@@ -39,8 +38,11 @@
           <span ng-bind="item.name"></span>
         </ui-select-choices>
       </ui-select>
-      <button type="submit" class="button" ng-click="quickAdd()">Add</button>
+      <div class="addButtonContainer">
+        <button class="button addButton" type="submit" ng-click="quickAdd()">Add</button>
+      </div>
     </div>
+    <hr class="borderLine">
     <div class="section" ng-repeat="(sectionName, section) in sections">
       <h4>{{section.name}}<br>
         <small><i>{{section.description}}</i></small>

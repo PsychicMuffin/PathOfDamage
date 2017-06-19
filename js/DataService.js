@@ -1,6 +1,6 @@
 angular.module('PathOfDamage')
 .service('DataService', function () {
-  const ELEMENTS = ['physical', 'fire', 'cold', 'lightning', 'chaos'];
+  var ELEMENTS;
   const VALUE_DELIMITER = '\r';
   const ROW_DELIMITER = '\f';
   const SECTION_DELIMITER = '\0';
@@ -117,6 +117,9 @@ angular.module('PathOfDamage')
   }
 
   return {
+    init: function(elements) {
+      ELEMENTS = elements;
+    },
     getSections: function () {
       return {
         mitigation: {

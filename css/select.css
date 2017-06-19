@@ -1,5 +1,6 @@
 .dropdown {
     position: relative;
+    min-width: 300px;
 }
 
 .dropdown-menu {
