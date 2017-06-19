@@ -143,7 +143,7 @@ angular.module('PathOfDamage', ['ui.select'])
     });
     damage.physical -= damage.physical * $scope.sections.shift.tables.shifts.totals.total / 100;
 
-    var armor = $scope.sections.mitigation.armor / ($scope.sections.mitigation.armor + 10 * damage.physical);
+    var armor = $scope.sections.mitigation.armor / (+$scope.sections.mitigation.armor + 10 * damage.physical);
     var endurance = $scope.sections.mitigation.charges * .04;
     var additional = $scope.sections.mitigation.tables.reduction.totals.total / 100;
     var reduction = armor + endurance + additional;
@@ -191,11 +191,11 @@ angular.module('PathOfDamage', ['ui.select'])
   }
 
   $scope.getMaximumSurvivableHit = function () {
-    var hit = 1;
-    while (calcDamage(hit).remaining > 0) {
+    var hit = $scope.healthPool * 0.6;
+    while (calcDamage(hit).remaining > 0 && hit < 100000) {
       hit++;
     }
-    return hit - 1;
+    return hit < 100000 ? hit - 1 : "big!";
   };
 
   function serializeData() {
