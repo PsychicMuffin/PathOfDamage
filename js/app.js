@@ -199,7 +199,7 @@ angular.module('PathOfDamage', ['ui.select'])
   }
 
   $scope.getMaximumSurvivableHit = function () {
-    var hit = $scope.healthPool * 0.6;
+    var hit = $scope.sections.mitigation.healthPool * 0.6;
     while (calcDamage(hit).remaining > 0 && hit < 100000) {
       hit++;
     }
