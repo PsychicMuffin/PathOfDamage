@@ -152,7 +152,7 @@ angular.module('PathOfDamage', ['ui.select'])
     damage.physical -= damage.physical * $scope.sections.shift.tables.shifts.totals.total / 100;
 
     var armor = $scope.sections.mitigation.armor / (+$scope.sections.mitigation.armor + 10 * damage.physical);
-    var endurance = $scope.sections.mitigation.charges * .04;
+    var endurance = $scope.sections.mitigation.charges * .04 || 0;
     var additional = $scope.sections.mitigation.tables.reduction.totals.total / 100;
     var reduction = armor + endurance + additional;
     if (reduction > .9) {
