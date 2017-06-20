@@ -21,6 +21,25 @@
     padding: 0;
 }
 
+.inputContainer {
+    margin-top: 1.7em;
+    padding-right: 0.5em;
+    display: inline-block;
+}
+
+.quickAddContainer {
+    display: inline-flex;
+}
+
+.addButtonContainer {
+    padding: 5px;
+    width: 7em;
+}
+
+.addButton:hover {
+    background-color: lightblue;
+}
+
 .input {
     font-size: 12px;
     line-height: 1.5;

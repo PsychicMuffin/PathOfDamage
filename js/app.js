@@ -1,10 +1,32 @@
-angular.module('PathOfDamage', [])
-.controller('Damage', function ($scope, $document, $window, DataService) {
+angular.module('PathOfDamage', ['ui.select'])
+.controller('Damage', function ($scope, $document, $window, DataService, Items) {
+  const ELEMENTS = ['physical', 'fire', 'cold', 'lightning', 'chaos'];
+
+  DataService.init(ELEMENTS);
   $scope.sections = DataService.getSections();
+  $scope.items = Items.getItems();
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
   var damageTable = angular.element(document.getElementById('damageTable'))[0];
   var windowHeight = $window.innerHeight;
   var throttled = false;
+
+  $scope.selected = {};
+
+  $scope.quickAdd = function () {
+    if ($scope.selected.item) {
+      var item = $scope.selected.item;
+      if (item.elements) {
+        var elements = {physical: false, fire: false, cold: false, lightning: false, chaos: false};
+        item.elements.forEach(function (elementIndex) {
+          elements[ELEMENTS[elementIndex]] = true;
+        });
+      }
+      var table = $scope.sections[item.section].tables[item.table];
+      table.quickAddRow(item.name, item.value, elements);
+      $scope.updateTotal(table);
+      $scope.selected = {};
+    }
+  };
 
   $scope.setElement = function (table, row, element) {
     row.elements = {physical: false, fire: false, cold: false, lightning: false, chaos: false};
