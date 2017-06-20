@@ -23,7 +23,7 @@
 .damageTable .maxHit {
     font-weight: bold;
     text-align: right;
-    padding-right: 20px;
+    padding-right: 10px;
 }
 
 .damageTable .damageInput input {
