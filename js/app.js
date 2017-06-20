@@ -6,11 +6,13 @@ angular.module('PathOfDamage', ['ui.select'])
   $scope.sections = DataService.getSections();
   $scope.items = Items.getItems();
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
-  var damageTable = angular.element(document.getElementById('damageTable'))[0];
+  $scope.selected = {};
+  const damageTable = angular.element(document.getElementById('damageTable'))[0];
+  const addButton = angular.element(document.getElementById('addButton'))[0];
+  var quickAdd;  //Timeout required so that the angular directive can add the DOM elements on render
+  setTimeout(function() { quickAdd = angular.element(document.getElementsByClassName('ui-select-focusser'))[0] }, 100);
   var windowHeight = $window.innerHeight;
   var throttled = false;
-
-  $scope.selected = {};
 
   $scope.quickAdd = function () {
     if ($scope.selected.item) {
@@ -25,7 +27,13 @@ angular.module('PathOfDamage', ['ui.select'])
       table.quickAddRow(item.name, item.value, elements);
       $scope.updateTotal(table);
       $scope.selected = {};
+      quickAdd.focus();
     }
+  };
+
+  $scope.focusAddButton = function() {
+    //timeout required so that the ui-selector can finish re-rendering
+    setTimeout(function() { addButton.focus() },10);
   };
 
   $scope.setElement = function (table, row, element) {
@@ -252,5 +260,5 @@ angular.module('PathOfDamage', ['ui.select'])
 
   window.onpopstate = function () {
     window.location.reload();
-  }
+  };
 });

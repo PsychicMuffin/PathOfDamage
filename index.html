@@ -31,7 +31,7 @@
   </div>
   <div class="inputSection">
     <div class="quickAddContainer">
-      <ui-select class="input" ng-model="selected.item">
+      <ui-select id="quickAdd" class="input" ng-model="selected.item" ng-change="focusAddButton()">
         <ui-select-match placeholder="Quick Add...">
           <span ng-bind="$select.selected.name"></span>
         </ui-select-match>
@@ -40,7 +40,7 @@
         </ui-select-choices>
       </ui-select>
       <div class="addButtonContainer">
-        <button class="button addButton" type="submit" ng-click="quickAdd()">Add</button>
+        <button id="addButton" class="button addButton" type="submit" ng-click="quickAdd()">Add</button>
       </div>
     </div>
     <hr class="borderLine">
@@ -80,6 +80,7 @@
               <input class="input"
                      type="text"
                      placeholder="Source Name"
+                     spellcheck="false"
                      ng-model="row.name"
                      ng-change="add(table)">
             </td>
