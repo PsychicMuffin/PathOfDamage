@@ -8,6 +8,7 @@
   <script src="js/app.js"></script>
   <script src="js/DataService.js"></script>
   <script src="js/Items.js"></script>
+  <script src="js/numbersOnly.js"></script>
   <script src="js/selectAllOnClick.js"></script>
   <script src="libs/ui-select/select.js"></script>
   <link rel="stylesheet" href="libs/ui-select/select.css">
@@ -50,18 +51,17 @@
       <div class="inputContainer" ng-if="section.armor !== undefined || section.charges !== undefined">
         <label>Armor:
           <input class="input number noIncrement"
-                 type="number"
+                 type="text"
+                 placeholder="0"
                  ng-model="section.armor"
-                 ng-model-options="{debounce: 500}"
                  id="armor"
                  ng-change="updateDamageValues()"
-                 select-all-on-click>
+                 select-all-on-click numbers-only>
         </label>
         <label>Endurance Charges:
           <input class="input number"
                  type="number"
                  ng-model="section.charges"
-                 ng-model-options="{debounce: 500}"
                  id="charges"
                  ng-change="updateDamageValues()"
                  select-all-on-click>
@@ -81,19 +81,17 @@
                      type="text"
                      placeholder="Source Name"
                      ng-model="row.name"
-                     ng-change="add(table)"
-                     ng-model-options="{debounce: 500}">
+                     ng-change="add(table)">
             </td>
             <td class="percent">
               <div class="inputGroup">
                 <input class="input number noIncrement"
-                       type="number"
+                       type="text"
                        placeholder="+/-"
                        ng-model="row.value"
                        ng-change="add(table)"
-                       ng-model-options="{debounce: 500}"
                        ng-attr-id="{{tableName}}"
-                       select-all-on-click>
+                       select-all-on-click numbers-only>
                 <div ng-if="tableName !== 'flat'" class="inputGroupAddon">%</div>
                 <div ng-if="tableName == 'flat'"
                      class="inputGroupAddon flat"
@@ -181,12 +179,12 @@
     <tr ng-repeat="hit in hits track by $index">
       <td class="damageInput">
         <input class="input number noIncrement"
-               type="number"
+               type="text"
+               placeholder="0"
                ng-model="hits[$index].hit"
-               ng-model-options="{debounce: 500}"
                ng-change="updateHitRow($index)"
                ng-blur="deleteEmptyRow($index)"
-               select-all-on-click>
+               select-all-on-click numbers-only>
       </td>
       <td class="damageOutput"><span class="taken">{{hit.taken}}</span>
         <div class="healthBarContainer">
@@ -209,28 +207,28 @@
     <label ng-repeat="(name, value) in sections.mitigation.resistance"
            class="label resistance {{name}}" title="{{capitalize(name)}} resistance">
       <input class="input number noIncrement"
-             type="number"
+             type="text"
+             placeholder="0"
              ng-model="sections.mitigation.resistance[name]"
-             ng-model-options="{debounce: 500}"
              ng-change="updateDamageValues()"
-             select-all-on-click>
+             select-all-on-click numbers-only>
     </label>
   </div>
   <label class="label">Health and ES Pool:
     <input class="input number noIncrement pool"
-           type="number"
+           type="text"
+           placeholder="0"
            ng-model="sections.mitigation.healthPool"
-           ng-model-options="{debounce: 500}"
            ng-change="updateDamageValues()"
-           select-all-on-click>
+           select-all-on-click numbers-only>
   </label>
   <label class="label">Unreserved Mana:
     <input class="input number noIncrement pool"
-           type="number"
+           type="text"
+           placeholder="0"
            ng-model="sections.mitigation.manaPool"
-           ng-model-options="{debounce: 500}"
            ng-change="updateDamageValues()"
-           select-all-on-click>
+           select-all-on-click numbers-only>
   </label>
 </div>
 </body>
