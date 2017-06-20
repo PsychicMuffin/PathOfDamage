@@ -192,7 +192,7 @@ angular.module('PathOfDamage', ['ui.select'])
       taken: totalTaken,
       physTaken: Math.round(damage.physical),
       eleTaken: Math.round(eleDamage),
-      manaTaken: $scope.sections.mitigation.manaPool - manaLeft,
+      manaTaken: Math.round($scope.sections.mitigation.manaPool - manaLeft),
       mitigated: hit - totalTaken,
       remaining: $scope.sections.mitigation.healthPool - totalTaken
     }
