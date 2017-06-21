@@ -78,6 +78,7 @@ angular.module('PathOfDamage')
         {id: 64, name: 'Berserker (Ascendant)', value: 5, section: 'taken', table: 'increased', elements: [0,1,2,3,4]},
         {id: 65, name: 'Slayer (Ascendant)', value: -50, section: 'taken', table: 'increased', elements: [0]},
         {id: 66, name: 'Champion (Ascendant)', value: -5, section: 'taken', table: 'increased', elements: [0,1,2,3,4]},
+        {id: 76, name: 'The Wise Oak', value: -10, section: 'taken', table: 'increased', elements: [1,2,3]},
 
         // More Damage Taken
         {id: 67, name: 'Kintsugi', value: -20, section: 'taken', table: 'more', elements: [0,1,2,3,4]},
