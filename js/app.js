@@ -6,11 +6,13 @@ angular.module('PathOfDamage', ['ui.select'])
   $scope.sections = DataService.getSections();
   $scope.items = Items.getItems();
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
-  var damageTable = angular.element(document.getElementById('damageTable'))[0];
+  $scope.selected = {};
+  const damageTable = angular.element(document.getElementById('damageTable'))[0];
+  const addButton = angular.element(document.getElementById('addButton'))[0];
+  var quickAdd;  //Timeout required so that the angular directive can add the DOM elements on render
+  setTimeout(function() { quickAdd = angular.element(document.getElementsByClassName('ui-select-focusser'))[0] }, 100);
   var windowHeight = $window.innerHeight;
   var throttled = false;
-
-  $scope.selected = {};
 
   $scope.quickAdd = function () {
     if ($scope.selected.item) {
@@ -25,7 +27,13 @@ angular.module('PathOfDamage', ['ui.select'])
       table.quickAddRow(item.name, item.value, elements);
       $scope.updateTotal(table);
       $scope.selected = {};
+      quickAdd.focus();
     }
+  };
+
+  $scope.focusAddButton = function() {
+    //timeout required so that the ui-selector can finish re-rendering
+    setTimeout(function() { addButton.focus() },10);
   };
 
   $scope.setElement = function (table, row, element) {
@@ -143,8 +151,8 @@ angular.module('PathOfDamage', ['ui.select'])
     });
     damage.physical -= damage.physical * $scope.sections.shift.tables.shifts.totals.total / 100;
 
-    var armor = $scope.sections.mitigation.armor / ($scope.sections.mitigation.armor + 10 * damage.physical);
-    var endurance = $scope.sections.mitigation.charges * .04;
+    var armor = $scope.sections.mitigation.armor / (+$scope.sections.mitigation.armor + 10 * damage.physical) || 0;
+    var endurance = $scope.sections.mitigation.charges * .04 || 0;
     var additional = $scope.sections.mitigation.tables.reduction.totals.total / 100;
     var reduction = armor + endurance + additional;
     if (reduction > .9) {
@@ -184,18 +192,22 @@ angular.module('PathOfDamage', ['ui.select'])
       taken: totalTaken,
       physTaken: Math.round(damage.physical),
       eleTaken: Math.round(eleDamage),
-      manaTaken: $scope.sections.mitigation.manaPool - manaLeft,
+      manaTaken: Math.round($scope.sections.mitigation.manaPool - manaLeft),
       mitigated: hit - totalTaken,
       remaining: $scope.sections.mitigation.healthPool - totalTaken
     }
   }
 
   $scope.getMaximumSurvivableHit = function () {
-    var hit = 1;
-    while (calcDamage(hit).remaining > 0) {
-      hit++;
+    var hit = 0;
+    var start = Math.round(Math.log10($scope.sections.mitigation.healthPool)) + 1;
+    for (var i = start; i > -1; i--){
+      while (calcDamage(hit).remaining > 0) {
+        hit+= Math.pow(10,i);
+      }
+      hit -= Math.pow(10,i);
     }
-    return hit - 1;
+    return hit;
   };
 
   function serializeData() {
@@ -252,5 +264,5 @@ angular.module('PathOfDamage', ['ui.select'])
 
   window.onpopstate = function () {
     window.location.reload();
-  }
+  };
 });
