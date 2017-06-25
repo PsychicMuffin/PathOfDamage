@@ -147,7 +147,7 @@ angular.module('PathOfDamage', ['ui.select'])
     var shiftTotals = $scope.sections.shift.tables.shifts.totals;
     Object.keys(shiftTotals).forEach(function (element) {
       var shifted = damage.physical * shiftTotals[element] / 100;
-      damage[element] += shifted * (1 - $scope.sections.mitigation.resistance[element] / 100);
+      damage[element] += shifted * (1 - $scope.sections.mitigation.resistance[element] / 100)  || 0;
     });
     damage.physical -= damage.physical * $scope.sections.shift.tables.shifts.totals.total / 100;
 
@@ -180,7 +180,7 @@ angular.module('PathOfDamage', ['ui.select'])
     var manaLeft = $scope.sections.mitigation.manaPool;
     var manaTotals = $scope.sections.shift.tables.mana.totals;
     Object.keys(manaTotals).forEach(function (element) {
-      var taken = Math.min(damage[element] * manaTotals[element] / 100, manaLeft);
+      var taken = Math.min(damage[element] * manaTotals[element] / 100, manaLeft) || 0;
       damage[element] -= taken;
       manaLeft -= taken;
     });
