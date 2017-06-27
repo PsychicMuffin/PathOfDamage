@@ -220,13 +220,14 @@ angular.module('PathOfDamage', ['ui.select'])
     var calc = calcDamage(hit);
     var start = Math.round(Math.log10($scope.sections.mitigation.health + $scope.sections.mitigation.es)) - 1;
     for (var i = start; i > -1; i--){
-      while (calc.healthRemaining + calc.esRemaining > 0) {
+      var l = 0;
+      while (calc.healthRemaining + calc.esRemaining > 0 && l++ < 1000) {
         hit+= Math.pow(10,i);
         calc = calcDamage(hit);
       }
       hit -= Math.pow(10,i);
     }
-    return hit;
+    return l < 1000 ? hit : "Error";
   };
 
   function serializeData() {
