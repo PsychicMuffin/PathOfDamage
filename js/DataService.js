@@ -125,7 +125,8 @@ angular.module('PathOfDamage')
         mitigation: {
           name: "Damage Mitigation",
           description: "Elemental and chaos damage is mitigated by its respective resistance. Physical damage is mitigated by the sum of all '% additional Physical Damage Reduction' modifiers, up to its 90% cap. This includes armor, endurance charges, and things like Basalt Flasks and Chaos Golem.",
-          healthPool: 5000,
+          health: 5000,
+          es: 0,
           manaPool: 1000,
           armor: 0,
           charges: 0,
@@ -186,7 +187,8 @@ angular.module('PathOfDamage')
       dataString += scope.sections.mitigation.resistance.cold + SECTION_DELIMITER;
       dataString += scope.sections.mitigation.resistance.lightning + SECTION_DELIMITER;
       dataString += scope.sections.mitigation.resistance.chaos + SECTION_DELIMITER;
-      dataString += scope.sections.mitigation.healthPool + SECTION_DELIMITER;
+      dataString += scope.sections.mitigation.health + SECTION_DELIMITER;
+      dataString += scope.sections.mitigation.es + SECTION_DELIMITER;
       dataString += scope.sections.mitigation.manaPool;
       return dataString;
     },
@@ -210,7 +212,8 @@ angular.module('PathOfDamage')
       scope.sections.mitigation.resistance.cold = parseIntOrNull(sections[i++]);
       scope.sections.mitigation.resistance.lightning = parseIntOrNull(sections[i++]);
       scope.sections.mitigation.resistance.chaos = parseIntOrNull(sections[i++]);
-      scope.sections.mitigation.healthPool = parseIntOrNull(sections[i++]);
+      scope.sections.mitigation.health = parseIntOrNull(sections[i++]);
+      scope.sections.mitigation.es = parseIntOrNull(sections[i++]);
       scope.sections.mitigation.manaPool = parseIntOrNull(sections[i]);
     }
   };

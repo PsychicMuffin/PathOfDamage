@@ -95,8 +95,8 @@ angular.module('PathOfDamage', ['ui.select'])
     }
   };
 
-  $scope.getBarWidth = function (damage) {
-    var percent = (damage / $scope.sections.mitigation.healthPool) * 99;
+  $scope.getBarWidth = function (remaining) {
+    var percent = (remaining / ($scope.sections.mitigation.health + $scope.sections.mitigation.es)) * 99;
     if (percent > 99) {
       percent = 99;
     }
@@ -177,33 +177,52 @@ angular.module('PathOfDamage', ['ui.select'])
       damage[element] *= 1 + moreTotals[element] / 100;
     });
 
-    var manaLeft = $scope.sections.mitigation.manaPool;
-    var manaTotals = $scope.sections.shift.tables.mana.totals;
-    Object.keys(manaTotals).forEach(function (element) {
-      var taken = Math.min(damage[element] * manaTotals[element] / 100, manaLeft) || 0;
-      damage[element] -= taken;
-      manaLeft -= taken;
-    });
-
     var eleDamage = damage.fire + damage.cold + damage.lightning + damage.chaos;
     var totalTaken = Math.round(damage.physical + eleDamage);
+
+    if ($scope.sections.mitigation.es >= totalTaken) {
+      //Damage taken from mana before health is ignored if ES absorbs all of the damage
+      var esTaken = totalTaken;
+      var healthTaken = 0;
+    } else {
+      esTaken = $scope.sections.mitigation.es;
+
+      var manaLeft = $scope.sections.mitigation.manaPool;
+      var manaTotals = $scope.sections.shift.tables.mana.totals;
+      var percentTakenAsHealth = 1- (esTaken / totalTaken);
+      Object.keys(manaTotals).forEach(function (element) {
+        var taken = Math.min(damage[element] * manaTotals[element] * percentTakenAsHealth / 100, manaLeft) || 0;
+        damage[element] -= taken;
+        manaLeft -= taken;
+      });
+
+      eleDamage = damage.fire + damage.cold + damage.lightning + damage.chaos;
+      totalTaken = Math.round(damage.physical + eleDamage);
+      healthTaken = Math.max(totalTaken - esTaken, 0);
+    }
+
     return {
       hit: hit,
-      taken: totalTaken,
+      totalTaken: totalTaken,
+      healthTaken: healthTaken,
+      esTaken: esTaken,
       physTaken: Math.round(damage.physical),
       eleTaken: Math.round(eleDamage),
       manaTaken: Math.round($scope.sections.mitigation.manaPool - manaLeft),
       mitigated: hit - totalTaken,
-      remaining: $scope.sections.mitigation.healthPool - totalTaken
+      healthRemaining: $scope.sections.mitigation.health - healthTaken,
+      esRemaining: $scope.sections.mitigation.es - esTaken
     }
   }
 
   $scope.getMaximumSurvivableHit = function () {
     var hit = 0;
-    var start = Math.round(Math.log10($scope.sections.mitigation.healthPool)) + 1;
+    var calc = calcDamage(hit);
+    var start = Math.round(Math.log10($scope.sections.mitigation.health + $scope.sections.mitigation.es)) - 1;
     for (var i = start; i > -1; i--){
-      while (calcDamage(hit).remaining > 0) {
+      while (calc.healthRemaining + calc.esRemaining > 0) {
         hit+= Math.pow(10,i);
+        calc = calcDamage(hit);
       }
       hit -= Math.pow(10,i);
     }

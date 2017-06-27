@@ -14,10 +14,14 @@
 
 .damageTable .label {
     padding-top: 5px;
-    padding-right: 20px;
+    padding-right: 10px;
     width: 100%;
     text-align: right;
     display: inline-block;
+}
+
+.damageTable .label.health {
+    padding-right: 5px;
 }
 
 .damageTable .maxHit {
@@ -60,6 +64,12 @@
 .damageTable .damageOutput .health {
     background-color: #FF0000;
     border-bottom: 1px solid #8B0000;
+}
+
+.damageTable .damageOutput .es {
+    border-top: 1px solid #B0FFFF;
+    background-color: #E0FFFF;
+    border-bottom: 1px solid #00BFFF;
 }
 
 .damageTable .damageOutput .physical {
@@ -107,6 +117,10 @@
 
 .damageTable .table-striped tr:nth-of-type(odd) {
     background-color: #F3FAFA;
+}
+
+.healthPoolContainer {
+    display: flex;
 }
 
 .resistanceHeader {
