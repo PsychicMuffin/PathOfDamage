@@ -187,7 +187,7 @@ angular.module('PathOfDamage', ['ui.select'])
     } else {
       esTaken = $scope.sections.mitigation.es;
 
-      var manaLeft = $scope.sections.mitigation.manaPool;
+      var manaLeft = $scope.sections.mitigation.mana;
       var manaTotals = $scope.sections.shift.tables.mana.totals;
       var percentTakenAsHealth = 1- (esTaken / totalTaken);
       Object.keys(manaTotals).forEach(function (element) {
@@ -208,7 +208,7 @@ angular.module('PathOfDamage', ['ui.select'])
       esTaken: esTaken,
       physTaken: Math.round(damage.physical),
       eleTaken: Math.round(eleDamage),
-      manaTaken: Math.round($scope.sections.mitigation.manaPool - manaLeft),
+      manaTaken: Math.round($scope.sections.mitigation.mana - manaLeft),
       mitigated: hit - totalTaken,
       healthRemaining: $scope.sections.mitigation.health - healthTaken,
       esRemaining: $scope.sections.mitigation.es - esTaken
@@ -219,15 +219,15 @@ angular.module('PathOfDamage', ['ui.select'])
     var hit = 0;
     var calc = calcDamage(hit);
     var start = Math.round(Math.log10($scope.sections.mitigation.health + $scope.sections.mitigation.es)) - 1;
+    var calcLimit = 0;
     for (var i = start; i > -1; i--){
-      var l = 0;
-      while (calc.healthRemaining + calc.esRemaining > 0 && l++ < 1000) {
+      while (calc.healthRemaining > 0 && calcLimit++ < 1000) {
         hit+= Math.pow(10,i);
         calc = calcDamage(hit);
       }
       hit -= Math.pow(10,i);
     }
-    return l < 1000 ? hit : "Error";
+    return calcLimit < 1000 ? hit : "Error";
   };
 
   function serializeData() {
