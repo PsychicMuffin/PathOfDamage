@@ -95,8 +95,8 @@ angular.module('PathOfDamage', ['ui.select'])
     }
   };
 
-  $scope.getBarWidth = function (damage) {
-    var percent = (damage / $scope.sections.mitigation.healthPool) * 99;
+  $scope.getBarWidth = function (remaining) {
+    var percent = (remaining / ($scope.sections.mitigation.health + $scope.sections.mitigation.es)) * 99;
     if (percent > 99) {
       percent = 99;
     }
@@ -177,37 +177,57 @@ angular.module('PathOfDamage', ['ui.select'])
       damage[element] *= 1 + moreTotals[element] / 100;
     });
 
-    var manaLeft = $scope.sections.mitigation.manaPool;
-    var manaTotals = $scope.sections.shift.tables.mana.totals;
-    Object.keys(manaTotals).forEach(function (element) {
-      var taken = Math.min(damage[element] * manaTotals[element] / 100, manaLeft) || 0;
-      damage[element] -= taken;
-      manaLeft -= taken;
-    });
+    var totalTaken = Math.round(damage.physical + damage.fire + damage.cold + damage.lightning + damage.chaos);
+    var lifeTaken = Math.max(totalTaken - $scope.sections.mitigation.es, 0);
+    if (lifeTaken > 0) {
+      var takenFromMana = {};
+      var totalTakenFromMana = 0;
+
+      var manaTotals = $scope.sections.shift.tables.mana.totals;
+      Object.keys(manaTotals).forEach(function (element) {
+        takenFromMana[element] = damage[element] * manaTotals[element] / 100;
+        totalTakenFromMana += takenFromMana[element];
+      });
+      var normalizeManaTaken = Math.min($scope.sections.mitigation.mana / totalTakenFromMana, 1);
+
+      var percentTakenAsLife = lifeTaken / totalTaken;
+      Object.keys(takenFromMana).forEach(function (element) {
+        var actualTakenFromMana = takenFromMana[element] * normalizeManaTaken * percentTakenAsLife;
+        damage[element] -= actualTakenFromMana;
+        totalTaken -= actualTakenFromMana;
+        lifeTaken -= actualTakenFromMana;
+      });
+    }
 
     var eleDamage = damage.fire + damage.cold + damage.lightning + damage.chaos;
-    var totalTaken = Math.round(damage.physical + eleDamage);
+    var esTaken = Math.min(totalTaken, $scope.sections.mitigation.es);
+    var manaTaken = Math.min(totalTakenFromMana, $scope.sections.mitigation.mana);
+
     return {
       hit: hit,
-      taken: totalTaken,
+      totalTaken: Math.round(totalTaken),
       physTaken: Math.round(damage.physical),
       eleTaken: Math.round(eleDamage),
-      manaTaken: Math.round($scope.sections.mitigation.manaPool - manaLeft),
-      mitigated: hit - totalTaken,
-      remaining: $scope.sections.mitigation.healthPool - totalTaken
-    }
+      manaTaken: Math.round(manaTaken),
+      mitigated: Math.round(hit - totalTaken),
+      healthRemaining: Math.round($scope.sections.mitigation.health - lifeTaken),
+      esRemaining: Math.round($scope.sections.mitigation.es - esTaken)
+    };
   }
 
   $scope.getMaximumSurvivableHit = function () {
     var hit = 0;
-    var start = Math.round(Math.log10($scope.sections.mitigation.healthPool)) + 1;
+    var calc = calcDamage(hit);
+    var start = Math.round(Math.log10($scope.sections.mitigation.health + $scope.sections.mitigation.es)) - 1;
+    var calcLimit = 0;
     for (var i = start; i > -1; i--){
-      while (calcDamage(hit).remaining > 0) {
+      while (calc.healthRemaining > 0 && calcLimit++ < 1000) {
         hit+= Math.pow(10,i);
+        calc = calcDamage(hit);
       }
       hit -= Math.pow(10,i);
     }
-    return hit;
+    return calcLimit < 1000 ? hit : "Error";
   };
 
   function serializeData() {
