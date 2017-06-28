@@ -177,41 +177,40 @@ angular.module('PathOfDamage', ['ui.select'])
       damage[element] *= 1 + moreTotals[element] / 100;
     });
 
-    var eleDamage = damage.fire + damage.cold + damage.lightning + damage.chaos;
-    var totalTaken = Math.round(damage.physical + eleDamage);
-
-    if ($scope.sections.mitigation.es >= totalTaken) {
-      //Damage taken from mana before health is ignored if ES absorbs all of the damage
-      var esTaken = totalTaken;
-      var healthTaken = 0;
-    } else {
-      esTaken = $scope.sections.mitigation.es;
-
-      var manaLeft = $scope.sections.mitigation.manaPool;
+    var totalTaken = Math.round(damage.physical + damage.fire + damage.cold + damage.lightning + damage.chaos);
+    var lifeTaken = Math.max(totalTaken - $scope.sections.mitigation.es, 0);
+    if (lifeTaken > 0) {
+      var takenFromMana = {};
+      var totalTakenFromMana = 0;
       var manaTotals = $scope.sections.shift.tables.mana.totals;
-      var percentTakenAsHealth = 1- (esTaken / totalTaken);
       Object.keys(manaTotals).forEach(function (element) {
-        var taken = Math.min(damage[element] * manaTotals[element] * percentTakenAsHealth / 100, manaLeft) || 0;
-        damage[element] -= taken;
-        manaLeft -= taken;
+        takenFromMana[element] = damage[element] * manaTotals[element] / 100;
+        totalTakenFromMana += takenFromMana[element];
       });
+      var normalizeManaTaken = Math.min($scope.sections.mitigation.manaPool / totalTakenFromMana, 1);
 
-      eleDamage = damage.fire + damage.cold + damage.lightning + damage.chaos;
-      totalTaken = Math.round(damage.physical + eleDamage);
-      healthTaken = Math.max(totalTaken - esTaken, 0);
+      var percentTakenAsLife = lifeTaken / totalTaken;
+      Object.keys(takenFromMana).forEach(function (element) {
+        var actualTakenFromMana = takenFromMana[element] * normalizeManaTaken * percentTakenAsLife;
+        damage[element] -= actualTakenFromMana;
+        totalTaken -= actualTakenFromMana;
+        lifeTaken -= actualTakenFromMana;
+      });
     }
+
+    var eleDamage = damage.fire + damage.cold + damage.lightning + damage.chaos;
+    var esTaken = Math.min(totalTaken, $scope.sections.mitigation.es);
+    var manaTaken = Math.min(totalTakenFromMana, $scope.sections.mitigation.manaPool);
 
     return {
       hit: hit,
-      totalTaken: totalTaken,
-      healthTaken: healthTaken,
-      esTaken: esTaken,
+      totalTaken: Math.round(totalTaken),
       physTaken: Math.round(damage.physical),
       eleTaken: Math.round(eleDamage),
-      manaTaken: Math.round($scope.sections.mitigation.manaPool - manaLeft),
-      mitigated: hit - totalTaken,
-      healthRemaining: $scope.sections.mitigation.health - healthTaken,
-      esRemaining: $scope.sections.mitigation.es - esTaken
+      manaTaken: Math.round(manaTaken),
+      mitigated: Math.round(hit - totalTaken),
+      healthRemaining: Math.round($scope.sections.mitigation.health - lifeTaken),
+      esRemaining: Math.round($scope.sections.mitigation.es - esTaken)
     }
   }
 
