@@ -188,7 +188,7 @@ angular.module('PathOfDamage', ['ui.select'])
         takenFromMana[element] = damage[element] * manaTotals[element] / 100;
         totalTakenFromMana += takenFromMana[element];
       });
-      var normalizeManaTaken = Math.min($scope.sections.mitigation.manaPool / totalTakenFromMana, 1);
+      var normalizeManaTaken = Math.min($scope.sections.mitigation.mana / totalTakenFromMana, 1);
 
       var percentTakenAsLife = lifeTaken / totalTaken;
       Object.keys(takenFromMana).forEach(function (element) {
@@ -201,7 +201,7 @@ angular.module('PathOfDamage', ['ui.select'])
 
     var eleDamage = damage.fire + damage.cold + damage.lightning + damage.chaos;
     var esTaken = Math.min(totalTaken, $scope.sections.mitigation.es);
-    var manaTaken = Math.min(totalTakenFromMana, $scope.sections.mitigation.manaPool);
+    var manaTaken = Math.min(totalTakenFromMana, $scope.sections.mitigation.mana);
 
     return {
       hit: hit,
