@@ -55,6 +55,7 @@
                  ng-model="section.armor"
                  id="armor"
                  ng-change="updateDamageValues()"
+                 ng-model-options="{debounce: 200}"
                  select-all-on-click>
         </label>
         <label>Endurance Charges:
@@ -64,6 +65,7 @@
                  ng-model="section.charges"
                  id="charges"
                  ng-change="updateDamageValues()"
+                 ng-model-options="{debounce: 200}"
                  select-all-on-click>
         </label>
       </div>
@@ -92,6 +94,7 @@
                        ng-model="row.value"
                        ng-change="add(table)"
                        ng-attr-id="{{tableName}}"
+                       ng-model-options="{debounce: 200}"
                        select-all-on-click>
                 <div ng-if="tableName !== 'flat'" class="inputGroupAddon">%</div>
                 <div ng-if="tableName == 'flat'"
@@ -191,6 +194,7 @@
                ng-model="hits[$index].hit"
                ng-change="updateHitRow($index)"
                ng-blur="deleteEmptyRow($index)"
+               ng-model-options="{debounce: 200}"
                select-all-on-click>
       </td>
       <td class="damageOutput"><span class="taken">{{hit.totalTaken}}</span>
@@ -220,6 +224,7 @@
              max="100"
              ng-model="sections.mitigation.resistance[name]"
              ng-change="updateDamageValues()"
+             ng-model-options="{debounce: 200}"
              select-all-on-click>
     </label>
   </div>
@@ -231,6 +236,7 @@
              ng-model="sections.mitigation.health"
              ng-change="updateDamageValues()"
              ng-required="true"
+             ng-model-options="{debounce: 200}"
              select-all-on-click>
     </label>
     <label class="label es">ES:
@@ -240,6 +246,7 @@
              ng-model="sections.mitigation.es"
              ng-change="updateDamageValues()"
              ng-required="true"
+             ng-model-options="{debounce: 200}"
              select-all-on-click>
     </label>
   </div>
@@ -249,6 +256,7 @@
            min="0"
            ng-model="sections.mitigation.mana"
            ng-change="updateDamageValues()"
+           ng-model-options="{debounce: 200}"
            select-all-on-click>
   </label>
 </div>
