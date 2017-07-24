@@ -214,7 +214,7 @@
       </td>
     </tr>
   </table>
-  <div class="maxHit">Maximum survivable hit: {{getMaximumSurvivableHit()}}</div>
+  <div class="maxHit">Maximum survivable hit: {{maxSurvivableHit}}</div>
   <div class="resistanceHeader">Resistances:</div>
   <div class="resistanceContainer">
     <label ng-repeat="(name, value) in sections.mitigation.resistance"
@@ -258,6 +258,18 @@
            ng-change="updateDamageValues()"
            ng-model-options="{debounce: 200}"
            select-all-on-click>
+  </label>
+  <label class="label">Chaos Blocked by ES:
+    <input class="input number noIncrement pool"
+           type="checkbox"
+           ng-model="sections.mitigation.chaosBlocked"
+           ng-change="updateDamageValues()">
+  </label>
+  <label class="label">Chaos Immune:
+    <input class="input number noIncrement pool"
+           type="checkbox"
+           ng-model="sections.mitigation.chaosImmune"
+           ng-change="updateDamageValues()">
   </label>
 </div>
 </body>
