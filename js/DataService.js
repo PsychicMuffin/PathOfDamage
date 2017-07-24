@@ -136,6 +136,8 @@ angular.module('PathOfDamage')
             lightning: 75,
             chaos: -60
           },
+          chaosImmune: false,
+          chaosBlocked: false,
           tables: {
             reduction: new DamageReductionTable()
           }
@@ -189,7 +191,9 @@ angular.module('PathOfDamage')
       dataString += scope.sections.mitigation.resistance.chaos + SECTION_DELIMITER;
       dataString += scope.sections.mitigation.health + SECTION_DELIMITER;
       dataString += scope.sections.mitigation.es + SECTION_DELIMITER;
-      dataString += scope.sections.mitigation.mana;
+      dataString += scope.sections.mitigation.mana + SECTION_DELIMITER;
+      dataString += encodeBoolean(scope.sections.mitigation.chaosBlocked);
+      dataString += encodeBoolean(scope.sections.mitigation.chaosImmune);
       return dataString;
     },
     decodeData: function (scope, dataString) {
@@ -214,7 +218,9 @@ angular.module('PathOfDamage')
       scope.sections.mitigation.resistance.chaos = parseIntOrNull(sections[i++]);
       scope.sections.mitigation.health = parseIntOrNull(sections[i++]);
       scope.sections.mitigation.es = parseIntOrNull(sections[i++]);
-      scope.sections.mitigation.mana = parseIntOrNull(sections[i]);
+      scope.sections.mitigation.mana = parseIntOrNull(sections[i++]);
+      scope.sections.mitigation.chaosBlocked = decodeBoolean(sections[i].charAt(0));
+      scope.sections.mitigation.chaosImmune = decodeBoolean(sections[i].charAt(1));
     }
   };
 
@@ -243,9 +249,13 @@ angular.module('PathOfDamage')
   function encodeElements(elements) {
     var encoded = '';
     ELEMENTS.forEach(function (element) {
-      encoded += +(elements[element]);
+      encoded += encodeBoolean(elements[element]);
     });
     return parseInt(encoded, 2).toString(36);
+  }
+
+  function encodeBoolean(boolean) {
+    return +boolean;
   }
 
   function decodeTable(table, tableString) {
@@ -254,7 +264,7 @@ angular.module('PathOfDamage')
       for (var i = 0; i < rows.length; i++) {
         var values = rows[i].split(VALUE_DELIMITER);
         table.addRow(
-            values[0].slice(0, 1) === '1',
+            decodeBoolean(values[0].slice(0, 1)),
             values[0].slice(1),
             parseIntOrNull(values[1]),
             decodeElements(values[2])
@@ -269,10 +279,14 @@ angular.module('PathOfDamage')
       var booleans = parseInt(encodedElements, 36).toString(2).split('');
       var index = booleans.length;
       for (var i = ELEMENTS.length; i-- > 0;) {
-        elements[ELEMENTS[i]] = booleans[--index] === '1';
+        elements[ELEMENTS[i]] = decodeBoolean(booleans[--index]);
       }
       return elements;
     }
+  }
+
+  function decodeBoolean(string) {
+    return string === '1';
   }
 
   function parseIntOrNull(string) {

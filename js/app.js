@@ -6,11 +6,14 @@ angular.module('PathOfDamage', ['ui.select'])
   $scope.sections = DataService.getSections();
   $scope.items = Items.getItems();
   $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
+  $scope.maxSurvivableHit = 0;
   $scope.selected = {};
   const damageTable = angular.element(document.getElementById('damageTable'))[0];
   const addButton = angular.element(document.getElementById('addButton'))[0];
   var quickAdd;  //Timeout required so that the angular directive can add the DOM elements on render
-  setTimeout(function() { quickAdd = angular.element(document.getElementsByClassName('ui-select-focusser'))[0] }, 100);
+  setTimeout(function () {
+    quickAdd = angular.element(document.getElementsByClassName('ui-select-focusser'))[0]
+  }, 100);
   var windowHeight = $window.innerHeight;
   var throttled = false;
 
@@ -31,9 +34,11 @@ angular.module('PathOfDamage', ['ui.select'])
     }
   };
 
-  $scope.focusAddButton = function() {
+  $scope.focusAddButton = function () {
     //timeout required so that the ui-selector can finish re-rendering
-    setTimeout(function() { addButton.focus() },10);
+    setTimeout(function () {
+      addButton.focus()
+    }, 10);
   };
 
   $scope.setElement = function (table, row, element) {
@@ -75,6 +80,7 @@ angular.module('PathOfDamage', ['ui.select'])
     $scope.hits = $scope.hits.map(function (hit) {
       return hit.hit ? calcDamage(hit.hit) : hit;
     });
+    updateMaxSurvivableHit();
     if (!skipSerialization) {
       serializeData();
     }
@@ -138,6 +144,8 @@ angular.module('PathOfDamage', ['ui.select'])
       chaos: 0
     };
 
+    var mitigation = $scope.sections.mitigation;
+
     var monsterIncrease = $scope.sections.monster.tables.increase.totals.total / 100;
     damage.physical *= (1 + monsterIncrease);
 
@@ -145,15 +153,15 @@ angular.module('PathOfDamage', ['ui.select'])
     damage.physical *= (1 + monsterMore);
 
     var shiftTotals = $scope.sections.shift.tables.shifts.totals;
-    Object.keys(shiftTotals).forEach(function (element) {
+    Object.keys(damage).forEach(function (element) {
       var shifted = damage.physical * shiftTotals[element] / 100;
-      damage[element] += shifted * (1 - $scope.sections.mitigation.resistance[element] / 100)  || 0;
+      damage[element] += shifted * (1 - mitigation.resistance[element] / 100) || 0;
     });
     damage.physical -= damage.physical * $scope.sections.shift.tables.shifts.totals.total / 100;
 
-    var armor = $scope.sections.mitigation.armor / (+$scope.sections.mitigation.armor + 10 * damage.physical) || 0;
-    var endurance = $scope.sections.mitigation.charges * .04 || 0;
-    var additional = $scope.sections.mitigation.tables.reduction.totals.total / 100;
+    var armor = mitigation.armor / (+mitigation.armor + 10 * damage.physical) || 0;
+    var endurance = mitigation.charges * .04 || 0;
+    var additional = mitigation.tables.reduction.totals.total / 100;
     var reduction = armor + endurance + additional;
     if (reduction > .9) {
       reduction = .9;
@@ -161,74 +169,94 @@ angular.module('PathOfDamage', ['ui.select'])
     damage.physical *= (1 - reduction);
 
     var flatTotals = $scope.sections.taken.tables.flat.totals;
-    Object.keys(flatTotals).forEach(function (element) {
+    Object.keys(damage).forEach(function (element) {
       if (damage[element] > 0) {
         damage[element] = Math.max(damage[element] + flatTotals[element], 0);
       }
     });
 
     var increasedTotals = $scope.sections.taken.tables.increased.totals;
-    Object.keys(increasedTotals).forEach(function (element) {
+    Object.keys(damage).forEach(function (element) {
       damage[element] *= 1 + increasedTotals[element] / 100;
     });
 
     var moreTotals = $scope.sections.taken.tables.more.totals;
-    Object.keys(moreTotals).forEach(function (element) {
+    Object.keys(damage).forEach(function (element) {
       damage[element] *= 1 + moreTotals[element] / 100;
     });
 
-    var totalTaken = Math.round(damage.physical + damage.fire + damage.cold + damage.lightning + damage.chaos);
-    var lifeTaken = Math.max(totalTaken - $scope.sections.mitigation.es, 0);
-    if (lifeTaken > 0) {
-      var takenFromMana = {};
-      var totalTakenFromMana = 0;
+    if (mitigation.chaosImmune) {
+      damage.chaos = 0;
+    }
 
+    // Energy shield calculations
+    var esDamage = Object.assign({}, damage);
+    if (!mitigation.chaosBlocked) {
+      delete esDamage.chaos;
+    }
+    var totalEsDamage = totalValues(esDamage);
+    var esNormalization = Math.min(mitigation.es / totalEsDamage, 1) || 0;
+
+    var lifeDamage = {chaos: damage.chaos};
+    Object.keys(esDamage).forEach(function (element) {
+      lifeDamage[element] = esDamage[element] - esDamage[element] * esNormalization;
+    });
+    var totalLifeDamage = totalValues(lifeDamage);
+
+    // Mind over Mater calculations
+    if (totalLifeDamage > 0) {
+      var manaDamage = {};
       var manaTotals = $scope.sections.shift.tables.mana.totals;
       Object.keys(manaTotals).forEach(function (element) {
-        takenFromMana[element] = damage[element] * manaTotals[element] / 100;
-        totalTakenFromMana += takenFromMana[element];
+        manaDamage[element] = lifeDamage[element] * manaTotals[element] / 100;
       });
-      var normalizeManaTaken = Math.min($scope.sections.mitigation.mana / totalTakenFromMana, 1);
+      var totalManaDamage = totalValues(manaDamage);
+      var manaNormalization = Math.min(mitigation.mana / totalManaDamage, 1);
 
-      var percentTakenAsLife = lifeTaken / totalTaken;
-      Object.keys(takenFromMana).forEach(function (element) {
-        var actualTakenFromMana = takenFromMana[element] * normalizeManaTaken * percentTakenAsLife;
-        damage[element] -= actualTakenFromMana;
-        totalTaken -= actualTakenFromMana;
-        lifeTaken -= actualTakenFromMana;
+      Object.keys(manaDamage).forEach(function (element) {
+        var normalizedManaDamage = manaDamage[element] * manaNormalization;
+        damage[element] -= normalizedManaDamage;
+        totalLifeDamage -= normalizedManaDamage;
       });
     }
 
+    var totalDamage = damage.physical + damage.fire + damage.cold + damage.lightning + damage.chaos;
     var eleDamage = damage.fire + damage.cold + damage.lightning + damage.chaos;
-    var esTaken = Math.min(totalTaken, $scope.sections.mitigation.es);
-    var manaTaken = Math.min(totalTakenFromMana, $scope.sections.mitigation.mana);
+    var esTaken = Math.min(totalEsDamage, mitigation.es);
+    var manaTaken = Math.min(totalManaDamage, mitigation.mana);
 
     return {
       hit: hit,
-      totalTaken: Math.round(totalTaken),
+      totalTaken: Math.round(totalDamage),
       physTaken: Math.round(damage.physical),
       eleTaken: Math.round(eleDamage),
       manaTaken: Math.round(manaTaken),
-      mitigated: Math.round(hit - totalTaken),
-      healthRemaining: Math.round($scope.sections.mitigation.health - lifeTaken),
-      esRemaining: Math.round($scope.sections.mitigation.es - esTaken)
+      mitigated: Math.round(hit - totalDamage),
+      healthRemaining: Math.round(mitigation.health - totalLifeDamage),
+      esRemaining: Math.round(mitigation.es - esTaken)
     };
   }
 
-  $scope.getMaximumSurvivableHit = function () {
+  function totalValues(object) {
+    return Object.keys(object).reduce(function (previous, key) {
+      return previous + object[key];
+    }, 0)
+  }
+
+  function updateMaxSurvivableHit() {
     var hit = 0;
     var start = Math.round(Math.log10($scope.sections.mitigation.health)) - 1;
     var calcLimit = 0;
-    for (var i = start; i > -1; i--){
+    for (var i = start; i > -1; i--) {
       var calc = calcDamage(hit);
       while (calc.healthRemaining > 0 && calcLimit++ < 1000) {
-        hit+= Math.pow(10,i);
+        hit += Math.pow(10, i);
         calc = calcDamage(hit);
       }
-      hit -= Math.pow(10,i);
+      hit -= Math.pow(10, i);
     }
-    return calcLimit < 1000 ? hit : "Error";
-  };
+    $scope.maxSurvivableHit = calcLimit < 1000 ? hit : 'Error';
+  }
 
   function serializeData() {
     var stringified = DataService.encodeData($scope);
