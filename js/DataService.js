@@ -1,6 +1,6 @@
 angular.module('PathOfDamage')
 .service('DataService', function () {
-  var ELEMENTS;
+  const ELEMENTS = ['physical', 'fire', 'cold', 'lightning', 'chaos'];
   const VALUE_DELIMITER = '\r';
   const ROW_DELIMITER = '\f';
   const SECTION_DELIMITER = '\0';
@@ -117,110 +117,123 @@ angular.module('PathOfDamage')
   }
 
   return {
-    init: function(elements) {
-      ELEMENTS = elements;
-    },
-    getSections: function () {
+    getMitigation: function () {
       return {
-        mitigation: {
-          name: "Damage Mitigation",
-          description: "Elemental and chaos damage is mitigated by its respective resistance. Physical damage is mitigated by the sum of all '% additional Physical Damage Reduction' modifiers, up to its 90% cap. This includes armor, endurance charges, and things like Basalt Flasks and Chaos Golem.",
-          health: 5000,
-          es: 0,
-          mana: 1000,
-          armor: 0,
-          charges: 0,
-          resistance: {
-            fire: 75,
-            cold: 75,
-            lightning: 75,
-            chaos: -60
-          },
-          chaosImmune: false,
-          chaosBlocked: false,
-          tables: {
-            reduction: new DamageReductionTable()
-          }
+        name: "Damage Mitigation",
+        description: "Elemental and chaos damage is mitigated by its respective resistance. Physical damage is mitigated by the sum of all '% additional Physical Damage Reduction' modifiers, up to its 90% cap. This includes armor, endurance charges, and things like Basalt Flasks and Chaos Golem.",
+        health: 5000,
+        es: 0,
+        mana: 1000,
+        armor: 0,
+        charges: 0,
+        resistance: {
+          fire: 75,
+          cold: 75,
+          lightning: 75,
+          chaos: -60
         },
-        taken: {
-          name: "Damage Taken",
-          description: "After damage mitigation, modifiers to damage taken are applied. Flat amounts (±X Damage taken from Y, like Astramentis) are applied first, then the sum of all increases/reductions (% increased/reduced X Damage taken, like Fortify, Shock, and Abyssus) and lastly more/less multipliers (% more/less X Damage taken, like Arctic Armour).",
-          tables: {
-            flat: new FlatTakenTable(),
-            increased: new IncreasedTakenTable(),
-            more: new MoreTakenTable()
-          }
-        },
-        shift: {
-          name: "Damage Shifts",
-          description: "Modifiers that shift physical damage to elemental, typically reading like '% of Physical Damage taken as Y', such as Taste of Hate or Lightning Coil. Additionally, damage can be taken from mana like Mind over Matter.",
-          tables: {
-            shifts: new DamageShiftTable(),
-            mana: new DamageFromManaTable()
-          }
-        },
-        monster: {
-          name: "Monster Modifications",
-          description: "These are things that directly change a monster's damage before they attack, such as map mods or curses",
-          tables: {
-            increase: new MonsterIncreaseTable(),
-            more: new MonsterMoreTable()
-          }
+        chaosImmune: false,
+        chaosBlocked: false,
+        tables: {
+          reduction: new DamageReductionTable()
         }
-      };
+      }
     },
-    encodeData: function (scope) {
+    getDamageTaken: function () {
+      return {
+        name: "Damage Taken",
+        description: "After damage mitigation, modifiers to damage taken are applied. Flat amounts (±X Damage taken from Y, like Astramentis) are applied first, then the sum of all increases/reductions (% increased/reduced X Damage taken, like Fortify, Shock, and Abyssus) and lastly more/less multipliers (% more/less X Damage taken, like Arctic Armour).",
+        tables: {
+          flat: new FlatTakenTable(),
+          increased: new IncreasedTakenTable(),
+          more: new MoreTakenTable()
+        }
+      }
+    },
+    getShifts: function () {
+      return {
+        name: "Damage Shifts",
+        description: "Modifiers that shift physical damage to elemental, typically reading like '% of Physical Damage taken as Y', such as Taste of Hate or Lightning Coil. Additionally, damage can be taken from mana like Mind over Matter.",
+        tables: {
+          shifts: new DamageShiftTable(),
+          mana: new DamageFromManaTable()
+        }
+      }
+    },
+    getMonsterMods: function () {
+      return {
+        name: "Monster Modifications",
+        description: "These are things that directly change a monster's damage before they attack, such as map mods or curses",
+        tables: {
+          increase: new MonsterIncreaseTable(),
+          more: new MonsterMoreTable()
+        }
+      }
+    },
+    getHits: function () {
+      return [
+        {hit: 100},
+        {hit: 500},
+        {hit: 1000},
+        {hit: 2000},
+        {hit: 3000},
+        {hit: 5000},
+        {hit: 7500},
+        {hit: 10000}
+      ];
+    },
+    encodeData: function (mitigation, taken, shift, monster, hits) {
       var dataString = '';
-      dataString += encodeTable(scope.sections.monster.tables.increase.rows);
-      dataString += encodeTable(scope.sections.monster.tables.more.rows);
-      dataString += encodeTable(scope.sections.shift.tables.shifts.rows);
-      dataString += encodeTable(scope.sections.shift.tables.mana.rows);
-      dataString += encodeTable(scope.sections.mitigation.tables.reduction.rows);
-      dataString += encodeTable(scope.sections.taken.tables.flat.rows);
-      dataString += encodeTable(scope.sections.taken.tables.increased.rows);
-      dataString += encodeTable(scope.sections.taken.tables.more.rows);
-      scope.hits.slice(0, -1).map(function (hit, index, array) {
+      dataString += encodeTable(monster.tables.increase.rows);
+      dataString += encodeTable(monster.tables.more.rows);
+      dataString += encodeTable(shift.tables.shifts.rows);
+      dataString += encodeTable(shift.tables.mana.rows);
+      dataString += encodeTable(mitigation.tables.reduction.rows);
+      dataString += encodeTable(taken.tables.flat.rows);
+      dataString += encodeTable(taken.tables.increased.rows);
+      dataString += encodeTable(taken.tables.more.rows);
+      hits.slice(0, -1).map(function (hit, index, array) {
         var delimiter = index === array.length - 1 ? SECTION_DELIMITER : ROW_DELIMITER;
         dataString += hit.hit + delimiter;
       });
-      dataString += scope.sections.mitigation.armor + SECTION_DELIMITER;
-      dataString += scope.sections.mitigation.charges + SECTION_DELIMITER;
-      dataString += scope.sections.mitigation.resistance.fire + SECTION_DELIMITER;
-      dataString += scope.sections.mitigation.resistance.cold + SECTION_DELIMITER;
-      dataString += scope.sections.mitigation.resistance.lightning + SECTION_DELIMITER;
-      dataString += scope.sections.mitigation.resistance.chaos + SECTION_DELIMITER;
-      dataString += scope.sections.mitigation.health + SECTION_DELIMITER;
-      dataString += scope.sections.mitigation.es + SECTION_DELIMITER;
-      dataString += scope.sections.mitigation.mana + SECTION_DELIMITER;
-      dataString += encodeBoolean(scope.sections.mitigation.chaosBlocked);
-      dataString += encodeBoolean(scope.sections.mitigation.chaosImmune);
+      dataString += mitigation.armor + SECTION_DELIMITER;
+      dataString += mitigation.charges + SECTION_DELIMITER;
+      dataString += mitigation.resistance.fire + SECTION_DELIMITER;
+      dataString += mitigation.resistance.cold + SECTION_DELIMITER;
+      dataString += mitigation.resistance.lightning + SECTION_DELIMITER;
+      dataString += mitigation.resistance.chaos + SECTION_DELIMITER;
+      dataString += mitigation.health + SECTION_DELIMITER;
+      dataString += mitigation.es + SECTION_DELIMITER;
+      dataString += mitigation.mana + SECTION_DELIMITER;
+      dataString += encodeBoolean(mitigation.chaosBlocked);
+      dataString += encodeBoolean(mitigation.chaosImmune);
       return dataString;
     },
     decodeData: function (scope, dataString) {
       var i = 0;
       var sections = dataString.split(SECTION_DELIMITER);
-      decodeTable(scope.sections.monster.tables.increase, sections[i++]);
-      decodeTable(scope.sections.monster.tables.more, sections[i++]);
-      decodeTable(scope.sections.shift.tables.shifts, sections[i++]);
-      decodeTable(scope.sections.shift.tables.mana, sections[i++]);
-      decodeTable(scope.sections.mitigation.tables.reduction, sections[i++]);
-      decodeTable(scope.sections.taken.tables.flat, sections[i++]);
-      decodeTable(scope.sections.taken.tables.increased, sections[i++]);
-      decodeTable(scope.sections.taken.tables.more, sections[i++]);
+      decodeTable(scope.monster.tables.increase, sections[i++]);
+      decodeTable(scope.monster.tables.more, sections[i++]);
+      decodeTable(scope.shift.tables.shifts, sections[i++]);
+      decodeTable(scope.shift.tables.mana, sections[i++]);
+      decodeTable(scope.mitigation.tables.reduction, sections[i++]);
+      decodeTable(scope.taken.tables.flat, sections[i++]);
+      decodeTable(scope.taken.tables.increased, sections[i++]);
+      decodeTable(scope.taken.tables.more, sections[i++]);
       scope.hits = sections[i++].split(ROW_DELIMITER).map(function (hit) {
         return {hit: parseIntOrNull(hit)};
       });
-      scope.sections.mitigation.armor = parseIntOrNull(sections[i++]);
-      scope.sections.mitigation.charges = parseIntOrNull(sections[i++]);
-      scope.sections.mitigation.resistance.fire = parseIntOrNull(sections[i++]);
-      scope.sections.mitigation.resistance.cold = parseIntOrNull(sections[i++]);
-      scope.sections.mitigation.resistance.lightning = parseIntOrNull(sections[i++]);
-      scope.sections.mitigation.resistance.chaos = parseIntOrNull(sections[i++]);
-      scope.sections.mitigation.health = parseIntOrNull(sections[i++]);
-      scope.sections.mitigation.es = parseIntOrNull(sections[i++]);
-      scope.sections.mitigation.mana = parseIntOrNull(sections[i++]);
-      scope.sections.mitigation.chaosBlocked = decodeBoolean(sections[i].charAt(0));
-      scope.sections.mitigation.chaosImmune = decodeBoolean(sections[i].charAt(1));
+      scope.mitigation.armor = parseIntOrNull(sections[i++]);
+      scope.mitigation.charges = parseIntOrNull(sections[i++]);
+      scope.mitigation.resistance.fire = parseIntOrNull(sections[i++]);
+      scope.mitigation.resistance.cold = parseIntOrNull(sections[i++]);
+      scope.mitigation.resistance.lightning = parseIntOrNull(sections[i++]);
+      scope.mitigation.resistance.chaos = parseIntOrNull(sections[i++]);
+      scope.mitigation.health = parseIntOrNull(sections[i++]);
+      scope.mitigation.es = parseIntOrNull(sections[i++]);
+      scope.mitigation.mana = parseIntOrNull(sections[i++]);
+      scope.mitigation.chaosBlocked = decodeBoolean(sections[i].charAt(0));
+      scope.mitigation.chaosImmune = decodeBoolean(sections[i].charAt(1));
     }
   };
 

@@ -1,11 +1,14 @@
 angular.module('PathOfDamage', ['ui.select'])
-.controller('Damage', function ($scope, $document, $window, DataService, Items) {
+.controller('Damage', function ($scope, $document, $window, DataService, Modifiers) {
   const ELEMENTS = ['physical', 'fire', 'cold', 'lightning', 'chaos'];
 
-  DataService.init(ELEMENTS);
-  $scope.sections = DataService.getSections();
-  $scope.items = Items.getItems();
-  $scope.hits = [{hit: 100}, {hit: 500}, {hit: 1000}, {hit: 2000}, {hit: 3000}, {hit: 5000}, {hit: 7500}, {hit: 10000}];
+  $scope.mitigation = DataService.getMitigation();
+  $scope.taken = DataService.getDamageTaken();
+  $scope.shift = DataService.getShifts();
+  $scope.monster = DataService.getMonsterMods();
+  $scope.hits = DataService.getHits();
+  $scope.modifiers = Modifiers.getModifiers();
+
   $scope.maxSurvivableHit = 0;
   $scope.selected = {};
   const damageTable = angular.element(document.getElementById('damageTable'))[0];
@@ -18,16 +21,16 @@ angular.module('PathOfDamage', ['ui.select'])
   var throttled = false;
 
   $scope.quickAdd = function () {
-    if ($scope.selected.item) {
-      var item = $scope.selected.item;
-      if (item.elements) {
+    if ($scope.selected.modifier) {
+      var modifier = $scope.selected.modifier;
+      if (modifier.elements) {
         var elements = {physical: false, fire: false, cold: false, lightning: false, chaos: false};
-        item.elements.forEach(function (elementIndex) {
+        modifier.elements.forEach(function (elementIndex) {
           elements[ELEMENTS[elementIndex]] = true;
         });
       }
-      var table = $scope.sections[item.section].tables[item.table];
-      table.quickAddRow(item.name, item.value, elements);
+      var table = $scope[modifier.section].tables[modifier.table];
+      table.quickAddRow(modifier.name, modifier.value, elements);
       $scope.updateTotal(table);
       $scope.selected = {};
       quickAdd.focus();
@@ -102,7 +105,7 @@ angular.module('PathOfDamage', ['ui.select'])
   };
 
   $scope.getBarWidth = function (remaining) {
-    var percent = (remaining / ($scope.sections.mitigation.health + $scope.sections.mitigation.es)) * 99;
+    var percent = (remaining / ($scope.mitigation.health + $scope.mitigation.es)) * 99;
     if (percent > 99) {
       percent = 99;
     }
@@ -144,58 +147,53 @@ angular.module('PathOfDamage', ['ui.select'])
       chaos: 0
     };
 
-    var mitigation = $scope.sections.mitigation;
-
-    var monsterIncrease = $scope.sections.monster.tables.increase.totals.total / 100;
+    var monsterIncrease = $scope.monster.tables.increase.totals.total / 100;
     damage.physical *= (1 + monsterIncrease);
 
-    var monsterMore = $scope.sections.monster.tables.more.totals.total / 100;
+    var monsterMore = $scope.monster.tables.more.totals.total / 100;
     damage.physical *= (1 + monsterMore);
 
-    var shiftTotals = $scope.sections.shift.tables.shifts.totals;
+    var shiftTotals = $scope.shift.tables.shifts.totals;
     Object.keys(damage).forEach(function (element) {
       var shifted = damage.physical * shiftTotals[element] / 100;
-      damage[element] += shifted * (1 - mitigation.resistance[element] / 100) || 0;
+      damage[element] += shifted * (1 - $scope.mitigation.resistance[element] / 100) || 0;
     });
-    damage.physical -= damage.physical * $scope.sections.shift.tables.shifts.totals.total / 100;
+    damage.physical -= damage.physical * $scope.shift.tables.shifts.totals.total / 100;
 
-    var armor = mitigation.armor / (+mitigation.armor + 10 * damage.physical) || 0;
-    var endurance = mitigation.charges * .04 || 0;
-    var additional = mitigation.tables.reduction.totals.total / 100;
+    var armor = $scope.mitigation.armor / (+$scope.mitigation.armor + 10 * damage.physical) || 0;
+    var endurance = $scope.mitigation.charges * .04 || 0;
+    var additional = $scope.mitigation.tables.reduction.totals.total / 100;
     var reduction = armor + endurance + additional;
     if (reduction > .9) {
       reduction = .9;
     }
     damage.physical *= (1 - reduction);
 
-    var flatTotals = $scope.sections.taken.tables.flat.totals;
     Object.keys(damage).forEach(function (element) {
       if (damage[element] > 0) {
-        damage[element] = Math.max(damage[element] + flatTotals[element], 0);
+        damage[element] = Math.max(damage[element] + $scope.taken.tables.flat.totals[element], 0);
       }
     });
 
-    var increasedTotals = $scope.sections.taken.tables.increased.totals;
     Object.keys(damage).forEach(function (element) {
-      damage[element] *= 1 + increasedTotals[element] / 100;
+      damage[element] *= 1 + $scope.taken.tables.increased.totals[element] / 100;
     });
 
-    var moreTotals = $scope.sections.taken.tables.more.totals;
     Object.keys(damage).forEach(function (element) {
-      damage[element] *= 1 + moreTotals[element] / 100;
+      damage[element] *= 1 + $scope.taken.tables.more.totals[element] / 100;
     });
 
-    if (mitigation.chaosImmune) {
+    if ($scope.mitigation.chaosImmune) {
       damage.chaos = 0;
     }
 
     // Energy shield calculations
     var esDamage = Object.assign({}, damage);
-    if (!mitigation.chaosBlocked) {
+    if (!$scope.mitigation.chaosBlocked) {
       delete esDamage.chaos;
     }
     var totalEsDamage = totalValues(esDamage);
-    var esNormalization = Math.min(mitigation.es / totalEsDamage, 1) || 0;
+    var esNormalization = Math.min($scope.mitigation.es / totalEsDamage, 1) || 0;
 
     var lifeDamage = {chaos: damage.chaos};
     Object.keys(esDamage).forEach(function (element) {
@@ -206,12 +204,12 @@ angular.module('PathOfDamage', ['ui.select'])
     // Mind over Mater calculations
     if (totalLifeDamage > 0) {
       var manaDamage = {};
-      var manaTotals = $scope.sections.shift.tables.mana.totals;
+      var manaTotals = $scope.shift.tables.mana.totals;
       Object.keys(manaTotals).forEach(function (element) {
         manaDamage[element] = lifeDamage[element] * manaTotals[element] / 100;
       });
       var totalManaDamage = totalValues(manaDamage);
-      var manaNormalization = Math.min(mitigation.mana / totalManaDamage, 1);
+      var manaNormalization = Math.min($scope.mitigation.mana / totalManaDamage, 1);
 
       Object.keys(manaDamage).forEach(function (element) {
         var normalizedManaDamage = manaDamage[element] * manaNormalization;
@@ -222,8 +220,8 @@ angular.module('PathOfDamage', ['ui.select'])
 
     var totalDamage = damage.physical + damage.fire + damage.cold + damage.lightning + damage.chaos;
     var eleDamage = damage.fire + damage.cold + damage.lightning + damage.chaos;
-    var esTaken = Math.min(totalEsDamage, mitigation.es);
-    var manaTaken = Math.min(totalManaDamage, mitigation.mana);
+    var esTaken = Math.min(totalEsDamage, $scope.mitigation.es);
+    var manaTaken = Math.min(totalManaDamage, $scope.mitigation.mana);
 
     return {
       hit: hit,
@@ -232,8 +230,8 @@ angular.module('PathOfDamage', ['ui.select'])
       eleTaken: Math.round(eleDamage),
       manaTaken: Math.round(manaTaken),
       mitigated: Math.round(hit - totalDamage),
-      healthRemaining: Math.round(mitigation.health - totalLifeDamage),
-      esRemaining: Math.round(mitigation.es - esTaken)
+      healthRemaining: Math.round($scope.mitigation.health - totalLifeDamage),
+      esRemaining: Math.round($scope.mitigation.es - esTaken)
     };
   }
 
@@ -245,7 +243,7 @@ angular.module('PathOfDamage', ['ui.select'])
 
   function updateMaxSurvivableHit() {
     var hit = 0;
-    var start = Math.round(Math.log10($scope.sections.mitigation.health)) - 1;
+    var start = Math.round(Math.log10($scope.mitigation.health)) - 1;
     var calcLimit = 0;
     for (var i = start; i > -1; i--) {
       var calc = calcDamage(hit);
@@ -259,7 +257,7 @@ angular.module('PathOfDamage', ['ui.select'])
   }
 
   function serializeData() {
-    var stringified = DataService.encodeData($scope);
+    var stringified = DataService.encodeData($scope.mitigation, $scope.taken, $scope.shift, $scope.monster, $scope.hits);
     stringified = LZString.compressToEncodedURIComponent(stringified);
     window.history.pushState({}, '', '?' + stringified);
   }
@@ -277,8 +275,7 @@ angular.module('PathOfDamage', ['ui.select'])
   }
 
   // Add empty last row to tables
-  Object.keys($scope.sections).forEach(function (sectionKey) {
-    var section = $scope.sections[sectionKey];
+  [$scope.mitigation, $scope.taken, $scope.shift, $scope.monster].forEach(function (section) {
     Object.keys(section.tables).forEach(function (tableKey) {
       var table = section.tables[tableKey];
       table.addRow();
