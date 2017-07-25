@@ -7,7 +7,7 @@
   <script src="libs/lz-string.min.js"></script>
   <script src="js/app.js"></script>
   <script src="js/DataService.js"></script>
-  <script src="js/Items.js"></script>
+  <script src="js/Modifiers.js"></script>
   <script src="js/selectAllOnClick.js"></script>
   <script src="libs/ui-select/select.js"></script>
   <link rel="stylesheet" href="libs/ui-select/select.css">
@@ -30,20 +30,20 @@
   </div>
   <div class="inputSection">
     <div class="quickAddContainer">
-      <ui-select id="quickAdd" class="input" ng-model="selected.item" ng-change="focusAddButton()">
+      <ui-select id="quickAdd" class="input" ng-model="selected.modifier" ng-change="focusAddButton()">
         <ui-select-match placeholder="Quick Add...">
           <span ng-bind="$select.selected.name"></span>
         </ui-select-match>
-        <ui-select-choices repeat="item in (items | filter: $select.search) track by item.id">
-          <span ng-bind="item.name"></span>
+        <ui-select-choices repeat="modifier in (modifiers | filter: $select.search) track by modifier.id">
+          <span ng-bind="modifier.name"></span>
         </ui-select-choices>
       </ui-select>
       <div class="addButtonContainer">
-        <button id="addButton" class="button addButton" type="submit" ng-click="quickAdd()">Add</button>
+        <button id="addButton" class="button addButton" ng-click="quickAdd()">Add</button>
       </div>
     </div>
     <hr class="borderLine">
-    <div class="section" ng-repeat="(sectionName, section) in sections">
+    <div class="section" ng-repeat="section in [mitigation, taken, shift, monster]">
       <h4>{{section.name}}<br>
         <small><i>{{section.description}}</i></small>
       </h4>
@@ -80,7 +80,6 @@
             </td>
             <td class="name">
               <input class="input"
-                     type="text"
                      placeholder="Source Name"
                      spellcheck="false"
                      ng-model="row.name"
@@ -127,7 +126,7 @@
                 </tr>
               </table>
             </td>
-            <td ng-if="sectionName==='taken' || tableName==='mana'">
+            <td ng-if="section.name==='Damage Taken' || tableName==='mana'">
               <table class="multi elementSelector">
                 <tr>
                   <td><label class="select physical" ng-class="{selected: row.elements.physical}" title="Physical">
@@ -208,7 +207,7 @@
           <span ng-if="hit.eleTaken">Ele Damage Taken: {{hit.eleTaken}} <br/></span>
           <span ng-if="hit.manaTaken">Mana Damage Taken: {{hit.manaTaken}} <br/></span>
           Damage Mitigated: {{hit.mitigated}} <br/>
-          <span ng-if="sections.mitigation.es">ES Remaining: {{hit.esRemaining}} <br/></span>
+          <span ng-if="mitigation.es">ES Remaining: {{hit.esRemaining}} <br/></span>
           Health Remaining: {{hit.healthRemaining}}
         </div>
       </td>
@@ -217,12 +216,12 @@
   <div class="maxHit">Maximum survivable hit: {{maxSurvivableHit}}</div>
   <div class="resistanceHeader">Resistances:</div>
   <div class="resistanceContainer">
-    <label ng-repeat="(name, value) in sections.mitigation.resistance"
+    <label ng-repeat="(name, value) in mitigation.resistance"
            class="label resistance {{name}}" title="{{capitalize(name)}} resistance">
       <input class="input number noIncrement"
              type="number"
              max="100"
-             ng-model="sections.mitigation.resistance[name]"
+             ng-model="mitigation.resistance[name]"
              ng-change="updateDamageValues()"
              ng-model-options="{debounce: 200}"
              select-all-on-click>
@@ -233,7 +232,7 @@
       <input class="input number noIncrement pool"
              type="number"
              min="0"
-             ng-model="sections.mitigation.health"
+             ng-model="mitigation.health"
              ng-change="updateDamageValues()"
              ng-required="true"
              ng-model-options="{debounce: 200}"
@@ -243,7 +242,7 @@
       <input class="input number noIncrement pool"
              type="number"
              min="0"
-             ng-model="sections.mitigation.es"
+             ng-model="mitigation.es"
              ng-change="updateDamageValues()"
              ng-required="true"
              ng-model-options="{debounce: 200}"
@@ -254,7 +253,7 @@
     <input class="input number noIncrement pool"
            type="number"
            min="0"
-           ng-model="sections.mitigation.mana"
+           ng-model="mitigation.mana"
            ng-change="updateDamageValues()"
            ng-model-options="{debounce: 200}"
            select-all-on-click>
@@ -262,13 +261,13 @@
   <label class="label">Chaos Blocked by ES:
     <input class="input number noIncrement pool"
            type="checkbox"
-           ng-model="sections.mitigation.chaosBlocked"
+           ng-model="mitigation.chaosBlocked"
            ng-change="updateDamageValues()">
   </label>
   <label class="label">Chaos Immune:
     <input class="input number noIncrement pool"
            type="checkbox"
-           ng-model="sections.mitigation.chaosImmune"
+           ng-model="mitigation.chaosImmune"
            ng-change="updateDamageValues()">
   </label>
 </div>
