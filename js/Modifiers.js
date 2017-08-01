@@ -109,7 +109,7 @@ angular.module('PathOfDamage')
       return sort([
         new ManaTaken(70, 'Mind Over Matter', 30, [0, 1, 2, 3, 4]),
         new ManaTaken(71, 'Divine Guidance', 10, [0, 1, 2, 3, 4]),
-        new ManaTaken(72, 'Cloak of Defiance', 20, [0, 1, 2, 3, 4]),
+        new ManaTaken(72, 'Cloak of Defiance', 10, [0, 1, 2, 3, 4]),
         new ManaTaken(73, 'The Aylardex', 6, [0, 1, 2, 3, 4]),
         new ManaTaken(74, 'Mind of the Council', 30, [3]),
         new ManaTaken(75, 'Damage taken from Mana Corruption', 6, [0, 1, 2, 3, 4])
