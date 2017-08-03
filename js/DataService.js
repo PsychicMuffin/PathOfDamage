@@ -205,8 +205,7 @@ angular.module('PathOfDamage')
       dataString += mitigation.health + SECTION_DELIMITER;
       dataString += mitigation.es + SECTION_DELIMITER;
       dataString += mitigation.mana + SECTION_DELIMITER;
-      dataString += encodeBoolean(mitigation.chaosBlocked);
-      dataString += encodeBoolean(mitigation.chaosImmune);
+      dataString += encodeBooleans([mitigation.chaosBlocked, mitigation.chaosImmune]);
       return dataString;
     },
     decodeData: function (scope, dataString) {
@@ -232,15 +231,16 @@ angular.module('PathOfDamage')
       scope.mitigation.health = parseIntOrNull(sections[i++]);
       scope.mitigation.es = parseIntOrNull(sections[i++]);
       scope.mitigation.mana = parseIntOrNull(sections[i++]);
-      scope.mitigation.chaosBlocked = decodeBoolean(sections[i].charAt(0));
-      scope.mitigation.chaosImmune = decodeBoolean(sections[i].charAt(1));
+      var booleans = decodeBooleans(sections[i], 2);
+      scope.mitigation.chaosBlocked = booleans[0];
+      scope.mitigation.chaosImmune = booleans[1];
     }
   };
 
   function encodeTable(table) {
     var tableData = '';
     for (var i = 0; i < table.length - 1; i++) {
-      tableData += +table[i].enabled;
+      tableData += encodeBoolean(table[i].enabled);
       if (table[i].name) {
         tableData += table[i].name;
       }
@@ -250,7 +250,7 @@ angular.module('PathOfDamage')
       }
       if (table[i].elements) {
         tableData += VALUE_DELIMITER;
-        tableData += encodeElements(table[i].elements);
+        tableData += encodeBooleans(Object.values(table[i].elements));
       }
       if (i !== table.length - 2) {
         tableData += ROW_DELIMITER;
@@ -259,11 +259,10 @@ angular.module('PathOfDamage')
     return tableData + SECTION_DELIMITER;
   }
 
-  function encodeElements(elements) {
-    var encoded = '';
-    ELEMENTS.forEach(function (element) {
-      encoded += encodeBoolean(elements[element]);
-    });
+  function encodeBooleans(booleans) {
+    var encoded = booleans.reduce(function (sum, value) {
+      return encodeBoolean(value) + sum;
+    }, '');
     return parseInt(encoded, 2).toString(36);
   }
 
@@ -288,14 +287,23 @@ angular.module('PathOfDamage')
 
   function decodeElements(encodedElements) {
     if (encodedElements) {
-      var elements = [];
-      var booleans = parseInt(encodedElements, 36).toString(2).split('');
-      var index = booleans.length;
-      for (var i = ELEMENTS.length; i-- > 0;) {
-        elements[ELEMENTS[i]] = decodeBoolean(booleans[--index]);
-      }
+      var booleans = decodeBooleans(encodedElements, ELEMENTS.length);
+      var elements = {};
+      ELEMENTS.forEach(function (element, index) {
+        elements[element] = booleans[index];
+      });
       return elements;
     }
+  }
+
+  function decodeBooleans(encoded, length) {
+    var booleans = [];
+    var booleanString = parseInt(encoded, 36).toString(2);
+    var stringLength = booleanString.length;
+    for (var i = 0; i < length; i++) {
+      booleans[i] = decodeBoolean(booleanString[--stringLength]);
+    }
+    return booleans;
   }
 
   function decodeBoolean(string) {
